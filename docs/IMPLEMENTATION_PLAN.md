@@ -1,5 +1,18 @@
 # Plan de implementación
 
+## Iteración 05 — sistema de producto unificado
+
+- [x] Proteger `fc2a772`, crear `iteration-05-unified-product-system` y capturar baseline.
+- [x] Cerrar investigación práctica, principios y auditoría antes de modificar UI.
+- [x] Unificar shell, navegación Ink, header opcional, safe areas, sheets y feedback.
+- [x] Centralizar spacing, radios, superficies, botones, media provenance y motion.
+- [x] Reimplementar pilotos: portada 7, Guardados y Viaje.
+- [x] Aplicar plantilla editorial a portadas 7, 8 y 10 sin códigos decorativos.
+- [x] Auditar 28 Guardados y sustituir siete por fotografía real licenciada.
+- [x] Diferenciar de forma visible generated editorial y graphic fallback.
+- [x] Cerrar matriz final de navegador, capturas after y láminas before/after.
+- [ ] Reintentar los tres assets Commons limitados por HTTP 429 o solicitar imagen al usuario.
+
 ## Iteración 04 — TRAZA: viaje por capas
 
 El alcance, referencias y decisiones completas están documentados en `ITERATION_04_PLAN.md`, `REFERENCE_AUDIT.md` y `PATTERN_DECISIONS.md`.

@@ -16,13 +16,19 @@ El movimiento de Electric London explica relaciones espaciales y confirma accion
 - Comidas: selección destacada en lima, sustitución no destructiva y retirada reversible.
 - Traslados y anchors: expansión local sin desplazar la navegación fuera de su zona segura.
 
-## Parámetros
+## Tokens compartidos
 
-- Springs de capas: stiffness 285–360; damping 32–38.
-- Rotación máxima de portada: 11°.
-- Escala mínima de portada: 0.96.
-- Stagger de itinerario: 45 ms por card, limitado a 360 ms.
-- Toast: 4.2 s y acción de deshacer.
+Los componentes consumen `src/lib/motion.ts`; los valores no se redefinen de forma local.
+
+| Token | Valor | Uso |
+|---|---|---|
+| `gestureSpring` | stiffness 360, damping 32, mass 0.78 | navegación, controles y confirmaciones directas |
+| `layerSpring` | stiffness 285, damping 34, mass 0.9 | hojas, detalle y cambio de capa |
+| `softSpring` | stiffness 220, damping 30, mass 1 | reorganización y cambios editoriales suaves |
+| `quickEase` | 180 ms, cubic-bezier(0.22, 1, 0.36, 1) | estados CSS breves |
+| `layerEase` | 280 ms, cubic-bezier(0.22, 1, 0.36, 1) | entrada/salida CSS de superficies |
+
+La rotación máxima de portada es 11°, su escala mínima es 0.96, el stagger del itinerario es 45 ms por card (máximo 360 ms) y el toast permanece 4.2 s con acción de deshacer.
 
 ## Accesibilidad
 
