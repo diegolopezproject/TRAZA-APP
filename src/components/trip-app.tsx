@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { AnimatePresence, LayoutGroup, motion } from "motion/react";
-import type { Activity, ActivityLevel, DaySection, Place, PlaceAssignment, TransferPlan, Trip, UserPlan } from "@/domain/models";
+import type { Activity, ActivityLevel, ActivityPlacement, DaySection, Place, PlaceAssignment, TransferPlan, Trip, UserPlan } from "@/domain/models";
 import { activityTitleEs, es } from "@/content/es";
 import { createInitialLocalState, LocalTripRepository } from "@/data/local-trip-repository";
 import type { LocalTripState } from "@/data/local-trip-repository";
@@ -56,7 +56,14 @@ export function TripApp({ trip }: TripAppProps) {
           media: place.media,
         } : activity;
       });
-      return { ...day, activities: [...activities, ...local.userPlans.filter((plan) => plan.dayId === day.id)] };
+      const combined = [...activities, ...local.userPlans.filter((plan) => plan.dayId === day.id)];
+      const scoped = local.placements.filter((placement) => placement.dayId === day.id);
+      const ordered = [...combined].sort((a, b) => (scoped.find((item) => item.activityId === a.id)?.order ?? 999) - (scoped.find((item) => item.activityId === b.id)?.order ?? 999));
+      const withSections = ordered.map((activity) => {
+        const placement = scoped.find((item) => item.activityId === activity.id);
+        return placement ? { ...activity, section: placement.section } : activity;
+      });
+      return { ...day, activities: withSections };
     });
     return { ...trip, days, savedPlaces: local.places, transfers: local.transfers };
   }, [local, trip]);
@@ -169,6 +176,11 @@ export function TripApp({ trip }: TripAppProps) {
     persistWithUndo({ ...local, transfers }, "Traslados actualizados");
   }
 
+  function savePlacements(placements: ActivityPlacement[]) {
+    const otherDays = local.placements.filter((placement) => placement.dayId !== openDay?.id);
+    persist({ ...local, placements: [...otherDays, ...placements] });
+  }
+
   function resetLocalData() {
     const reset = repositoryRef.current?.reset() ?? createInitialLocalState(trip);
     setLocal(reset);
@@ -184,7 +196,7 @@ export function TripApp({ trip }: TripAppProps) {
 
         <BottomNav active={state.tab} onChange={(tab) => dispatch({ type: "CHANGE_TAB", tab })} />
 
-        <AnimatePresence>{openDay ? <DayItinerary key={openDay.id} day={openDay} dayIndex={openDayIndex} onClose={() => dispatch({ type: "CLOSE_DAY" })} onOpenActivity={openActivity} assignedItems={assignedItems} onEditAssignment={(placeId) => dispatch({ type: "OPEN_ASSIGNMENT", placeId })} onOpenPlace={setPlaceDetailId} onAddPlan={() => setPlanSheet({ dayId: openDay.id })} onEditPlan={(activity) => setPlanSheet({ dayId: openDay.id, planId: activity.id })} onOpenMeal={(activity) => setMealActivityId(activity.id)} /> : null}</AnimatePresence>
+        <AnimatePresence>{openDay ? <DayItinerary key={openDay.id} day={openDay} dayIndex={openDayIndex} onClose={() => dispatch({ type: "CLOSE_DAY" })} onOpenActivity={openActivity} assignedItems={assignedItems} onEditAssignment={(placeId) => dispatch({ type: "OPEN_ASSIGNMENT", placeId })} onOpenPlace={setPlaceDetailId} onAddPlan={() => setPlanSheet({ dayId: openDay.id })} onEditPlan={(activity) => setPlanSheet({ dayId: openDay.id, planId: activity.id })} onOpenMeal={(activity) => setMealActivityId(activity.id)} placements={local.placements} onSavePlacements={savePlacements} onOrganizeNotice={(message) => setNotice({ message })} /> : null}</AnimatePresence>
         <AnimatePresence>{detailActivity ? <ActivityDetail key={detailActivity.id} activity={detailActivity} nearbyPlaces={nearbyPlaces} onBack={() => dispatch({ type: "CLOSE_DETAIL" })} /> : null}</AnimatePresence>
         <AnimatePresence>{assignmentPlace ? <AssignmentSheet key={assignmentPlace.id} place={assignmentPlace} days={effectiveTrip.days} assignment={assignment} onAssign={(dayId, section, level) => assignPlace(assignmentPlace.id, dayId, section, level)} onRemove={() => removeAssignment(assignmentPlace.id)} onClose={() => dispatch({ type: "CLOSE_ASSIGNMENT" })} /> : null}</AnimatePresence>
         <AnimatePresence>{placeEditor ? <PlaceFormSheet key={placeEditor} place={editedPlace} onSave={savePlace} onDelete={editedPlace ? deletePlace : undefined} onClose={() => setPlaceEditor(null)} /> : null}</AnimatePresence>

@@ -58,6 +58,7 @@ describe("LocalTripRepository", () => {
       assignments: [{ placeId: restaurant.id, dayId: "2026-08-08", section: "afternoon", level: "nearby-option" }],
       mealSelections: [{ mealSlotId: "lunch", dayId: "2026-08-08", sourcePlaceId: restaurant.id }],
       userPlans: [{ ...plan, dayId: "2026-08-12" }],
+      placements: [{ activityId: "2026-08-12-local-plan-test", dayId: "2026-08-12", section: "evening", order: 0 }],
       transfers: initial.transfers.map((transfer) => transfer.id === "arrival-transfer" ? { ...transfer, transportType: "Tren" } : transfer),
     });
     const reloaded = new LocalTripRepository(seed, storage).load();
@@ -65,6 +66,7 @@ describe("LocalTripRepository", () => {
     expect(reloaded.mealSelections[0].sourcePlaceId).toBe(restaurant.id);
     expect(reloaded.places.some((place) => place.id === restaurant.id)).toBe(true);
     expect(reloaded.userPlans[0].dayId).toBe("2026-08-12");
+    expect(reloaded.placements[0].section).toBe("evening");
     expect(reloaded.transfers[0].transportType).toBe("Tren");
   });
 });

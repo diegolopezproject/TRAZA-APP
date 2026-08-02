@@ -75,6 +75,7 @@ await page.getByRole("dialog").waitFor();
 await page.waitForTimeout(450);
 await page.screenshot({ path: path.join(outputDir, "09-selector-restaurante.png") });
 await page.getByRole("button", { name: /GAIL's Bakery London Bridge/i }).click();
+await page.locator(".assignment-backdrop").waitFor({ state: "detached" });
 await page.getByText(/Comida · GAIL's Bakery London Bridge/i).waitFor();
 
 await page.reload({ waitUntil: "networkidle" });
@@ -83,9 +84,11 @@ await page.locator(".day-cover.is-active .open-day-handle").click();
 await page.getByText(/Comida · GAIL's Bakery London Bridge/i).waitFor();
 await page.getByRole("button", { name: "Cambiar restaurante" }).first().click();
 await page.getByRole("button", { name: /Bread Ahead Bakery/i }).click();
+await page.locator(".assignment-backdrop").waitFor({ state: "detached" });
 await page.getByText(/Comida · Bread Ahead Bakery/i).waitFor();
 await page.getByRole("button", { name: "Cambiar restaurante" }).first().click();
 await page.getByRole("button", { name: "Quitar restaurante" }).click();
+await page.locator(".assignment-backdrop").waitFor({ state: "detached" });
 await page.getByRole("button", { name: "Elegir restaurante" }).first().waitFor();
 
 await page.getByRole("button", { name: "Cerrar el itinerario y volver a la portada" }).click();
@@ -113,6 +116,8 @@ await humbleCard.scrollIntoViewIfNeeded();
 await humbleCard.getByRole("button", { name: /Añadir Humble Crumble/i }).click();
 await page.getByRole("dialog").waitFor();
 await page.getByRole("button", { name: /viernes · 7 de agosto/i }).click();
+await page.getByRole("button", { name: "Añadir al día" }).click();
+await page.locator(".assignment-backdrop").waitFor({ state: "detached" });
 await page.reload({ waitUntil: "networkidle" });
 await page.getByRole("button", { name: "Guardados" }).click();
 await page.locator(".saved-card").filter({ hasText: "Humble Crumble" }).getByText(/Añadido al 7 de agosto/i).waitFor();

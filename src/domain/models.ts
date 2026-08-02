@@ -20,7 +20,7 @@ export interface MediaAsset {
   sourceUrl?: string;
   author?: string;
   license?: string;
-  kind: "photo" | "illustration" | "graphic";
+  kind: "photo" | "illustration" | "graphic" | "generated-editorial" | "fallback";
   editorial?: boolean;
   generatedAt?: string;
   sharedFallback?: boolean;
@@ -94,6 +94,13 @@ export interface UserPlan extends Activity {
   dayId: string;
   section: DaySection;
   userCreated: true;
+}
+
+export interface ActivityPlacement {
+  activityId: string;
+  dayId: string;
+  section: DaySection;
+  order: number;
 }
 
 export interface Booking {

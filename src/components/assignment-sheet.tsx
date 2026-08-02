@@ -21,6 +21,7 @@ export function AssignmentSheet({ place, days, assignment, onAssign, onRemove, o
   const reducedMotion = useReducedMotion();
   const [section, setSection] = useState<DaySection>(assignment?.section ?? "anytime");
   const [level, setLevel] = useState<ActivityLevel>(assignment?.level ?? "nearby-option");
+  const [selectedDayId, setSelectedDayId] = useState<string | null>(assignment?.dayId ?? null);
 
   return (
     <motion.div
@@ -65,9 +66,9 @@ export function AssignmentSheet({ place, days, assignment, onAssign, onRemove, o
 
         <div className="assignment-days" role="list" aria-label={es.assignment.daysLabel}>
           {days.map((day, index) => {
-            const active = assignment?.dayId === day.id;
+            const active = selectedDayId === day.id;
             return (
-              <button key={day.id} type="button" className={active ? "is-assigned" : ""} onClick={() => onAssign(day.id, section, level)}>
+              <button key={day.id} type="button" className={active ? "is-assigned" : ""} onClick={() => setSelectedDayId(day.id)}>
                 <span className="assignment-day-number">{day.date.slice(-2)}</span>
                 <span><strong>{weekdayEs(day)} · {formatSpanishDate(day.date)}</strong><small>{coverTitleEs(day)}</small></span>
                 {active ? <span className="assignment-current"><CheckIcon /> {es.assignment.current}</span> : <span>0{index + 1}</span>}
@@ -75,6 +76,8 @@ export function AssignmentSheet({ place, days, assignment, onAssign, onRemove, o
             );
           })}
         </div>
+
+        {selectedDayId ? <div className="assignment-placement"><p className="mono-label">{days.find((day) => day.id === selectedDayId)?.date.slice(-2)} AGO</p><h3>¿Dónde quieres colocarlo?</h3><div className="placement-options"><button type="button" className={section === "morning" ? "is-selected" : ""} onClick={() => setSection("morning")}><strong>Mañana</strong><small>Entre el despertar y la comida</small></button><button type="button" className={section === "afternoon" ? "is-selected" : ""} onClick={() => setSection("afternoon")}><strong>Mediodía / tarde</strong><small>Para el bloque central del día</small></button><button type="button" className={section === "evening" ? "is-selected" : ""} onClick={() => setSection("evening")}><strong>Noche</strong><small>Cuando bajen las luces</small></button><button type="button" className={section === "anytime" ? "is-selected" : ""} onClick={() => setSection("anytime")}><strong>Opciones cercanas</strong><small>Decidir después, sin perderlo</small></button></div><button className="primary-button" type="button" onClick={() => onAssign(selectedDayId, section, level)}>Añadir al día</button></div> : null}
 
         {assignment ? <button className="assignment-remove" type="button" onClick={onRemove}>{es.assignment.remove}</button> : null}
       </motion.section>

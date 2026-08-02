@@ -5,10 +5,11 @@ import type {
   TransferPlan,
   Trip,
   UserPlan,
+  ActivityPlacement,
 } from "@/domain/models";
 
-export const LOCAL_TRIP_SCHEMA_VERSION = 3;
-export const LOCAL_TRIP_STORAGE_KEY = "electric-london:trip:v3";
+export const LOCAL_TRIP_SCHEMA_VERSION = 4;
+export const LOCAL_TRIP_STORAGE_KEY = "traza:trip:v4";
 
 export interface LocalTripState {
   schemaVersion: typeof LOCAL_TRIP_SCHEMA_VERSION;
@@ -16,6 +17,7 @@ export interface LocalTripState {
   assignments: PlaceAssignment[];
   mealSelections: MealSelection[];
   userPlans: UserPlan[];
+  placements: ActivityPlacement[];
   transfers: TransferPlan[];
   updatedAt: string;
 }
@@ -37,6 +39,7 @@ export function createInitialLocalState(seed: Trip): LocalTripState {
     assignments: [],
     mealSelections: [],
     userPlans: [],
+    placements: [],
     transfers: clone(seed.transfers),
     updatedAt: new Date(0).toISOString(),
   };
@@ -71,6 +74,7 @@ function migrate(value: unknown, seed: Trip): LocalTripState | null {
     assignments,
     mealSelections: Array.isArray(value.mealSelections) ? value.mealSelections as MealSelection[] : [],
     userPlans: Array.isArray(value.userPlans) ? value.userPlans as UserPlan[] : [],
+    placements: Array.isArray(value.placements) ? value.placements as ActivityPlacement[] : [],
     transfers: Array.isArray(value.transfers) ? value.transfers as TransferPlan[] : initial.transfers,
     updatedAt: typeof value.updatedAt === "string" ? value.updatedAt : new Date(0).toISOString(),
   };

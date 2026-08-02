@@ -37,7 +37,7 @@ export function ActivityDetail({ activity, nearbyPlaces, onBack }: ActivityDetai
         {activity.media ? <MediaFrame media={activity.media} priority sizes="(max-width: 680px) 100vw, 680px" /> : null}
         <span className="detail-photo-wash" aria-hidden="true" />
         <div className="detail-hero-type" aria-hidden="true">SKY<br />GARDEN</div>
-        <div className="detail-hero-stamp">35 FENCHURCH ST<br />51.5112° N</div>
+        <div className="detail-hero-stamp">35 FENCHURCH ST<br />LA CITY</div>
       </motion.div>
 
       <div className="detail-content">

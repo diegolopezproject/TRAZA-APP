@@ -5,6 +5,7 @@ import type { TransferPlan, Trip } from "@/domain/models";
 import { areaEs, es, titleEs } from "@/content/es";
 import { formatSpanishShortDate, mapsUrl } from "@/lib/format";
 import { ArrowIcon, CheckIcon, MapIcon, PlaneIcon, TicketIcon } from "./icons";
+import { AppHeader } from "./app-header";
 
 interface TripViewProps { trip: Trip; onSaveTransfers: (transfers: TransferPlan[]) => void; }
 
@@ -20,6 +21,7 @@ export function TripView({ trip, onSaveTransfers }: TripViewProps) {
 
   return (
     <section className="trip-view" aria-labelledby="trip-title">
+      <AppHeader context="trip" />
       <header className="trip-header"><p className="mono-label">{es.trip.document}</p><h1 id="trip-title">Londres<br /><span>2026</span></h1><div className="trip-stamp">06—13<br />AGO</div><div className="trip-facts"><span><b>{trip.days.length}</b> {es.trip.days}</span><span><b>{trip.travellers.length}</b> {es.trip.travellers}</span><span><b>1</b> {es.trip.city}</span></div></header>
 
       <section className="travel-doc travel-doc--flight" aria-labelledby="flights-title">

@@ -5,9 +5,11 @@ import type { CSSProperties } from "react";
 import type { Place } from "@/domain/models";
 import { es } from "@/content/es";
 import { formatSpanishDate } from "@/lib/format";
+import { mapsUrl } from "@/lib/format";
 import { ArrowIcon, HeartIcon, PlusIcon } from "./icons";
 import { StatusLabel } from "./status-label";
 import { MediaFrame } from "./media-frame";
+import { AppHeader } from "./app-header";
 
 interface SavedViewProps {
   places: Place[];
@@ -36,6 +38,7 @@ export function SavedView({ places, assignments, onAssignRequest, onAddPlace, on
 
   return (
     <section className="saved-view" aria-labelledby="saved-title">
+      <AppHeader context="saved" />
       <header className="saved-header">
         <div className="saved-symbol" aria-hidden="true"><HeartIcon /></div>
         <p className="mono-label">{es.saved.kicker}</p>
@@ -63,6 +66,7 @@ export function SavedView({ places, assignments, onAssignRequest, onAddPlace, on
                   <button type="button" className={assignments[place.id] ? "is-assigned" : ""} aria-label={es.saved.assignAria(place.name)} onClick={() => onAssignRequest(place.id)}>{assignments[place.id] ? <HeartIcon /> : <PlusIcon />}{assignments[place.id] ? es.saved.assigned(formatSpanishDate(assignments[place.id])) : es.saved.add}<ArrowIcon /></button>
                   <button type="button" onClick={() => onEditPlace(place.id)}>{es.saved.edit}</button>
                 </div>
+                {place.mapsQuery ? <a className="saved-maps-link" href={mapsUrl(place.mapsQuery)} target="_blank" rel="noreferrer">Abrir en Google Maps <ArrowIcon /></a> : null}
               </div>
             </article>
           );

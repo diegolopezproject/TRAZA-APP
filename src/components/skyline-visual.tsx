@@ -13,7 +13,7 @@ export function SkylineVisual({ compact = false }: SkylineVisualProps) {
         <path d="M167 104V23M150 52h34" stroke="currentColor" strokeWidth="9" />
         <path d="M54 307h33M54 331h33M151 183h32M151 210h32M151 237h32M151 264h32M222 224h24M222 250h24" stroke="var(--sky)" strokeWidth="8" />
       </svg>
-      <div className="sky-caption"><span>51.5112° N</span><span>LA CITY</span></div>
+      <div className="sky-caption"><span>LA CITY</span><span>ARRIBA</span></div>
       <div className="evening-chip">19:00 / CW</div>
     </div>
   );

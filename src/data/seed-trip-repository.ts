@@ -12,7 +12,7 @@ import type {
 } from "@/domain/models";
 import type { TripRepository } from "@/domain/trip-repository";
 import { slugify } from "@/lib/format";
-import { activityMedia, placeMedia } from "./media-catalog";
+import { activityMedia, fallbackPlaceMedia, placeMedia } from "./media-catalog";
 
 type Seed = typeof seed;
 type SeedActivity = Seed["days"][number]["activities"][number];
@@ -61,7 +61,8 @@ function mapPlaces(places: Seed["savedPlaces"]): Place[] {
     id: `${slugify(place.name)}-${index}`,
     status: toStatus(place.status),
     tags: "tags" in place && Array.isArray(place.tags) ? [...place.tags] : [],
-    media: placeMedia[place.name],
+    media: placeMedia[place.name] ?? fallbackPlaceMedia(place.name),
+    mapsQuery: place.mapsQuery ?? `${place.name}, London, UK`,
   }));
 }
 

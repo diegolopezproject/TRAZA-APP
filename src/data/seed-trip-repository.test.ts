@@ -36,7 +36,8 @@ describe("SeedTripRepository", () => {
     const trip = await new SeedTripRepository().getTrip();
     expect(trip.savedPlaces).toHaveLength(28);
     expect(trip.savedPlaces.map((place) => place.name)).toContain("Shakespeare's Globe");
-    expect(new Set(trip.savedPlaces.filter((place) => place.media).map((place) => place.media?.src)).size).toBe(6);
+    expect(trip.savedPlaces.every((place) => place.media && place.mapsQuery)).toBe(true);
+    expect(new Set(trip.savedPlaces.map((place) => place.media?.src)).size).toBe(28);
     expect(trip.savedPlaces.find((place) => place.name === "Hard Rock Cafe")?.tags).toContain("Cabina de One Direction");
   });
 

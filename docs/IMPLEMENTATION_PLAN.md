@@ -1,5 +1,18 @@
 # Plan de implementación
 
+## Iteración 04 — TRAZA: viaje por capas
+
+El alcance, referencias y decisiones completas están documentados en `ITERATION_04_PLAN.md`, `REFERENCE_AUDIT.md` y `PATTERN_DECISIONS.md`.
+
+- [x] Proteger el baseline de Iteración 03 con Git y commit reproducible.
+- [x] Reemplazar L/26/coordenadas por marca TRAZA, header global, favicon y app icon.
+- [x] Documentar componentes, tipografía y superficies; glass limitado a la capa funcional.
+- [x] Completar media y Maps para los 28 lugares con auditoría trazable.
+- [x] Añadir paso Guardados → ¿Dónde quieres colocarlo? y persistencia v4.
+- [x] Implementar Organizar con borrador, cancelar/guardar, locks y controles accesibles.
+- [x] Mantener Días / Guardados / Viaje, CRUD local-first y reduced motion.
+- [ ] Capturar la matriz visual final de Iteración 04 y cerrar QA de navegador.
+
 ## Iteración 02 — sistema y legibilidad
 
 - [x] Auditar producto, código y capturas en 390×844, 430×932, 768×1024 y 1440×900.
