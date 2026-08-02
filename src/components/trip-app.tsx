@@ -19,6 +19,8 @@ import { PlaceDetailSheet } from "./place-detail-sheet";
 import { PlanFormSheet } from "./plan-form-sheet";
 import { SavedView } from "./saved-view";
 import { TripView } from "./trip-view";
+import { AppShell } from "./app-shell";
+import { motionDuration, motionEase } from "@/lib/motion";
 
 interface TripAppProps { trip: Trip; }
 interface Notice { message: string; undo?: () => void; }
@@ -189,9 +191,9 @@ export function TripApp({ trip }: TripAppProps) {
 
   return (
     <LayoutGroup>
-      <main className={`app-shell app-shell--${state.tab}`}>
+      <AppShell activeTab={state.tab}>
         {state.tab === "journey" ? <DayCarousel days={effectiveTrip.days} selectedIndex={state.selectedDay} onSelect={selectDay} onOpen={(day) => dispatch({ type: "OPEN_DAY", dayId: day.id })} /> : null}
-        {state.tab === "saved" ? <SavedView places={local.places} assignments={assignmentsByPlace} onAssignRequest={(placeId) => dispatch({ type: "OPEN_ASSIGNMENT", placeId })} onAddPlace={() => setPlaceEditor("new")} onEditPlace={setPlaceEditor} onReset={resetLocalData} /> : null}
+        {state.tab === "saved" ? <SavedView places={local.places} assignments={assignmentsByPlace} onAssignRequest={(placeId) => dispatch({ type: "OPEN_ASSIGNMENT", placeId })} onAddPlace={() => setPlaceEditor("new")} onEditPlace={setPlaceEditor} onOpenPlace={setPlaceDetailId} onReset={resetLocalData} /> : null}
         {state.tab === "trip" ? <TripView trip={effectiveTrip} onSaveTransfers={saveTransfers} /> : null}
 
         <BottomNav active={state.tab} onChange={(tab) => dispatch({ type: "CHANGE_TAB", tab })} />
@@ -204,8 +206,8 @@ export function TripApp({ trip }: TripAppProps) {
         <AnimatePresence>{planDay ? <PlanFormSheet key={`${planDay.id}-${editedPlan?.id ?? "new"}`} day={planDay} days={effectiveTrip.days} places={local.places} plan={editedPlan} onChoosePlace={chooseSavedForDay} onSave={savePlan} onDelete={editedPlan ? deletePlan : undefined} onClose={() => setPlanSheet(null)} /> : null}</AnimatePresence>
         <AnimatePresence>{openDay && mealActivity ? <MealPickerSheet key={mealActivity.id} day={openDay} meal={mealActivity} places={local.places} selectedPlaceId={mealSelection?.sourcePlaceId} onSelect={chooseRestaurant} onRemove={removeRestaurant} onClose={() => setMealActivityId(null)} /> : null}</AnimatePresence>
 
-        <AnimatePresence>{notice ? <motion.aside className="assignment-toast" role="status" initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 12, opacity: 0 }}><span>{notice.message}</span>{notice.undo ? <button type="button" onClick={notice.undo}>{es.forms.undo}</button> : null}</motion.aside> : null}</AnimatePresence>
-      </main>
+        <AnimatePresence>{notice ? <motion.aside className="assignment-toast" role="status" initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 8, opacity: 0 }} transition={{ duration: motionDuration.standard, ease: motionEase }}><span>{notice.message}</span>{notice.undo ? <button type="button" onClick={notice.undo}>{es.forms.undo}</button> : null}</motion.aside> : null}</AnimatePresence>
+      </AppShell>
     </LayoutGroup>
   );
 }

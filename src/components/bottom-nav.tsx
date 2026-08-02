@@ -2,6 +2,7 @@ import type { AppTab } from "@/lib/app-state";
 import { motion } from "motion/react";
 import { es } from "@/content/es";
 import { HeartIcon, JourneyIcon, TicketIcon } from "./icons";
+import { gestureSpring } from "@/lib/motion";
 
 interface BottomNavProps {
   active: AppTab;
@@ -25,7 +26,7 @@ export function BottomNav({ active, onChange }: BottomNavProps) {
           aria-current={active === id ? "page" : undefined}
           onClick={() => onChange(id)}
         >
-          {active === id ? <motion.span className="nav-active-pill" layoutId="nav-active-pill" transition={{ type: "spring", stiffness: 420, damping: 34 }} /> : null}
+          {active === id ? <motion.span className="nav-active-pill" layoutId="nav-active-pill" transition={gestureSpring} /> : null}
           <Icon />
           <span className="nav-label">{label}</span>
         </button>

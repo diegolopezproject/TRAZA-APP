@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { CloseIcon } from "./icons";
+import { motionDuration, sheetSpring } from "@/lib/motion";
 
 interface MobileSheetProps {
   title: string;
@@ -32,7 +33,7 @@ export function MobileSheet({ title, kicker, closeLabel, children, onClose, wide
         initial={reducedMotion ? { opacity: 0 } : { y: "100%", scale: .98 }}
         animate={reducedMotion ? { opacity: 1 } : { y: 0, scale: 1 }}
         exit={reducedMotion ? { opacity: 0 } : { y: "100%", scale: .98 }}
-        transition={{ type: "spring", stiffness: 360, damping: 38 }}
+        transition={reducedMotion ? { duration: motionDuration.fast } : sheetSpring}
       >
         <header className="assignment-header editor-sheet-header">
           <div><p className="mono-label">{kicker}</p><h2 id="editor-sheet-title">{title}</h2></div>

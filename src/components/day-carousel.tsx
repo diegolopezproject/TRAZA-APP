@@ -7,7 +7,6 @@ import { es, weekdayEs } from "@/content/es";
 import { dayNumber } from "@/lib/format";
 import { DayCover } from "./day-cover";
 import { ArrowIcon } from "./icons";
-import { AppHeader } from "./app-header";
 
 interface DayCarouselProps { days: Day[]; selectedIndex: number; onSelect: (index: number) => void; onOpen: (day: Day) => void; }
 
@@ -25,7 +24,6 @@ export function DayCarousel({ days, selectedIndex, onSelect, onOpen }: DayCarous
   function handleScroll(event: UIEvent<HTMLDivElement>) { if (!initializedRef.current) return; if (frameRef.current) window.cancelAnimationFrame(frameRef.current); const scroller = event.currentTarget; frameRef.current = window.requestAnimationFrame(() => { const center = scroller.scrollLeft + scroller.clientWidth / 2; let closest = 0; let distance = Number.POSITIVE_INFINITY; cardRefs.current.forEach((card, index) => { if (!card) return; const nextDistance = Math.abs(center - (card.offsetLeft + card.offsetWidth / 2)); if (nextDistance < distance) { distance = nextDistance; closest = index; } }); if (closest !== selectedIndex) onSelect(closest); }); }
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) { if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) { event.preventDefault(); moveTo(event.key === "ArrowLeft" ? selectedIndex - 1 : event.key === "ArrowRight" ? selectedIndex + 1 : event.key === "Home" ? 0 : days.length - 1); } }
   return <section className="journey-view" aria-label={es.journey.label}>
-    <AppHeader dayIndex={selectedIndex} dayDate={days[selectedIndex]?.date} />
     <div ref={scrollerRef} className="day-carousel" onScroll={handleScroll} onKeyDown={handleKeyDown} tabIndex={0} role="region" aria-roledescription="carrusel" aria-label={es.journey.label} data-testid="day-carousel">
       {days.map((day, index) => <div className={`day-slide${index === selectedIndex ? " is-selected" : ""}`} key={day.id} ref={(node) => { cardRefs.current[index] = node; }}><DayCover day={day} index={index} active={index === selectedIndex} onOpen={() => onOpen(day)} /></div>)}
     </div>

@@ -21,6 +21,7 @@ export interface MediaAsset {
   author?: string;
   license?: string;
   kind: "photo" | "illustration" | "graphic" | "generated-editorial" | "fallback";
+  classification?: "real-photo" | "official-photo" | "licensed-photo" | "user-photo" | "generated-editorial" | "graphic-fallback";
   editorial?: boolean;
   generatedAt?: string;
   sharedFallback?: boolean;

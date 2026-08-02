@@ -10,6 +10,7 @@ import { ActivityCard } from "./activity-card";
 import { ChevronIcon, CloseIcon, HeartIcon, MapIcon, PlusIcon } from "./icons";
 import { MediaFrame } from "./media-frame";
 import { DayMotif } from "./day-motif";
+import { gestureSpring, motionDuration } from "@/lib/motion";
 
 interface AssignedItem { place: Place; assignment: PlaceAssignment; }
 
@@ -128,7 +129,7 @@ export function DayItinerary({ day, dayIndex, onClose, onOpenActivity, assignedI
       initial={reducedMotion ? { opacity: 0 } : { y: 72, opacity: .35, scale: .975, rotateX: 7 }}
       animate={{ y: 0, opacity: 1, scale: 1, rotateX: 0 }}
       exit={reducedMotion ? { opacity: 0 } : { y: 92, opacity: 0, scale: .98, rotateX: 5 }}
-      transition={reducedMotion ? { duration: .12 } : { type: "spring", stiffness: 285, damping: 32 }}
+      transition={reducedMotion ? { duration: motionDuration.fast } : gestureSpring}
       style={{ transformOrigin: "50% 0%" }}
     >
       <div ref={scrollerRef} className="itinerary-scroll" style={pullStyle} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd} data-testid="itinerary-scroll">
@@ -149,7 +150,7 @@ export function DayItinerary({ day, dayIndex, onClose, onOpenActivity, assignedI
 
         <div className="itinerary-content">
           <div className="itinerary-intro"><span className="mono-label">{weekday.slice(0, 3)} / {dayNumber(day.date)}</span><p>{editorial.intro}</p></div>
-          <div className="itinerary-actions"><button type="button" onClick={onAddPlan}><PlusIcon /> {es.day.addPlan}</button><button type="button" className="secondary-button" onClick={startOrganizing}>Organizar</button></div>
+          {!organizing ? <div className="itinerary-actions"><button type="button" onClick={onAddPlan}><PlusIcon /> {es.day.addPlan}</button><button type="button" className="secondary-button" onClick={startOrganizing}>Organizar</button></div> : null}
           {organizing ? <div className="organize-bar surface-translucent" role="toolbar" aria-label="Guardar cambios de organización"><button type="button" className="organize-cancel" onClick={() => setOrganizing(false)}>Cancelar</button><button type="button" className="organize-save" onClick={saveOrganization}>Guardar cambios</button></div> : null}
 
           <aside className="level-legend" aria-label={es.day.legend}><span><b>✓</b> {es.status.confirmed}</span><span><b>~</b> {es.status.flexible}</span><span><b>+</b> {es.levels["nearby-option"]}</span></aside>
