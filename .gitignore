@@ -1,0 +1,10 @@
+node_modules/
+.next/
+coverage/
+*.log
+*.tsbuildinfo
+.env*
+!.env.example
+screenshots/*.png
+screenshots/**/*.png
+screenshots/**/*.json

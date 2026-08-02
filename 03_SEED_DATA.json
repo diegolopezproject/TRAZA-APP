@@ -1,0 +1,552 @@
+{
+  "trip": {
+    "id": "london-2026",
+    "name": "London 2026",
+    "destination": "London",
+    "startDate": "2026-08-06",
+    "endDate": "2026-08-13",
+    "travellers": [
+      "Diego",
+      "María"
+    ],
+    "hotel": {
+      "name": "Ibis Styles London Ealing",
+      "checkInDate": "2026-08-06",
+      "checkInTime": "14:00",
+      "checkOutDate": "2026-08-13",
+      "checkOutTime": "12:00",
+      "timeNotes": "Check-in and check-out times should be verified with the hotel.",
+      "mapsQuery": "Ibis Styles London Ealing"
+    }
+  },
+  "days": [
+    {
+      "date": "2026-08-06",
+      "weekday": "Thursday",
+      "coverTitle": "First afternoon in London",
+      "visualTheme": "orange-night",
+      "activities": [
+        {
+          "title": "Flight Seville to London Gatwick",
+          "type": "travel",
+          "level": "anchor",
+          "status": "confirmed",
+          "startTime": "11:50",
+          "endTime": "13:35",
+          "notes": "Sevilla SVQ a Gatwick LGW."
+        },
+        {
+          "title": "Transfer to Ealing",
+          "type": "transport",
+          "level": "intention",
+          "status": "planned",
+          "timeLabel": "After landing",
+          "area": "Gatwick → Ealing",
+          "mapsQuery": "Gatwick Airport to Ibis Styles London Ealing"
+        },
+        {
+          "title": "Hotel check-in",
+          "type": "stay",
+          "level": "intention",
+          "status": "planned",
+          "timeLabel": "After arrival in Ealing",
+          "area": "Ealing",
+          "mapsQuery": "Ibis Styles London Ealing"
+        },
+        {
+          "title": "Paseo nocturno por el Londres actual",
+          "type": "tour",
+          "level": "anchor",
+          "status": "confirmed",
+          "startTime": "19:00",
+          "partySize": 2,
+          "area": "Central London"
+        },
+        {
+          "title": "Dinner",
+          "type": "meal",
+          "level": "nearby-option",
+          "status": "unplanned",
+          "timeLabel": "After the night tour"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-07",
+      "weekday": "Friday",
+      "coverTitle": "City above, Canary Wharf after dark",
+      "visualTheme": "sky-lime-orange",
+      "activities": [
+        {
+          "title": "Sky Garden",
+          "type": "attraction",
+          "level": "anchor",
+          "status": "confirmed",
+          "startTime": "08:30",
+          "endTime": "09:30",
+          "area": "City of London",
+          "mapsQuery": "Sky Garden London",
+          "notes": "Entrada confirmada a las 08:30. Duración estimada: una hora."
+        },
+        {
+          "title": "Free Tour por la City de Londres",
+          "type": "tour",
+          "level": "anchor",
+          "status": "confirmed",
+          "startTime": "13:00",
+          "partySize": 2,
+          "area": "City of London"
+        },
+        {
+          "title": "Lunch",
+          "type": "meal",
+          "level": "nearby-option",
+          "status": "unplanned",
+          "timeLabel": "Around the City tour"
+        },
+        {
+          "title": "Canary Wharf",
+          "type": "neighbourhood",
+          "level": "intention",
+          "status": "planned",
+          "timeLabel": "Afternoon"
+        },
+        {
+          "title": "The Hunger Games",
+          "type": "entertainment",
+          "level": "anchor",
+          "status": "confirmed",
+          "startTime": "19:00",
+          "venue": "Troubadour Canary Wharf Theatre",
+          "area": "Canary Wharf",
+          "mapsQuery": "Troubadour Canary Wharf Theatre"
+        },
+        {
+          "title": "Dinner",
+          "type": "meal",
+          "level": "nearby-option",
+          "status": "unplanned",
+          "timeLabel": "Before or after the musical"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-08",
+      "weekday": "Saturday",
+      "coverTitle": "Notting Hill in colour",
+      "visualTheme": "pink-orange",
+      "activities": [
+        {
+          "title": "Free Tour por Notting Hill",
+          "type": "tour",
+          "level": "anchor",
+          "status": "confirmed",
+          "startTime": "10:00",
+          "partySize": 2,
+          "area": "Notting Hill"
+        },
+        {
+          "title": "Natural History Museum",
+          "type": "museum",
+          "level": "anchor",
+          "status": "confirmed",
+          "startTime": "15:30",
+          "area": "South Kensington",
+          "mapsQuery": "Natural History Museum London",
+          "notes": "Entrada confirmada a las 15:30."
+        },
+        {
+          "title": "Lunch",
+          "type": "meal",
+          "level": "nearby-option",
+          "status": "unplanned"
+        },
+        {
+          "title": "Dinner",
+          "type": "meal",
+          "level": "nearby-option",
+          "status": "unplanned"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-09",
+      "weekday": "Sunday",
+      "coverTitle": "Central London turns green",
+      "visualTheme": "violet-lime",
+      "activities": [
+        {
+          "title": "Free Tour por Londres",
+          "type": "tour",
+          "level": "anchor",
+          "status": "confirmed",
+          "startTime": "10:00",
+          "partySize": 2
+        },
+        {
+          "title": "Lunch",
+          "type": "meal",
+          "level": "nearby-option",
+          "status": "unplanned",
+          "timeLabel": "Before Wicked"
+        },
+        {
+          "title": "Wicked",
+          "type": "entertainment",
+          "level": "anchor",
+          "status": "confirmed",
+          "startTime": "14:30"
+        },
+        {
+          "title": "Palomitas o churros",
+          "type": "food",
+          "level": "nearby-option",
+          "status": "flexible"
+        },
+        {
+          "title": "Dinner",
+          "type": "meal",
+          "level": "nearby-option",
+          "status": "unplanned",
+          "timeLabel": "After Wicked"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-10",
+      "weekday": "Monday",
+      "coverTitle": "Camden to Whitechapel",
+      "visualTheme": "orange-black",
+      "activities": [
+        {
+          "title": "Free Tour por el Museo Británico",
+          "type": "tour",
+          "level": "anchor",
+          "status": "confirmed",
+          "startTime": "10:00",
+          "partySize": 2,
+          "area": "Bloomsbury",
+          "mapsQuery": "British Museum"
+        },
+        {
+          "title": "Camden",
+          "type": "neighbourhood",
+          "level": "intention",
+          "status": "planned",
+          "timeLabel": "After the museum",
+          "area": "Camden"
+        },
+        {
+          "title": "Tour de Jack el Destripador",
+          "type": "tour",
+          "level": "anchor",
+          "status": "confirmed",
+          "startTime": "18:00",
+          "partySize": 2,
+          "area": "East London"
+        },
+        {
+          "title": "Lunch",
+          "type": "meal",
+          "level": "nearby-option",
+          "status": "unplanned",
+          "timeLabel": "In Camden",
+          "area": "Camden"
+        },
+        {
+          "title": "Dinner",
+          "type": "meal",
+          "level": "nearby-option",
+          "status": "unplanned"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-11",
+      "weekday": "Tuesday",
+      "coverTitle": "London, still unwritten",
+      "visualTheme": "blue-pink",
+      "activities": [
+        {
+          "title": "One Direction locations",
+          "type": "theme-route",
+          "level": "nearby-option",
+          "status": "saved"
+        },
+        {
+          "title": "London Transport Museum",
+          "type": "museum",
+          "level": "nearby-option",
+          "status": "saved"
+        },
+        {
+          "title": "Design Museum",
+          "type": "museum",
+          "level": "nearby-option",
+          "status": "saved"
+        },
+        {
+          "title": "Shakespeare's Globe",
+          "type": "culture",
+          "level": "nearby-option",
+          "status": "saved"
+        },
+        {
+          "title": "Unusual London houses",
+          "type": "attraction",
+          "level": "nearby-option",
+          "status": "researching"
+        },
+        {
+          "title": "Uber Boat",
+          "type": "transport-experience",
+          "level": "intention",
+          "status": "flexible"
+        },
+        {
+          "title": "Soho at night",
+          "type": "neighbourhood",
+          "level": "intention",
+          "status": "flexible"
+        },
+        {
+          "title": "Lunch",
+          "type": "meal",
+          "level": "nearby-option",
+          "status": "unplanned"
+        },
+        {
+          "title": "Dinner",
+          "type": "meal",
+          "level": "nearby-option",
+          "status": "unplanned"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-12",
+      "weekday": "Wednesday",
+      "coverTitle": "Build this London day",
+      "visualTheme": "illustrated-open-day",
+      "activities": [
+        {
+          "title": "Warner Bros. Studio Tour London",
+          "type": "excursion",
+          "level": "nearby-option",
+          "status": "evaluating"
+        },
+        {
+          "title": "Day trip outside London",
+          "type": "excursion",
+          "level": "nearby-option",
+          "status": "evaluating"
+        },
+        {
+          "title": "Lunch",
+          "type": "meal",
+          "level": "nearby-option",
+          "status": "unplanned"
+        },
+        {
+          "title": "Dinner",
+          "type": "meal",
+          "level": "nearby-option",
+          "status": "unplanned"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-13",
+      "weekday": "Thursday",
+      "coverTitle": "London to Seville",
+      "visualTheme": "sky-white",
+      "activities": [
+        {
+          "title": "Hotel check-out",
+          "type": "stay",
+          "level": "anchor",
+          "status": "planned",
+          "endTime": "12:00"
+        },
+        {
+          "title": "Transfer to Heathrow",
+          "type": "transport",
+          "level": "intention",
+          "status": "planned"
+        },
+        {
+          "title": "Flight London Heathrow to Seville",
+          "type": "travel",
+          "level": "anchor",
+          "status": "confirmed",
+          "startTime": "15:10",
+          "endTime": "19:00",
+          "notes": "VY6023, Heathrow LHR to Seville SVQ."
+        }
+      ]
+    }
+  ],
+  "savedPlaces": [
+    {
+      "name": "Hard Rock Cafe",
+      "category": "food-drink",
+      "area": "Mayfair",
+      "tags": ["Cabina de One Direction", "restaurante", "música"],
+      "notes": "La cabina de One Direction es uno de los motivos principales de la visita.",
+      "mapsQuery": "Hard Rock Cafe London Old Park Lane",
+      "status": "saved"
+    },
+    {
+      "name": "M&M's London",
+      "category": "shopping",
+      "status": "saved"
+    },
+    {
+      "name": "Hamleys",
+      "category": "shopping",
+      "status": "saved"
+    },
+    {
+      "name": "Harrods",
+      "category": "shopping",
+      "status": "saved"
+    },
+    {
+      "name": "CAJP Japanese Pancakes",
+      "category": "food-drink",
+      "status": "saved"
+    },
+    {
+      "name": "Seabird",
+      "category": "food-drink",
+      "status": "saved"
+    },
+    {
+      "name": "The Yards Covent Garden",
+      "category": "shopping",
+      "status": "saved"
+    },
+    {
+      "name": "Reflection Garden",
+      "category": "attraction",
+      "status": "saved"
+    },
+    {
+      "name": "Chiswick",
+      "category": "neighbourhood",
+      "status": "saved"
+    },
+    {
+      "name": "Hans & Gretel",
+      "category": "food-drink",
+      "status": "saved"
+    },
+    {
+      "name": "Funky Chips - Camden",
+      "category": "food-drink",
+      "area": "Camden",
+      "status": "saved"
+    },
+    {
+      "name": "The Mac Factory",
+      "category": "food-drink",
+      "area": "Camden",
+      "status": "saved"
+    },
+    {
+      "name": "Humble Crumble | Camden Market",
+      "category": "food-drink",
+      "area": "Camden",
+      "status": "saved"
+    },
+    {
+      "name": "Royal Albert Hall",
+      "category": "museum-culture",
+      "tags": [
+        "landmark",
+        "music",
+        "one-direction"
+      ],
+      "status": "saved"
+    },
+    {
+      "name": "Partridges",
+      "category": "food-drink",
+      "status": "saved"
+    },
+    {
+      "name": "The Queen's Arms",
+      "category": "food-drink",
+      "status": "saved"
+    },
+    {
+      "name": "Kynance Mews",
+      "category": "attraction",
+      "status": "saved"
+    },
+    {
+      "name": "Snowflake Gelato - Soho",
+      "category": "food-drink",
+      "area": "Soho",
+      "status": "saved"
+    },
+    {
+      "name": "Kova Patisserie Aldgate East",
+      "category": "food-drink",
+      "status": "saved"
+    },
+    {
+      "name": "GAIL's Bakery London Bridge",
+      "category": "food-drink",
+      "area": "London Bridge",
+      "status": "saved"
+    },
+    {
+      "name": "Bread Ahead Bakery | Borough Market",
+      "category": "food-drink",
+      "area": "Borough Market",
+      "status": "saved"
+    },
+    {
+      "name": "The Black Pig",
+      "category": "food-drink",
+      "area": "Borough Market",
+      "status": "saved"
+    },
+    {
+      "name": "Chinatown Bakery",
+      "category": "food-drink",
+      "area": "Chinatown",
+      "status": "saved"
+    },
+    {
+      "name": "Belt Noodles",
+      "category": "food-drink",
+      "status": "saved"
+    },
+    {
+      "name": "Al Dente",
+      "category": "food-drink",
+      "area": "South Kensington",
+      "status": "researching",
+      "tags": ["pendiente de sucursal", "cerca del museo"],
+      "mapsQuery": "Al Dente South Kensington London",
+      "notes": "Elegir la sucursal más cercana al Natural History Museum."
+    },
+    {
+      "name": "London Transport Museum",
+      "category": "museum-culture",
+      "status": "saved"
+    },
+    {
+      "name": "Design Museum",
+      "category": "museum-culture",
+      "status": "saved"
+    },
+    {
+      "name": "Shakespeare's Globe",
+      "category": "museum-culture",
+      "status": "saved"
+    }
+  ]
+}
