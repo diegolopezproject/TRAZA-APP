@@ -8,6 +8,8 @@ All raster assets were generated with the built-in ImageGen mode and copied into
 
 Premium natural editorial travel photograph of the recognizable Sky Garden interior: lush planting, curved glass architecture and the City skyline in early August morning light. Vertical mobile crop, realistic texture, subtle 35 mm grain, safe responsive edges; no prominent people, logos, signage, text, watermark or fake UI.
 
+La Iteración 06 recupera exactamente `/media/sky-garden-editorial-v2.png` desde `fc2a772`, anterior al cambio fotográfico de Iteración 05. Card y detalle comparten el mismo asset, alt `Interior ajardinado de Sky Garden frente al skyline de la City de Londres`, recorte `50% 58%`, dimensiones `853 × 2048`, autor OpenAI, licencia de proyecto y clasificación `generated-editorial`. No se usa en la portada del día 7, que pertenece al sistema SVG de capítulos.
+
 ### Camden Market food
 
 Editorial close-up at Camden Market with three visual zones: warm apple crumble, loaded chips and macaroni cheese on a dark market counter. Vertical crop designed for distinct focal-point crops, warm authentic food-hall lighting and natural texture; no visible brands, legible signage, text, watermark or fake UI.

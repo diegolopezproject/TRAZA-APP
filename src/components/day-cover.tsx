@@ -6,7 +6,6 @@ import type { Day } from "@/domain/models";
 import { coverTitleEs, dayEditorial, es, weekdayEs } from "@/content/es";
 import { dayNumber } from "@/lib/format";
 import { DayMotif } from "./day-motif";
-import { MediaFrame } from "./media-frame";
 
 interface DayCoverProps {
   day: Day;
@@ -26,8 +25,6 @@ export function DayCover({ day, index, active, onOpen }: DayCoverProps) {
   const weekday = weekdayEs(day);
   const title = coverTitleEs(day);
   const editorial = dayEditorial[day.id];
-  const documentaryMedia = day.activities.find((activity) => activity.media)?.media;
-  const placeSequence = day.id === "2026-08-10" ? ["Bloomsbury", "Camden", "Whitechapel"] : null;
 
   function finishDrag(_: PointerEvent, info: PanInfo) {
     if (info.offset.y < -78 || info.velocity.y < -540) onOpen();
@@ -35,7 +32,7 @@ export function DayCover({ day, index, active, onOpen }: DayCoverProps) {
 
   return (
     <motion.article
-      className={`day-cover theme-${day.visualTheme}${active ? " is-active" : ""}${documentaryMedia ? " has-documentary-media" : ""}`}
+      className={`day-cover theme-${day.visualTheme}${active ? " is-active" : ""}`}
       aria-label={es.journey.coverAria(weekday, number, title)}
       drag={active && !reducedMotion ? "y" : false}
       dragConstraints={{ top: -132, bottom: 0 }}
@@ -51,8 +48,7 @@ export function DayCover({ day, index, active, onOpen }: DayCoverProps) {
       </header>
 
       <motion.div className="cover-media-zone" style={active ? { y: mediaY } : undefined}>
-        {documentaryMedia ? <MediaFrame media={documentaryMedia} priority={active} sizes="(max-width: 760px) 100vw, 460px" /> : <div className="cover-motif-wrap"><DayMotif day={day} />{placeSequence ? <div className="cover-place-sequence">{placeSequence.map((place) => <span key={place}>{place}</span>)}</div> : null}</div>}
-        <span className="cover-media-wash" aria-hidden="true" />
+        <div className="cover-motif-wrap"><DayMotif day={day} /></div>
         <div className="cover-number" aria-hidden="true">{number}</div>
       </motion.div>
 

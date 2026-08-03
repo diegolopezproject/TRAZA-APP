@@ -145,7 +145,6 @@ export function DayItinerary({ day, dayIndex, onClose, onOpenActivity, assignedI
             <div><p>{editorial.eyebrow}</p><h1>{coverTitleEs(day)}</h1></div>
             <DayMotif day={day} compact />
           </div>
-          <button className="close-day-text" type="button" onClick={onClose}><ChevronIcon /> {es.day.backCover}</button>
         </header>
 
         <div className="itinerary-content">

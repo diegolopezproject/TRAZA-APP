@@ -15,16 +15,15 @@ function commonsPhoto(asset: Omit<MediaAsset, "kind" | "classification" | "sourc
 }
 
 export const activityMedia: Record<string, MediaAsset> = {
-  "Sky Garden": commonsPhoto({
-    src: "/media/sky-garden-wikimedia.jpg",
-    alt: "Interior real de Sky Garden en la City de Londres",
-    width: 1400,
-    height: 1050,
-    focalPoint: "50% 48%",
-    sourceUrl: "https://commons.wikimedia.org/w/index.php?oldid=1176725637",
-    author: "DeveshT",
-    license: "CC0 1.0",
-  }),
+  "Sky Garden": {
+    src: "/media/sky-garden-editorial-v2.png",
+    alt: "Interior ajardinado de Sky Garden frente al skyline de la City de Londres",
+    width: 853,
+    height: 2048,
+    focalPoint: "50% 58%",
+    kind: "photo",
+    ...generatedMeta,
+  },
   "Natural History Museum": commonsPhoto({
     src: "/media/natural-history-museum-wikimedia.jpg",
     alt: "Exterior real del Natural History Museum de Londres",

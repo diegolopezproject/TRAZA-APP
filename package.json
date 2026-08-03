@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:visual": "node scripts/visual-smoke.mjs"
+    "test:visual": "node scripts/visual-iteration-06.mjs",
+    "test:visual:chromium": "set PW_ENGINE=chromium&& node scripts/visual-iteration-06.mjs"
   },
   "dependencies": {
     "geist": "1.7.2",

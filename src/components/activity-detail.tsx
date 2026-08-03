@@ -28,7 +28,7 @@ export function ActivityDetail({ activity, nearbyPlaces, onBack }: ActivityDetai
     >
       <header className="detail-toolbar">
         <button type="button" className="detail-back" onClick={onBack} aria-label={es.detail.backAria}>
-          <CloseIcon /> <span>{es.detail.back}</span>
+          <CloseIcon /><span className="sr-only">{es.detail.back}</span>
         </button>
         <span className="detail-code">LDN / SG</span>
       </header>

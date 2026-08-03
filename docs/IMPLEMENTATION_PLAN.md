@@ -1,5 +1,15 @@
 # Plan de implementación
 
+## Iteración 06 — base móvil y capítulos ilustrados
+
+- [x] Proteger el baseline, ejecutar el quality gate inicial y crear `iteration-06-mobile-foundation`.
+- [x] Centralizar safe areas, viewport dinámico, reserva de navegación, sheets y feedback.
+- [x] Convertir asignación de Guardados en un sheet secuencial de dos pasos.
+- [x] Consolidar formularios móviles con header/footer sticky y compatibilidad con teclado.
+- [x] Crear un sistema SVG común para las ocho portadas sin fotografía principal.
+- [x] Restaurar desde Git la fotografía editorial anterior de Sky Garden.
+- [x] Validar WebKit y Chromium en la matriz móvil y guardar evidencias before/after.
+
 ## Iteración 05 — sistema de producto unificado
 
 - [x] Proteger `fc2a772`, crear `iteration-05-unified-product-system` y capturar baseline.

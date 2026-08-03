@@ -15,12 +15,12 @@
 
 ## Reglas
 
-- `100dvh` y safe areas se resuelven en el shell, no por pantalla.
+- `100dvh`, `100svh`, `visualViewport` y los cuatro safe insets se resuelven en el shell, no por pantalla.
 - Días no tiene cabecera persistente: la portada contiene fecha, progreso y contexto.
 - Guardados y Viaje comparten el mismo header contextual de 52 px, sin tagline ni progreso duplicado.
 - La nav usa fondo Ink sólido. No depende de blur y su fallback es idéntico.
-- Guardados y Viaje tienen scroll local y reserva inferior `--nav-safe` común.
-- Sheets comparten scrim, radio 32, padding final y footer de acciones seguro.
+- Guardados y Viaje tienen scroll local y reserva inferior `--nav-reserve` común.
+- Sheets comparten scrim, radio 32, handle, header fijo, contenido scrollable y footer seguro sobre teclado/home indicator.
 - Toast se oculta bajo un modal y sube cuando existe barra de Organizar.
 - `prefers-reduced-motion` y `prefers-reduced-transparency` mantienen toda la función.
 
@@ -29,7 +29,6 @@
 - `AppShell`: viewport, sección activa y clases de estado.
 - `AppHeader`: orientación opcional, marca compacta y contexto.
 - `BottomNav`: tres destinos de primer nivel.
-- `MobileSheet`: diálogo modal y motion compartido.
+- `MobileSheet`: diálogo modal, foco contenido/restaurado, altura de `visualViewport` y motion compartido.
 - `MediaFrame`: media, fallback honesto y procedencia.
 - `PrimaryButton`, `SecondaryButton`, `IconButton`: controles comunes.
-
