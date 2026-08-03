@@ -16,19 +16,20 @@ interface AssignmentSheetProps {
   onAssign: (dayId: string, section: DaySection, level: ActivityLevel) => void;
   onRemove: () => void;
   onClose: () => void;
+  step: 1 | 2;
+  onStepChange: (step: 1 | 2) => void;
 }
 
-export function AssignmentSheet({ place, days, assignment, onAssign, onRemove, onClose }: AssignmentSheetProps) {
+export function AssignmentSheet({ place, days, assignment, onAssign, onRemove, onClose, step, onStepChange }: AssignmentSheetProps) {
   const reducedMotion = useReducedMotion();
   const [section, setSection] = useState<DaySection>(assignment?.section ?? "anytime");
   const [level, setLevel] = useState<ActivityLevel>(assignment?.level ?? "nearby-option");
   const [selectedDayId, setSelectedDayId] = useState<string | null>(assignment?.dayId ?? null);
-  const [step, setStep] = useState<1 | 2>(1);
   const selectedDay = days.find((day) => day.id === selectedDayId);
 
   function selectDay(dayId: string) {
     setSelectedDayId(dayId);
-    setStep(2);
+    onStepChange(2);
   }
 
   function choosePlacement(nextSection: DaySection, nextLevel: ActivityLevel) {
@@ -44,7 +45,7 @@ export function AssignmentSheet({ place, days, assignment, onAssign, onRemove, o
       onClose={onClose}
       footer={step === 2 ? (
         <>
-          <button className="secondary-button" type="button" onClick={() => setStep(1)}>Atrás</button>
+          <button className="secondary-button" type="button" onClick={onClose}>Atrás</button>
           <button className="primary-button" type="button" disabled={!selectedDayId} onClick={() => selectedDayId && onAssign(selectedDayId, section, level)}>Añadir al día</button>
         </>
       ) : undefined}

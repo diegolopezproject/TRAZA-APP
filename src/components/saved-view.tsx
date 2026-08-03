@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { Place } from "@/domain/models";
 import { es } from "@/content/es";
 import { formatSpanishDate, mapsUrl } from "@/lib/format";
@@ -16,6 +16,8 @@ interface SavedViewProps {
   onEditPlace: (placeId: string) => void;
   onOpenPlace: (placeId: string) => void;
   onReset: () => void;
+  filter: string;
+  onFilterChange: (filter: string) => void;
 }
 
 const filters = [
@@ -26,15 +28,14 @@ const filters = [
   { id: "shopping", label: es.saved.categories.shopping },
 ] as const;
 
-export function SavedView({ places, assignments, onAssignRequest, onAddPlace, onEditPlace, onOpenPlace, onReset }: SavedViewProps) {
-  const [filter, setFilter] = useState<string>("all");
+export function SavedView({ places, assignments, onAssignRequest, onAddPlace, onEditPlace, onOpenPlace, onReset, filter, onFilterChange }: SavedViewProps) {
   const visible = useMemo(() => filter === "all" ? places : places.filter((place) => place.category === filter), [filter, places]);
 
   return (
-    <section className="saved-view" aria-labelledby="saved-title">
+    <section className="saved-view" aria-labelledby="saved-title" data-navigation-scroll="saved">
       <div className="saved-header"><PageHeader eyebrow="Londres 2026" title="Guardados" count={`${places.length} lugares`} id="saved-title" /><Button className="add-place-button" type="button" onClick={onAddPlace}><PlusIcon /> {es.saved.addPlace}</Button></div>
 
-      <div className="filter-row" aria-label={es.saved.filtersLabel}>{filters.map((item) => <FilterChip key={item.id} selected={filter === item.id} onClick={() => setFilter(item.id)}>{item.label}</FilterChip>)}</div>
+      <div className="filter-row" aria-label={es.saved.filtersLabel}>{filters.map((item) => <FilterChip key={item.id} selected={filter === item.id} onClick={() => onFilterChange(item.id)}>{item.label}</FilterChip>)}</div>
 
       <div className="saved-editorial-list">
         {visible.map((place) => (
@@ -42,7 +43,7 @@ export function SavedView({ places, assignments, onAssignRequest, onAddPlace, on
         ))}
       </div>
 
-      {visible.length === 0 ? <div className="saved-empty"><p>{es.saved.empty}</p><button type="button" onClick={() => setFilter("all")}>{es.saved.showAll}</button></div> : null}
+      {visible.length === 0 ? <div className="saved-empty"><p>{es.saved.empty}</p><button type="button" onClick={() => onFilterChange("all")}>{es.saved.showAll}</button></div> : null}
       <footer className="saved-settings"><div><strong>Datos del viaje</strong><p>Persistencia local · sin referencias privadas.</p></div><button type="button" onClick={() => { if (window.confirm(es.saved.resetConfirm)) onReset(); }}>{es.saved.reset}</button></footer>
     </section>
   );

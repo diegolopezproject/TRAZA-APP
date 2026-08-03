@@ -7,6 +7,8 @@ import { mapsUrl } from "@/lib/format";
 import { ArrowIcon, CheckIcon, CloseIcon, MapIcon } from "./icons";
 import { MediaFrame } from "./media-frame";
 import { StatusLabel } from "./status-label";
+import { navigationMotion } from "@/lib/motion";
+import { useBackSwipe } from "@/lib/use-back-swipe";
 
 interface ActivityDetailProps {
   activity: Activity;
@@ -16,16 +18,20 @@ interface ActivityDetailProps {
 
 export function ActivityDetail({ activity, nearbyPlaces, onBack }: ActivityDetailProps) {
   const reducedMotion = useReducedMotion();
+  const backSwipe = useBackSwipe(onBack);
 
   return (
     <motion.article
       className="detail-layer"
+      data-navigation-scroll={`activity:${activity.id}`}
       aria-labelledby="detail-title"
       initial={reducedMotion ? { opacity: 0 } : { y: "100%" }}
       animate={reducedMotion ? { opacity: 1 } : { y: 0 }}
       exit={reducedMotion ? { opacity: 0 } : { y: "100%" }}
-      transition={{ type: "spring", stiffness: 320, damping: 36 }}
+      transition={reducedMotion ? { duration: 0 } : navigationMotion.spring}
+      style={{ x: backSwipe.x }}
     >
+      <div className="app-back-swipe-zone" aria-hidden="true" {...backSwipe.zoneProps} />
       <header className="detail-toolbar">
         <button type="button" className="detail-back" onClick={onBack} aria-label={es.detail.backAria}>
           <CloseIcon /><span className="sr-only">{es.detail.back}</span>

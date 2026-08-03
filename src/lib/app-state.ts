@@ -1,58 +1,56 @@
 export type AppTab = "journey" | "saved" | "trip";
+export type AssignmentStep = 1 | 2;
+export type DayMode = "view" | "organize";
+export type PlanView = "menu" | "saved" | "placement" | "create";
+
+export interface PlanSheetNavigation {
+  dayId: string;
+  planId?: string;
+  view: PlanView;
+  placeId?: string;
+}
 
 export interface AppState {
   tab: AppTab;
   selectedDay: number;
   openDayId: string | null;
+  dayMode: DayMode;
   detailActivityId: string | null;
   assignmentPlaceId: string | null;
+  assignmentStep: AssignmentStep;
+  placeEditorId: "new" | string | null;
+  placeDetailId: string | null;
+  planSheet: PlanSheetNavigation | null;
+  mealActivityId: string | null;
+  savedFilter: string;
+  tripEditingTransfers: boolean;
 }
-
-export type AppAction =
-  | { type: "SELECT_DAY"; index: number }
-  | { type: "OPEN_DAY"; dayId: string }
-  | { type: "CLOSE_DAY" }
-  | { type: "OPEN_DETAIL"; activityId: string }
-  | { type: "CLOSE_DETAIL" }
-  | { type: "OPEN_ASSIGNMENT"; placeId: string }
-  | { type: "CLOSE_ASSIGNMENT" }
-  | { type: "CHANGE_TAB"; tab: AppTab };
 
 export const initialAppState: AppState = {
   tab: "journey",
   selectedDay: 1,
   openDayId: null,
+  dayMode: "view",
   detailActivityId: null,
   assignmentPlaceId: null,
+  assignmentStep: 1,
+  placeEditorId: null,
+  placeDetailId: null,
+  planSheet: null,
+  mealActivityId: null,
+  savedFilter: "all",
+  tripEditingTransfers: false,
 };
 
-export function appReducer(state: AppState, action: AppAction): AppState {
-  switch (action.type) {
-    case "SELECT_DAY":
-      return state.openDayId === null
-        ? { ...state, selectedDay: action.index }
-        : state;
-    case "OPEN_DAY":
-      return { ...state, tab: "journey", openDayId: action.dayId };
-    case "CLOSE_DAY":
-      return { ...state, openDayId: null, detailActivityId: null };
-    case "OPEN_DETAIL":
-      return state.openDayId
-        ? { ...state, detailActivityId: action.activityId }
-        : state;
-    case "CLOSE_DETAIL":
-      return { ...state, detailActivityId: null };
-    case "OPEN_ASSIGNMENT":
-      return { ...state, assignmentPlaceId: action.placeId };
-    case "CLOSE_ASSIGNMENT":
-      return { ...state, assignmentPlaceId: null };
-    case "CHANGE_TAB":
-      return {
-        ...state,
-        tab: action.tab,
-        openDayId: null,
-        detailActivityId: null,
-        assignmentPlaceId: null,
-      };
-  }
+export function rootAppState(state: AppState, tab: AppTab = "journey"): AppState {
+  return {
+    ...initialAppState,
+    tab,
+    selectedDay: state.selectedDay,
+    savedFilter: state.savedFilter,
+  };
+}
+
+export function navigationStateEquals(left: AppState, right: AppState): boolean {
+  return JSON.stringify(left) === JSON.stringify(right);
 }

@@ -1,5 +1,16 @@
 # Plan de implementación
 
+## Iteración 09 — Navigation & Motion Polish
+
+- [x] Proteger `744c16d`, crear `iteration-09-navigation-motion-polish` y capturar baseline Chromium/WebKit.
+- [x] Localizar en `0cf6abb` la navegación histórica Ink + pill Lime y auditar la causa del flash.
+- [x] Recuperar la intención histórica dentro de `BottomNavigation` de Design System 1.1.
+- [x] Eliminar brightness/opacity del deck sin cambiar portadas ni contenido.
+- [x] Coordinar History API, X, Back, fallback, scroll y foco con una sola API.
+- [x] Añadir swipe-back lateral únicamente a pantallas secundarias.
+- [x] Cerrar Storybook, tests, matriz móvil, capturas y vídeo after.
+- [ ] Publicar Vercel Preview y esperar aprobación antes de producción.
+
 ## Iteración 08 — recuperación móvil y carácter visual
 
 - [x] Proteger baseline, crear rama y auditar producción en Chromium/WebKit y cinco viewports.

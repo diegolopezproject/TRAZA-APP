@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { CSSProperties, KeyboardEvent, PointerEvent, ReactNode } from "react";
+import type { CSSProperties, Key, KeyboardEvent, PointerEvent, ReactNode } from "react";
 import { useReducedMotion } from "motion/react";
 
 export type DayDeckAxis = "x" | "y";
@@ -48,13 +48,22 @@ export interface DayDeckProps {
   currentIndex: number;
   label: string;
   renderItem: (index: number, active: boolean) => ReactNode;
+  getItemKey?: (index: number) => Key;
   onIndexChange: (index: number) => void;
   onOpenCurrent: () => void;
+  /** Visual-QA seam used by Storybook; production leaves this undefined. */
+  diagnosticOffset?: { x: number; y: number };
+  diagnosticPressed?: boolean;
+  diagnosticSettling?: boolean;
 }
 
 const axisLockDistance = 10;
 
-export function DayDeck({ total, currentIndex, label, renderItem, onIndexChange, onOpenCurrent }: DayDeckProps) {
+export function visibleDayDeckIndices(currentIndex: number, total: number): number[] {
+  return [currentIndex - 1, currentIndex, currentIndex + 1].filter((index) => index >= 0 && index < total);
+}
+
+export function DayDeck({ total, currentIndex, label, renderItem, getItemKey, onIndexChange, onOpenCurrent, diagnosticOffset, diagnosticPressed, diagnosticSettling }: DayDeckProps) {
   const reducedMotion = useReducedMotion();
   const stageRef = useRef<HTMLDivElement>(null);
   const gestureRef = useRef<GestureState | null>(null);
@@ -70,11 +79,12 @@ export function DayDeck({ total, currentIndex, label, renderItem, onIndexChange,
   }, []);
 
   const visibleIndices = useMemo(
-    () => [currentIndex - 1, currentIndex, currentIndex + 1].filter((index) => index >= 0 && index < total),
+    () => visibleDayDeckIndices(currentIndex, total),
     [currentIndex, total],
   );
-  const dragProgress = Math.min(1, Math.abs(offset.x) / Math.max(1, stageWidth));
-  const incomingIndex = offset.x < 0 ? currentIndex + 1 : offset.x > 0 ? currentIndex - 1 : currentIndex;
+  const renderedOffset = diagnosticOffset ?? offset;
+  const dragProgress = Math.min(1, Math.abs(renderedOffset.x) / Math.max(1, stageWidth));
+  const incomingIndex = renderedOffset.x < 0 ? currentIndex + 1 : renderedOffset.x > 0 ? currentIndex - 1 : currentIndex;
 
   function reset(duration = reducedMotion ? 0 : 220) {
     setSettling(duration > 0);
@@ -86,6 +96,7 @@ export function DayDeck({ total, currentIndex, label, renderItem, onIndexChange,
 
   function handlePointerDown(event: PointerEvent<HTMLDivElement>) {
     if (settling || !event.isPrimary) return;
+    if (event.target instanceof Element && event.target.closest("button, a, input, select, textarea, [role='button']")) return;
     const now = performance.now();
     gestureRef.current = {
       pointerId: event.pointerId,
@@ -185,10 +196,10 @@ export function DayDeck({ total, currentIndex, label, renderItem, onIndexChange,
   }
 
   return (
-    <div className="ds-day-deck" data-axis={axis ?? "pending"} data-pressed={pressed || undefined}>
+    <div className="ds-day-deck" data-axis={axis ?? "pending"} data-pressed={diagnosticPressed || pressed || undefined}>
       <div
         ref={stageRef}
-        className={`ds-day-deck__stage${settling ? " is-settling" : ""}`}
+        className={`ds-day-deck__stage${diagnosticSettling || settling ? " is-settling" : ""}`}
         role="region"
         aria-roledescription="deck"
         aria-label={label}
@@ -202,9 +213,9 @@ export function DayDeck({ total, currentIndex, label, renderItem, onIndexChange,
         {visibleIndices.map((index) => {
           const slot = index - currentIndex;
           const style = {
-            transform: `translate3d(calc(${slot * 100}% + ${slot * 12}px + ${offset.x}px), ${index === currentIndex ? offset.y : 0}px, 0)`,
+            transform: `translate3d(calc(${slot * 100}% + ${slot * 12}px + ${renderedOffset.x}px), ${index === currentIndex ? renderedOffset.y : 0}px, 0)`,
           } as CSSProperties;
-          return <div className={`ds-day-deck__card${index === currentIndex ? " is-current" : ""}`} data-index={index} data-slot={slot} key={index} style={style}>{renderItem(index, index === currentIndex)}</div>;
+          return <div className={`ds-day-deck__card${index === currentIndex ? " is-current" : ""}`} data-index={index} data-slot={slot} key={getItemKey?.(index) ?? index} style={style}>{renderItem(index, index === currentIndex)}</div>;
         })}
       </div>
       <div className="ds-day-deck__indicator" role="progressbar" aria-label={`${currentIndex + 1} de ${total}`} aria-valuemin={1} aria-valuemax={total} aria-valuenow={currentIndex + 1}>

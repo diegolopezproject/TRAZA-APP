@@ -22,4 +22,10 @@ Meal cards open a restaurant picker, prioritize matching areas, retain `sourcePl
 
 ## Bottom navigation
 
-The active pill uses a short shared-layout transition. Saved and Trip scroll inside a viewport area that ends above the navigation dock, so the floating pill never covers their actions. Reduced motion preserves the state change without the spatial interpolation.
+The compact Ink dock restores the historic Electric Lime active pill inside the current Design System component. Icon and label move together with a short shared-layout transition. Saved and Trip scroll inside a viewport area that ends above the navigation dock, so the floating pill never covers their actions. Reduced motion preserves the state change without the spatial interpolation.
+
+## Browser and Android Back
+
+`useAppNavigation` is the single coordinator for React navigation and the browser History API. Opening a day, detail, sheet, form or relevant flow step pushes an entry; changing the selected day or Saved filter replaces the current entry. `popstate` restores the matching state, scroll containers and opener focus.
+
+X, visible Back and the internal edge swipe all call the same semantic `back()`. On a direct deep entry with no TRAZA predecessor, close replaces the state with safe `#days`; at the true Days root, system Back remains free to leave the app. The internal swipe zone exists only on secondary layers and does not intercept the horizontal day deck.

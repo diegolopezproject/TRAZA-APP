@@ -1,37 +1,59 @@
 # Sistema de movimiento
 
-El movimiento de Electric London explica relaciones espaciales y confirma acciones. No existe animación decorativa permanente fuera del pulso sutil del handle.
+El movimiento de TRAZA comunica jerarquía espacial y confirma acciones. Cada contexto usa una familia semántica distinta; no existe una animación genérica para toda la aplicación.
 
-## Momentos principales
+## Navigation motion
 
-1. **Cambio de capítulo:** scroll snap nativo, vecinos parciales, escala y saturación contenidas; parallax interno durante el drag vertical.
-2. **Abrir/cerrar día:** plegado perspectivo descrito en `DAY_TRANSITION.md`, spring controlado y aparición escalonada del contenido.
-3. **Actividad a detalle:** la media de Sky Garden comparte `layoutId` con el hero; el itinerario sigue montado y conserva el scroll.
-4. **Asignar o elegir:** bottom sheet desde el borde inferior, card actualizada, toast con deshacer y persistencia inmediata.
+Uso: cambio de sección, apertura/cierre de día, detalle y retroceso.
 
-## Microinteracciones
+- Spring: stiffness 420, damping 36, mass 0.78.
+- Distancia de entrada de capa: 24 px.
+- Pill de bottom navigation: `layoutId` compartido, sin crossfade de todo el dock.
+- Swipe-back: zona lateral de 24 px, desplazamiento directo con el dedo.
+- Commit de back: 28 % del viewport hasta un máximo de 112 px; un flick exige al menos 40 px y velocidad 0.5 px/ms.
+- Cancelación: spring 420/38/0.82.
+- Opacidad: no se reduce la pantalla subyacente durante back. Una capa secundaria puede usar fade solo en reduced motion.
 
-- Navegación inferior: pill compartida, presión breve, icono/label coordinados y safe area.
-- Formularios: entrada del sheet, confirmación por toast y aparición del elemento en su lista.
-- Comidas: selección destacada en lima, sustitución no destructiva y retirada reversible.
-- Traslados y anchors: expansión local sin desplazar la navegación fuera de su zona segura.
+## Deck motion
 
-## Tokens compartidos
+Uso exclusivo: cambiar de día y abrir la portada mediante gesto vertical.
 
-Los componentes consumen `src/lib/motion.ts`; los valores no se redefinen de forma local.
+- Settling: 220 ms con `cubic-bezier(.16, 1, .3, 1)`.
+- Threshold horizontal: 22 % del ancho, limitado a 72–112 px.
+- Flick horizontal: 0.5 px/ms y misma dirección que el desplazamiento.
+- Apertura vertical: 72 px o velocidad -0.52 px/ms.
+- Un gesto cambia como máximo un día y nunca hace loop.
+- Escala mínima aprobada: 0.98. La presión actual usa 0.995.
+- Opacidad de card y deck: siempre 1.
+- Filtros, overlays oscuros y crossfade completo: prohibidos.
+- Anterior, activa y siguiente permanecen montadas con key estable de día.
+- El indicador mantiene el índice confirmado; el segmento entrante solo muestra progreso de drag.
 
-| Token | Valor | Uso |
-|---|---|---|
-| `gestureSpring` | stiffness 360, damping 32, mass 0.78 | navegación, controles y confirmaciones directas |
-| `layerSpring` | stiffness 285, damping 34, mass 0.9 | hojas, detalle y cambio de capa |
-| `softSpring` | stiffness 220, damping 30, mass 1 | reorganización y cambios editoriales suaves |
-| `quickEase` | 180 ms, cubic-bezier(0.22, 1, 0.36, 1) | estados CSS breves |
-| `layerEase` | 280 ms, cubic-bezier(0.22, 1, 0.36, 1) | entrada/salida CSS de superficies |
+## Modal motion
 
-La rotación máxima de portada es 11°, su escala mínima es 0.96, el stagger del itinerario es 45 ms por card (máximo 360 ms) y el toast permanece 4.2 s con acción de deshacer.
+Uso: sheets, formularios y selectores.
 
-## Accesibilidad
+- Spring: stiffness 360, damping 38, mass 0.92.
+- Entrada principal desde el borde inferior.
+- Swipe-back horizontal se compone con el eje vertical sin instalar listeners globales.
+- El backdrop puede animar opacidad; nunca se reutiliza dentro del deck.
 
-- `prefers-reduced-motion` elimina animaciones, scroll suave y pulso.
-- Ninguna función depende únicamente de animación o gesto.
-- El foco visible se mantiene durante aperturas, navegación y formularios.
+## Microinteraction
+
+Uso: botones, tabs, badges, indicador y feedback local.
+
+- Duración: 160 ms.
+- Easing: `cubic-bezier(.22, 1, .36, 1)`.
+- Escala pressed: 0.97 mediante token compartido.
+- Ninguna microinteracción cambia la geometría reservada ni la posición de lectura.
+
+## Historial y continuidad
+
+El movimiento no decide navegación. `useAppNavigation` crea/restaura entradas de History API y el mismo `back()` alimenta X, botón Back, `popstate` y swipe-back. Cada entrada conserva scroll y foco de retorno; la animación solo representa ese cambio ya coordinado.
+
+## Reduced motion
+
+- Cambio inmediato o desplazamiento corto; sin parallax ni spring.
+- El deck mantiene color y contexto, sin fade global.
+- Historial, fallback, foco, scroll y gestos conservan toda la función.
+- CSS reduce las duraciones a `.01ms`; Motion usa duración cero o el token instantáneo según el contexto.

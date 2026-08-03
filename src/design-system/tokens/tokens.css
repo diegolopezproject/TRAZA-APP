@@ -69,12 +69,16 @@
   --ds-blur-atmosphere: 1.2rem;
   --ds-ease-standard: cubic-bezier(.2, .8, .2, 1);
   --ds-ease-enter: cubic-bezier(.16, 1, .3, 1);
+  --ds-motion-pressed-scale: .97;
 
   /* Layout, safe area and layers. */
   --ds-layout-content: 42.5rem;
   --ds-layout-wide: 62rem;
   --ds-touch-target: 2.75rem;
-  --ds-navigation-height: 4.25rem;
+  --ds-navigation-height: 3.875rem;
+  --ds-navigation-max-width: 22rem;
+  --ds-navigation-item-height: 3.375rem;
+  --ds-navigation-icon-size: 1.125rem;
   --ds-navigation-gap: .625rem;
   --ds-safe-top: env(safe-area-inset-top, 0px);
   --ds-safe-right: env(safe-area-inset-right, 0px);

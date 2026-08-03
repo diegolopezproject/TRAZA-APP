@@ -8,6 +8,7 @@ import { slugify } from "@/lib/format";
 import { HeartIcon, PlusIcon } from "./icons";
 import { MediaFrame } from "./media-frame";
 import { MobileSheet } from "./mobile-sheet";
+import type { PlanView } from "@/lib/app-state";
 
 interface PlanFormSheetProps {
   day: Day;
@@ -18,6 +19,9 @@ interface PlanFormSheetProps {
   onSave: (plan: UserPlan) => void;
   onDelete?: (plan: UserPlan) => void;
   onClose: () => void;
+  view: PlanView;
+  placementPlaceId?: string;
+  onNavigate: (view: PlanView, placeId?: string) => void;
 }
 
 function levelFor(status: ActivityStatus): ActivityLevel {
@@ -31,10 +35,9 @@ const placementOptions: Array<{ value: DaySection; label: string; copy: string }
   { value: "anytime", label: "Opciones cercanas", copy: "Decidir después, sin perderlo" },
 ];
 
-export function PlanFormSheet({ day, days, places, plan, onChoosePlace, onSave, onDelete, onClose }: PlanFormSheetProps) {
+export function PlanFormSheet({ day, days, places, plan, onChoosePlace, onSave, onDelete, onClose, view: mode, placementPlaceId, onNavigate }: PlanFormSheetProps) {
   const formId = useId();
-  const [mode, setMode] = useState<"menu" | "saved" | "create">(plan ? "create" : "menu");
-  const [placementPlace, setPlacementPlace] = useState<Place | null>(null);
+  const placementPlace = places.find((place) => place.id === placementPlaceId) ?? null;
   const [name, setName] = useState(plan?.title ?? "");
   const [dayId, setDayId] = useState(plan?.dayId ?? day.id);
   const [section, setSection] = useState<DaySection>(plan?.section ?? "anytime");
@@ -69,25 +72,25 @@ export function PlanFormSheet({ day, days, places, plan, onChoosePlace, onSave, 
 
   const footer = mode === "create" ? (
     <><button className="secondary-button" type="button" onClick={onClose}>{es.forms.cancel}</button><button className="primary-button" type="submit" form={formId}>{es.forms.save}</button></>
-  ) : mode === "saved" && placementPlace ? (
-    <><button className="secondary-button" type="button" onClick={() => setPlacementPlace(null)}>Atrás</button><button className="primary-button" type="button" onClick={() => onChoosePlace(placementPlace.id, section)}>Añadir al día</button></>
+  ) : mode === "placement" && placementPlace ? (
+    <><button className="secondary-button" type="button" onClick={onClose}>Atrás</button><button className="primary-button" type="button" onClick={() => onChoosePlace(placementPlace.id, section)}>Añadir al día</button></>
   ) : undefined;
 
   return (
     <MobileSheet title={plan ? es.forms.editPlan : es.forms.addPlan} kicker={`Días / ${day.date.slice(-2)} AGO`} closeLabel={es.forms.close} onClose={onClose} footer={footer} wide>
       {mode === "menu" ? (
         <div className="plan-choice-grid">
-          <button type="button" onClick={() => setMode("saved")}><HeartIcon /><strong>{es.forms.chooseSaved}</strong><span>Conserva el lugar en Guardados.</span></button>
-          <button type="button" onClick={() => setMode("create")}><PlusIcon /><strong>{es.forms.createPlan}</strong><span>Añade una actividad local y editable.</span></button>
+          <button type="button" onClick={() => onNavigate("saved")}><HeartIcon /><strong>{es.forms.chooseSaved}</strong><span>Conserva el lugar en Guardados.</span></button>
+          <button type="button" onClick={() => onNavigate("create")}><PlusIcon /><strong>{es.forms.createPlan}</strong><span>Añade una actividad local y editable.</span></button>
         </div>
       ) : null}
 
-      {mode === "saved" ? (
+      {mode === "saved" || mode === "placement" ? (
         <div className="saved-picker-list">
           {placementPlace ? (
             <div className="placement-step"><p className="mono-label">{placementPlace.name}</p><h3>¿Dónde quieres colocarlo?</h3><p>Elige una capa; podrás reorganizarlo más tarde.</p><div className="placement-options">{placementOptions.map((option) => <button type="button" key={option.value} className={section === option.value ? "is-selected" : ""} onClick={() => setSection(option.value)}><strong>{option.label}</strong><small>{option.copy}</small></button>)}</div></div>
           ) : places.map((place) => (
-            <button type="button" key={place.id} onClick={() => setPlacementPlace(place)}>{place.media ? <MediaFrame media={place.media} sizes="64px" /> : <span className="mini-fallback">{place.name.slice(0, 2).toUpperCase()}</span>}<span><strong>{place.name}</strong><small>{place.area ?? "Londres"} · {es.saved.categories[place.category]}</small></span><PlusIcon /></button>
+            <button type="button" key={place.id} onClick={() => onNavigate("placement", place.id)}>{place.media ? <MediaFrame media={place.media} sizes="64px" /> : <span className="mini-fallback">{place.name.slice(0, 2).toUpperCase()}</span>}<span><strong>{place.name}</strong><small>{place.area ?? "Londres"} · {es.saved.categories[place.category]}</small></span><PlusIcon /></button>
           ))}
         </div>
       ) : null}

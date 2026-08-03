@@ -7,11 +7,10 @@ import { formatSpanishShortDate, mapsUrl } from "@/lib/format";
 import { ArrowIcon, CheckIcon, MapIcon, PlaneIcon, TicketIcon } from "./icons";
 import { FlightTicketCard, TripSectionCard } from "@/design-system";
 
-interface TripViewProps { trip: Trip; onSaveTransfers: (transfers: TransferPlan[]) => void; }
+interface TripViewProps { trip: Trip; editingTransfers: boolean; onStartTransferEditing: () => void; onSaveTransfers: (transfers: TransferPlan[]) => void; }
 
-export function TripView({ trip, onSaveTransfers }: TripViewProps) {
+export function TripView({ trip, editingTransfers, onStartTransferEditing, onSaveTransfers }: TripViewProps) {
   const [anchorsOpen, setAnchorsOpen] = useState(false);
-  const [editingTransfers, setEditingTransfers] = useState(false);
   const [draftTransfers, setDraftTransfers] = useState(trip.transfers);
   const anchors = trip.days.flatMap((day) => day.activities.filter((activity) => activity.level === "anchor" && activity.status === "confirmed").map((activity) => ({ day, activity })));
 
@@ -21,11 +20,11 @@ export function TripView({ trip, onSaveTransfers }: TripViewProps) {
 
   function finishTransferEditing() {
     if (editingTransfers) onSaveTransfers(draftTransfers);
-    setEditingTransfers((value) => !value);
+    else onStartTransferEditing();
   }
 
   return (
-    <section className="trip-view" aria-labelledby="trip-title">
+    <section className="trip-view" aria-labelledby="trip-title" data-navigation-scroll="trip">
       <header className="trip-header">
         <div><p className="mono-label">Londres 2026</p><h1 id="trip-title">El viaje,<br /><span>en claro.</span></h1><p>Todo lo fijo y logístico, sin exponer referencias privadas.</p></div>
         <div className="trip-facts"><span><b>{trip.days.length}</b> {es.trip.days}</span><span><b>{trip.travellers.length}</b> {es.trip.travellers}</span><span><b>{anchors.length}</b> confirmados</span></div>

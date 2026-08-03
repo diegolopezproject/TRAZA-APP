@@ -1051,6 +1051,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-colo
 .day-motif--compact svg { transform: scale(.88) translate(22px, 8px); transform-origin: center; }
 
 .day-open-layer, .detail-layer { width: 100%; height: 100dvh; min-height: 100svh; inset: 0; }
+.app-back-swipe-zone { display: none; position: absolute; z-index: var(--ds-layer-sticky); top: 0; bottom: 0; left: max(var(--ds-safe-left), var(--ds-space-2)); width: var(--ds-space-6); touch-action: pan-y; }
 .itinerary-scroll { height: 100dvh; padding-bottom: var(--safe-bottom); scroll-padding-top: var(--top-safe-content); scroll-padding-bottom: var(--bottom-safe-content); -webkit-overflow-scrolling: touch; }
 .open-day-hero { min-height: clamp(350px, 47svh, 420px); padding: var(--top-safe-content) max(14px, var(--safe-right)) 20px max(14px, var(--safe-left)); }
 .open-day-toolbar { min-height: 52px; height: auto; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 10px; align-items: start; }
@@ -1167,6 +1168,10 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-colo
   .day-cover { will-change: auto; }
 }
 
+@media (pointer: coarse) {
+  .app-back-swipe-zone { display: block; }
+}
+
 /* Iteration 08 · product layouts consume Design System 1.1 patterns. */
 .open-day-hero { min-height: 0; padding: 0; border-radius: 0 0 var(--ds-radius-hero) var(--ds-radius-hero); background: var(--cover-bg); color: var(--cover-fg); }
 .open-day-hero .ds-day-header { position: relative; z-index: var(--ds-layer-sticky); }
@@ -1178,7 +1183,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-colo
 .itinerary-actions .ds-button { width: auto; min-height: var(--ds-touch-target); margin: 0; font-size: .8125rem; }
 .itinerary-actions .ds-button--primary { color: var(--ink); background: var(--lime); }
 .itinerary-actions .ds-button--secondary { color: var(--ink); background: transparent; }
-.section-heading.ds-section-header { grid-template-columns: 2rem minmax(0, 1fr) auto; gap: var(--ds-space-2); align-items: baseline; padding: 0 var(--ds-space-1) var(--ds-space-3); }
+.section-heading.ds-section-header { grid-template-columns: var(--ds-space-8) minmax(0, 1fr) auto; gap: var(--ds-space-2); align-items: baseline; padding: 0 var(--ds-space-1) var(--ds-space-3); }
 .section-heading.ds-section-header h2 { font-size: var(--ds-type-title); }
 
 .saved-header { display: grid; justify-items: start; padding: 0 0 var(--ds-space-5); }
@@ -1188,7 +1193,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-colo
 .saved-editorial-list .ds-saved-place-card { width: 100%; }
 .saved-editorial-list .ds-media-attribution { left: var(--ds-space-2); right: auto; bottom: auto; }
 
-.travel-doc.ds-trip-section-card { padding: var(--ds-space-5) var(--ds-space-5) var(--ds-space-5) calc(var(--ds-space-5) + .25rem); border: 1px solid var(--ink); box-shadow: none; }
+.travel-doc.ds-trip-section-card { padding: var(--ds-space-5) var(--ds-space-5) var(--ds-space-5) var(--ds-space-6); border: 1px solid var(--ink); box-shadow: none; }
 .travel-doc.ds-trip-section-card h2 { margin: 0; }
 .travel-doc.ds-trip-section-card > header { margin-bottom: var(--ds-space-5); }
 .flight-list { display: grid; gap: var(--ds-space-3); }

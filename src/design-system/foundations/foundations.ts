@@ -1,4 +1,5 @@
 export const trazaViewports = {
+  mobile360: { name: "Mobile 360", styles: { width: "360px", height: "800px" } },
   mobile390: { name: "Mobile 390", styles: { width: "390px", height: "844px" } },
   mobile402: { name: "Mobile 402", styles: { width: "402px", height: "874px" } },
   mobile430: { name: "Mobile 430", styles: { width: "430px", height: "932px" } },

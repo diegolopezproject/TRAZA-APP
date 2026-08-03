@@ -1,8 +1,19 @@
+"use client";
+
 import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { motion, useReducedMotion } from "motion/react";
+import { navigationMotion } from "@/lib/motion";
 
 export interface NavigationItem<Id extends string> { id: Id; label: string; icon: ReactNode; }
-export function BottomNavigation<Id extends string>({ items, active, onChange, label, variant = "ink" }: { items: readonly NavigationItem<Id>[]; active: Id; onChange: (id: Id) => void; label: string; variant?: "ink" | "elevated" }) {
-  return <nav className={`ds-bottom-navigation ds-bottom-navigation--${variant}`} aria-label={label}>{items.map((item) => <button key={item.id} type="button" aria-current={active === item.id ? "page" : undefined} className={`ds-bottom-navigation__item${active === item.id ? " is-active" : ""}`} onClick={() => onChange(item.id)}><span className="ds-bottom-navigation__icon">{item.icon}</span><span>{item.label}</span></button>)}</nav>;
+export function BottomNavigation<Id extends string>({ items, active, onChange, label, className = "" }: { items: readonly NavigationItem<Id>[]; active: Id; onChange: (id: Id) => void; label: string; className?: string }) {
+  const reducedMotion = useReducedMotion();
+  return <nav className={`ds-bottom-navigation ${className}`.trim()} aria-label={label}>{items.map((item) => {
+    const selected = active === item.id;
+    return <button key={item.id} type="button" aria-current={selected ? "page" : undefined} className={`ds-bottom-navigation__item${selected ? " is-active" : ""}`} onClick={() => onChange(item.id)}>
+      {selected ? <motion.span className="ds-bottom-navigation__active-pill" aria-hidden="true" layoutId={`ds-bottom-navigation-pill-${label}`} transition={reducedMotion ? { duration: 0 } : navigationMotion.spring} /> : null}
+      <span className="ds-bottom-navigation__icon">{item.icon}</span><span className="ds-bottom-navigation__label">{item.label}</span>
+    </button>;
+  })}</nav>;
 }
 
 export function CarouselNavigation({ current, total, previousLabel, nextLabel, onPrevious, onNext }: { current: number; total: number; previousLabel: string; nextLabel: string; onPrevious: () => void; onNext: () => void }) {

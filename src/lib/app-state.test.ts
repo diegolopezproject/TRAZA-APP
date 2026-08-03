@@ -1,46 +1,37 @@
 import { describe, expect, it } from "vitest";
-import { appReducer, initialAppState } from "./app-state";
+import { initialAppState, rootAppState } from "./app-state";
+import { createAppHistoryEntry, directEntryFallback, navigationFromHash, navigationHash, readAppHistoryEntry } from "./use-app-navigation";
 
-describe("appReducer", () => {
-  it("blocks horizontal day changes while a day is open", () => {
-    const open = appReducer(initialAppState, {
-      type: "OPEN_DAY",
-      dayId: "2026-08-07",
-    });
-    expect(appReducer(open, { type: "SELECT_DAY", index: 4 })).toBe(open);
+describe("app navigation state", () => {
+  it("returns to a safe Days root while preserving the selected day and filter", () => {
+    const nested = { ...initialAppState, tab: "saved" as const, selectedDay: 3, savedFilter: "food-drink", placeDetailId: "mms-london" };
+    expect(directEntryFallback(nested)).toEqual({ ...initialAppState, selectedDay: 3, savedFilter: "food-drink" });
   });
 
-  it("preserves the open day when closing an activity detail", () => {
-    const open = appReducer(initialAppState, {
-      type: "OPEN_DAY",
-      dayId: "2026-08-07",
-    });
-    const detail = appReducer(open, {
-      type: "OPEN_DETAIL",
-      activityId: "sky-garden",
-    });
-    expect(appReducer(detail, { type: "CLOSE_DETAIL" })).toMatchObject({
-      openDayId: "2026-08-07",
-      detailActivityId: null,
-    });
+  it("clears nested contexts when moving to a root tab", () => {
+    const nested = { ...initialAppState, openDayId: "2026-08-07", detailActivityId: "sky-garden", dayMode: "organize" as const };
+    expect(rootAppState(nested, "trip")).toMatchObject({ tab: "trip", openDayId: null, detailActivityId: null, dayMode: "view" });
   });
 
-  it("clears nested navigation when changing tabs", () => {
-    const nested = {
-      ...initialAppState,
-      openDayId: "2026-08-07",
-      detailActivityId: "sky-garden",
-    };
-    expect(appReducer(nested, { type: "CHANGE_TAB", tab: "saved" })).toMatchObject({
-      tab: "saved",
-      openDayId: null,
-      detailActivityId: null,
-    });
+  it("serializes and restores the Android back sequence for Sky Garden", () => {
+    const detail = { ...initialAppState, openDayId: "2026-08-07", detailActivityId: "sky-garden" };
+    const restored = navigationFromHash(navigationHash(detail));
+    expect(restored).toMatchObject({ tab: "journey", selectedDay: 1, openDayId: "2026-08-07", detailActivityId: "sky-garden" });
   });
 
-  it("keeps assignment-sheet navigation isolated from trip data", () => {
-    const open = appReducer(initialAppState, { type: "OPEN_ASSIGNMENT", placeId: "kynance-mews" });
-    expect(open.assignmentPlaceId).toBe("kynance-mews");
-    expect(appReducer(open, { type: "CLOSE_ASSIGNMENT" }).assignmentPlaceId).toBeNull();
+  it("serializes assignment steps as distinct history levels", () => {
+    const stepTwo = { ...initialAppState, tab: "saved" as const, assignmentPlaceId: "mms-london", assignmentStep: 2 as const };
+    expect(navigationHash(stepTwo)).toBe("#saved/assignment/mms-london/step/2");
+    expect(navigationFromHash(navigationHash(stepTwo))).toMatchObject({ assignmentPlaceId: "mms-london", assignmentStep: 2 });
+  });
+
+  it("ignores unknown plan views from external hashes", () => {
+    expect(navigationFromHash("#days/2026-08-07/plan/unknown").planSheet).toBeNull();
+  });
+
+  it("recognizes only versioned TRAZA history entries", () => {
+    const entry = createAppHistoryEntry(initialAppState, 2);
+    expect(readAppHistoryEntry({ __trazaNavigationV1: entry })).toEqual(entry);
+    expect(readAppHistoryEntry({ navigation: initialAppState })).toBeNull();
   });
 });

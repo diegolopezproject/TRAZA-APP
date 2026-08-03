@@ -11,7 +11,7 @@ export const token = {
   space: { pageInline: "var(--ds-space-page-inline)" },
   radius: { control: "var(--ds-radius-control)", card: "var(--ds-radius-card)", pill: "var(--ds-radius-pill)" },
   motion: { fast: "var(--ds-duration-fast)", base: "var(--ds-duration-base)", slow: "var(--ds-duration-slow)" },
-  layout: { navigationHeight: "var(--ds-navigation-height)", navigationReserve: "var(--ds-navigation-reserve)" },
+  layout: { navigationHeight: "var(--ds-navigation-height)", navigationItemHeight: "var(--ds-navigation-item-height)", navigationReserve: "var(--ds-navigation-reserve)" },
   layer: { nav: "var(--ds-layer-nav)", overlay: "var(--ds-layer-overlay)", toast: "var(--ds-layer-toast)" },
 } as const;
 

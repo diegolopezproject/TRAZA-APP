@@ -10,7 +10,8 @@ import { ActivityCard } from "./activity-card";
 import { ChevronIcon, CloseIcon, HeartIcon, MapIcon, PlusIcon } from "./icons";
 import { MediaFrame } from "./media-frame";
 import { DayMotif } from "./day-motif";
-import { gestureSpring, motionDuration } from "@/lib/motion";
+import { motionDuration, navigationMotion } from "@/lib/motion";
+import { useBackSwipe } from "@/lib/use-back-swipe";
 import { ActionGroup, Button, DayHeader, DayHero, SectionHeader } from "@/design-system";
 
 interface AssignedItem { place: Place; assignment: PlaceAssignment; }
@@ -29,6 +30,9 @@ interface DayItineraryProps {
   placements: ActivityPlacement[];
   onSavePlacements: (placements: ActivityPlacement[]) => void;
   onOrganizeNotice: (message: string) => void;
+  organizing: boolean;
+  onStartOrganizing: () => void;
+  onFinishOrganizing: () => void;
 }
 
 type SectionId = "morning" | "afternoon" | "evening";
@@ -43,12 +47,12 @@ function sectionFor(activity: Activity): SectionId {
 
 function activityTitle(activity: Activity): string { return activityTitleEs(activity); }
 
-export function DayItinerary({ day, dayIndex, onClose, onOpenActivity, assignedItems, onEditAssignment, onOpenPlace, onAddPlan, onEditPlan, onOpenMeal, placements, onSavePlacements, onOrganizeNotice }: DayItineraryProps) {
+export function DayItinerary({ day, dayIndex, onClose, onOpenActivity, assignedItems, onEditAssignment, onOpenPlace, onAddPlan, onEditPlan, onOpenMeal, placements, onSavePlacements, onOrganizeNotice, organizing, onStartOrganizing, onFinishOrganizing }: DayItineraryProps) {
   const reducedMotion = useReducedMotion();
+  const backSwipe = useBackSwipe(onClose);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const pullStart = useRef<number | null>(null);
   const [pull, setPull] = useState(0);
-  const [organizing, setOrganizing] = useState(false);
   const [draftActivities, setDraftActivities] = useState<Activity[]>(day.activities);
   const sections: Array<{ id: SectionId; label: string }> = [
     { id: "morning", label: es.day.sections[0] },
@@ -83,7 +87,7 @@ export function DayItinerary({ day, dayIndex, onClose, onOpenActivity, assignedI
       return placement ? { ...activity, section: placement.section } : activity;
     });
     setDraftActivities(next);
-    setOrganizing(true);
+    onStartOrganizing();
   }
 
   function isLocked(activity: Activity) {
@@ -117,7 +121,7 @@ export function DayItinerary({ day, dayIndex, onClose, onOpenActivity, assignedI
   function saveOrganization() {
     const next = draftActivities.map((activity, order) => ({ activityId: activity.id, dayId: day.id, section: sectionFor(activity), order }));
     onSavePlacements(next);
-    setOrganizing(false);
+    onFinishOrganizing();
     onOrganizeNotice("Cambios de organización guardados");
   }
 
@@ -127,13 +131,14 @@ export function DayItinerary({ day, dayIndex, onClose, onOpenActivity, assignedI
     <motion.section
       className="day-open-layer"
       aria-label={es.day.itineraryAria(weekday, dayNumber(day.date))}
-      initial={reducedMotion ? { opacity: 0 } : { y: 72, opacity: .35, scale: .975, rotateX: 7 }}
-      animate={{ y: 0, opacity: 1, scale: 1, rotateX: 0 }}
-      exit={reducedMotion ? { opacity: 0 } : { y: 92, opacity: 0, scale: .98, rotateX: 5 }}
-      transition={reducedMotion ? { duration: motionDuration.fast } : gestureSpring}
-      style={{ transformOrigin: "50% 0%" }}
+      initial={reducedMotion ? false : { y: navigationMotion.distance, scale: .985, rotateX: 5 }}
+      animate={{ y: 0, scale: 1, rotateX: 0 }}
+      exit={reducedMotion ? { opacity: 0 } : { y: navigationMotion.distance, scale: .985, rotateX: 4 }}
+      transition={reducedMotion ? { duration: motionDuration.instant } : navigationMotion.spring}
+      style={{ transformOrigin: "50% 0%", x: backSwipe.x }}
     >
-      <div ref={scrollerRef} className="itinerary-scroll" style={pullStyle} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd} data-testid="itinerary-scroll">
+      <div className="app-back-swipe-zone" aria-hidden="true" {...backSwipe.zoneProps} />
+      <div ref={scrollerRef} className="itinerary-scroll" style={pullStyle} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd} data-testid="itinerary-scroll" data-navigation-scroll={`day:${day.id}`}>
         <div className={`pull-indicator${pull >= 96 ? " is-ready" : ""}`} aria-hidden="true"><span /></div>
 
         <div className={`open-day-hero theme-${day.visualTheme}`}>
@@ -143,7 +148,7 @@ export function DayItinerary({ day, dayIndex, onClose, onOpenActivity, assignedI
 
         <div className="itinerary-content">
           {!organizing ? <ActionGroup className="itinerary-actions" primary={<Button onClick={onAddPlan}><PlusIcon /> {es.day.addPlan}</Button>} secondary={<Button variant="secondary" onClick={startOrganizing}>Organizar</Button>} /> : null}
-          {organizing ? <div className="organize-bar surface-translucent" role="toolbar" aria-label="Guardar cambios de organización"><button type="button" className="organize-cancel" onClick={() => setOrganizing(false)}>Cancelar</button><button type="button" className="organize-save" onClick={saveOrganization}>Guardar cambios</button></div> : null}
+          {organizing ? <div className="organize-bar surface-translucent" role="toolbar" aria-label="Guardar cambios de organización"><button type="button" className="organize-cancel" onClick={onFinishOrganizing}>Cancelar</button><button type="button" className="organize-save" onClick={saveOrganization}>Guardar cambios</button></div> : null}
 
           {sections.map((section, sectionIndex) => {
             const activities = (organizing ? draftActivities : day.activities).filter((activity) => sectionFor(activity) === section.id);
