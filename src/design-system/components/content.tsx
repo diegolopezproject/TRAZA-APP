@@ -5,8 +5,12 @@ export function Eyebrow({ className = "", ...props }: HTMLAttributes<HTMLParagra
   return <p {...props} className={`ds-eyebrow ${className}`.trim()} />;
 }
 
-export function SectionHeader({ title, count, action, className = "", ...props }: HTMLAttributes<HTMLElement> & { title: string; count?: ReactNode; action?: ReactNode }) {
-  return <header {...props} className={`ds-section-header ${className}`.trim()}><div><h2>{title}</h2>{count ? <span className="ds-count-badge">{count}</span> : null}</div>{action}</header>;
+export function SectionHeader({ title, count, index, action, className = "", ...props }: HTMLAttributes<HTMLElement> & { title: string; count?: ReactNode; index?: ReactNode; action?: ReactNode }) {
+  return <header {...props} className={`ds-section-header ${className}`.trim()}>{index ? <span className="ds-section-header__index">{index}</span> : null}<h2>{title}</h2>{count ? <span className="ds-section-header__count">{count}</span> : null}{action ? <div className="ds-section-header__action">{action}</div> : null}</header>;
+}
+
+export function PageHeader({ eyebrow, title, count, className = "", ...props }: HTMLAttributes<HTMLElement> & { eyebrow: string; title: string; count?: ReactNode }) {
+  return <header {...props} className={`ds-page-header ${className}`.trim()}><Eyebrow>{eyebrow}</Eyebrow><h1>{title}</h1>{count ? <p>{count}</p> : null}</header>;
 }
 
 export function StatusBadge({ status, children, className = "" }: { status: CoreStatus; children?: ReactNode; className?: string }) {

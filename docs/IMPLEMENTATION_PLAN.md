@@ -1,5 +1,16 @@
 # Plan de implementación
 
+## Iteración 08 — recuperación móvil y carácter visual
+
+- [x] Proteger baseline, crear rama y auditar producción en Chromium/WebKit y cinco viewports.
+- [x] Sustituir el carrusel libre por `DayDeck` controlado con axis lock y máximo ±1.
+- [x] Recuperar navbar Ink y una reserva inferior única.
+- [x] Madurar DayCover 2.0 con pilotos expresivos 6, 7 y 10.
+- [x] Simplificar día abierto, headers internos y copy redundante.
+- [x] Reconstruir SavedPlaceCard y flight tickets desde Patterns.
+- [x] Añadir historias atmosférica/flat, vertical stack y contenido largo real.
+- [ ] Cerrar gates y Vercel Preview sin tocar producción; vídeo y matriz ya validados.
+
 ## Iteración 06 — base móvil y capítulos ilustrados
 
 - [x] Proteger el baseline, ejecutar el quality gate inicial y crear `iteration-06-mobile-foundation`.

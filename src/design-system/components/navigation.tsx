@@ -1,8 +1,8 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 export interface NavigationItem<Id extends string> { id: Id; label: string; icon: ReactNode; }
-export function BottomNavigation<Id extends string>({ items, active, onChange, label }: { items: readonly NavigationItem<Id>[]; active: Id; onChange: (id: Id) => void; label: string }) {
-  return <nav className="ds-bottom-navigation" aria-label={label}>{items.map((item) => <button key={item.id} type="button" aria-current={active === item.id ? "page" : undefined} className={`ds-bottom-navigation__item${active === item.id ? " is-active" : ""}`} onClick={() => onChange(item.id)}><span className="ds-bottom-navigation__icon">{item.icon}</span><span>{item.label}</span></button>)}</nav>;
+export function BottomNavigation<Id extends string>({ items, active, onChange, label, variant = "ink" }: { items: readonly NavigationItem<Id>[]; active: Id; onChange: (id: Id) => void; label: string; variant?: "ink" | "elevated" }) {
+  return <nav className={`ds-bottom-navigation ds-bottom-navigation--${variant}`} aria-label={label}>{items.map((item) => <button key={item.id} type="button" aria-current={active === item.id ? "page" : undefined} className={`ds-bottom-navigation__item${active === item.id ? " is-active" : ""}`} onClick={() => onChange(item.id)}><span className="ds-bottom-navigation__icon">{item.icon}</span><span>{item.label}</span></button>)}</nav>;
 }
 
 export function CarouselNavigation({ current, total, previousLabel, nextLabel, onPrevious, onNext }: { current: number; total: number; previousLabel: string; nextLabel: string; onPrevious: () => void; onNext: () => void }) {

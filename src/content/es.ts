@@ -77,7 +77,7 @@ export const es = {
     intro: "Una ruta con puntos clave y espacio para decidir sobre la marcha.",
     legend: "Claves del itinerario",
     sections: ["Mañana", "Mediodía / tarde", "Noche"] as const,
-    moments: (count: number) => `${count} ${count === 1 ? "momento" : "momentos"}`,
+    moments: (count: number) => `${count} ${count === 1 ? "plan" : "planes"}`,
     ending: "Deja espacio\npara Londres.",
     closeChapter: "Cerrar este capítulo",
     nearby: "Opciones cercanas",
@@ -268,7 +268,7 @@ export const dayEditorial: Record<string, {
   ending: string;
 }> = {
   "2026-08-06": { meta: "JUE 06 · CAPÍTULO 01", eyebrow: "Gatwick → Ealing → Londres", intro: "Primer contacto con Londres: aterrizar, llegar a Ealing y salir a descubrir la ciudad cuando se encienden sus luces.", ending: "La llegada ya es parte del viaje." },
-  "2026-08-07": { meta: "VIE 07 · CAPÍTULO 02", eyebrow: "Sky Garden → City → Canary Wharf", intro: "Altura, piedra y cristal: la City abre el día y Canary Wharf lo lleva hasta el teatro.", ending: "De la azotea al escenario." },
+  "2026-08-07": { meta: "Viernes, 7 de agosto", eyebrow: "Sky Garden → City → Canary Wharf", intro: "Sky Garden por la mañana, la City al mediodía y Canary Wharf antes del musical.", ending: "De la azotea al escenario." },
   "2026-08-08": { meta: "SÁB 08 · CAPÍTULO 03", eyebrow: "Notting Hill → South Kensington", intro: "Color por la mañana y arquitectura victoriana por la tarde, con tiempo para elegir dónde sentarse a comer.", ending: "Fachadas, fósiles y una mesa por encontrar." },
   "2026-08-09": { meta: "DOM 09 · CAPÍTULO 04", eyebrow: "Londres monumental → West End", intro: "El Londres monumental conduce al West End: paseo por la mañana y telón a media tarde.", ending: "La ciudad cambia cuando se enciende el teatro." },
   "2026-08-10": { meta: "LUN 10 · CAPÍTULO 05", eyebrow: "Bloomsbury → Camden → Whitechapel", intro: "Del museo a Camden y, al caer la tarde, hacia las historias oscuras de Whitechapel.", ending: "Tres barrios, tres ritmos." },

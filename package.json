@@ -13,8 +13,10 @@
     "build-storybook": "storybook build",
     "lint:tokens": "node scripts/check-design-tokens.mjs",
     "test:design-system": "vitest run src/design-system",
-    "test:visual": "node scripts/visual-iteration-07.mjs",
-    "test:visual:chromium": "set PW_ENGINE=chromium&& node scripts/visual-iteration-07.mjs"
+    "test:visual": "node scripts/visual-iteration-08.mjs",
+    "test:visual:chromium": "set PW_ENGINE=chromium&& node scripts/visual-iteration-08.mjs",
+    "test:visual:webkit": "set PW_ENGINE=webkit&& node scripts/visual-iteration-08.mjs",
+    "test:visual:iteration07": "node scripts/visual-iteration-07.mjs"
   },
   "dependencies": {
     "geist": "1.7.2",

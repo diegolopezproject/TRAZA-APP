@@ -960,6 +960,10 @@ html, body { background: var(--cloud); }
   --nav-gap: 10px;
   --nav-safe: calc(var(--nav-height) + var(--safe-bottom) + var(--nav-gap));
   --nav-reserve: calc(var(--nav-safe) + 16px);
+  --nav-height: var(--ds-navigation-height);
+  --nav-gap: var(--ds-navigation-gap);
+  --nav-safe: var(--ds-navigation-safe);
+  --nav-reserve: var(--ds-navigation-reserve);
   --sheet-top-gap: 16px;
   --sheet-footer-gap: 10px;
   --floating-control-offset: calc(var(--safe-bottom) + 16px);
@@ -990,11 +994,12 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-colo
 
 .journey-view {
   display: grid;
-  grid-template-rows: minmax(0, 1fr) 48px;
+  grid-template-rows: minmax(0, 1fr);
   height: 100dvh;
   min-height: 100svh;
   padding: var(--top-safe-content) 0 var(--nav-reserve);
 }
+.journey-view > .ds-day-deck { min-height: 0; }
 .day-carousel {
   min-height: 0;
   height: 100%;
@@ -1160,4 +1165,37 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-colo
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   .day-cover { will-change: auto; }
+}
+
+/* Iteration 08 · product layouts consume Design System 1.1 patterns. */
+.open-day-hero { min-height: 0; padding: 0; border-radius: 0 0 var(--ds-radius-hero) var(--ds-radius-hero); background: var(--cover-bg); color: var(--cover-fg); }
+.open-day-hero .ds-day-header { position: relative; z-index: var(--ds-layer-sticky); }
+.open-day-hero .ds-day-hero { padding-top: 0; }
+.open-day-hero .ds-day-hero__motif .day-motif--compact { position: relative; inset: auto; width: 100%; height: 100%; opacity: 1; }
+.open-day-hero .ds-day-hero__motif .day-motif--compact svg { transform: scale(.86) translate(18px, 10px); transform-origin: center; }
+.itinerary-content { padding-top: var(--ds-space-5); padding-bottom: var(--ds-navigation-reserve); }
+.itinerary-actions.ds-action-group { justify-content: flex-start; margin: 0 0 var(--ds-space-6); padding-inline: var(--ds-space-1); }
+.itinerary-actions .ds-button { width: auto; min-height: var(--ds-touch-target); margin: 0; font-size: .8125rem; }
+.itinerary-actions .ds-button--primary { color: var(--ink); background: var(--lime); }
+.itinerary-actions .ds-button--secondary { color: var(--ink); background: transparent; }
+.section-heading.ds-section-header { grid-template-columns: 2rem minmax(0, 1fr) auto; gap: var(--ds-space-2); align-items: baseline; padding: 0 var(--ds-space-1) var(--ds-space-3); }
+.section-heading.ds-section-header h2 { font-size: var(--ds-type-title); }
+
+.saved-header { display: grid; justify-items: start; padding: 0 0 var(--ds-space-5); }
+.saved-header .ds-page-header { width: 100%; padding: var(--ds-space-6) var(--ds-space-5) var(--ds-space-3); }
+.saved-header .ds-page-header h1 { margin: 0; }
+.saved-header .add-place-button { margin: 0 var(--ds-space-5); }
+.saved-editorial-list .ds-saved-place-card { width: 100%; }
+.saved-editorial-list .ds-media-attribution { left: var(--ds-space-2); right: auto; bottom: auto; }
+
+.travel-doc.ds-trip-section-card { padding: var(--ds-space-5) var(--ds-space-5) var(--ds-space-5) calc(var(--ds-space-5) + .25rem); border: 1px solid var(--ink); box-shadow: none; }
+.travel-doc.ds-trip-section-card h2 { margin: 0; }
+.travel-doc.ds-trip-section-card > header { margin-bottom: var(--ds-space-5); }
+.flight-list { display: grid; gap: var(--ds-space-3); }
+.flight-list .ds-flight-ticket { background: var(--surface-card); }
+
+@media (max-height: 45rem) {
+  .ds-day-deck { gap: var(--ds-space-1); grid-template-rows: minmax(0, 1fr) 1.5rem; }
+  .ds-day-cover__kicker { padding-top: var(--ds-space-3); }
+  .ds-day-cover__copy { padding-block: var(--ds-space-2); }
 }

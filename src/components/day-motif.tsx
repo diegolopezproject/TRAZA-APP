@@ -17,7 +17,7 @@ function ChapterSix() {
 }
 
 function ChapterSeven() {
-  return <><Route d="M22 288 C94 270 112 224 157 202 S228 192 302 122" /><g className="chapter-main"><path d="M62 304 C70 248 74 132 102 52 C129 78 143 108 150 150 C158 200 151 254 145 304 Z" /><path className="chapter-paper" d="M88 284 C98 214 95 132 105 88 C123 126 130 190 122 284 Z" /><Windows x={82} y={184} columns={3} rows={5} gap={16} /></g><g className="chapter-secondary"><path d="M202 296 V154 H225 V296 M232 296 V118 H260 V296 M268 296 V176 H292 V296" /><path className="chapter-accent" d="M198 150 H296 V159 H198 Z" /></g></>;
+  return <><Route d="M22 288 C94 270 112 224 157 202 S228 192 302 122" /><g className="chapter-main chapter-sky-garden"><path d="M62 304 C70 248 74 132 102 52 C129 78 143 108 150 150 C158 200 151 254 145 304 Z" /><path className="chapter-paper" d="M88 284 C98 214 95 132 105 88 C123 126 130 190 122 284 Z" /><Windows x={82} y={184} columns={3} rows={5} gap={16} /></g><g className="chapter-secondary chapter-canary"><path d="M202 296 V154 H225 V296 M232 296 V118 H260 V296 M268 296 V176 H292 V296" /></g><g className="chapter-editorial-accent"><path className="chapter-orange-bars" d="M188 146 H302 V157 H188 Z M177 170 H276 V179 H177 Z" /><circle className="chapter-lime-focus" cx="274" cy="92" r="20" /></g></>;
 }
 
 function ChapterEight() {
@@ -29,7 +29,7 @@ function ChapterNine() {
 }
 
 function ChapterTen() {
-  return <><Route d="M20 276 C56 236 90 252 124 218 S184 176 214 210 S264 246 302 208" /><g className="chapter-main"><path d="M38 270 V132 H124 V270 Z" /><path className="chapter-paper" d="M54 154 H108 V270 H54 Z" /><path className="chapter-accent" d="M54 182 H108 V198 H54 Z" /><path d="M124 270 V104 H212 V270 Z" /><path className="chapter-paper" d="M144 132 H192 V270 H144 Z" /><path d="M212 270 V162 H294 V270 Z" /><path className="chapter-paper" d="M230 184 H276 V270 H230 Z" /></g><g className="chapter-secondary"><circle className="chapter-accent" cx="172" cy="72" r="32" /><circle cx="172" cy="72" r="12" /></g></>;
+  return <><Route d="M20 276 C56 236 90 252 124 218 S184 176 214 210 S264 246 302 208" /><g className="chapter-main"><path className="chapter-bloomsbury" d="M38 270 V132 H124 V270 Z M54 154 H108 V270 H54 Z" fillRule="evenodd" /><path className="chapter-camden" d="M124 270 V104 H212 V270 Z M144 132 H192 V270 H144 Z" fillRule="evenodd" /><path className="chapter-whitechapel" d="M212 270 V162 H294 V270 Z M230 184 H276 V270 H230 Z" fillRule="evenodd" /><path className="chapter-orange-bars" d="M52 180 H110 V195 H52 Z M136 204 H202 V217 H136 Z" /></g><g className="chapter-secondary"><circle className="chapter-sunset" cx="172" cy="72" r="32" /><circle cx="172" cy="72" r="10" /></g></>;
 }
 
 function ChapterEleven() {

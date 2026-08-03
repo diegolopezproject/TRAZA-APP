@@ -19,5 +19,6 @@ export function DayCover({ day, index, active, onOpen }: DayCoverProps) {
   const editorial = dayEditorial[day.id];
 
   const artPositions: Record<string, DayCoverArtPosition> = { "2026-08-06": "left", "2026-08-07": "back", "2026-08-08": "top", "2026-08-10": "left" };
-  return <DesignSystemDayCover dayNumber={number} weekday={weekday} sequenceLabel={`Día ${index + 1} de 8`} eyebrow={editorial.eyebrow} title={title} status={confirmed ? es.journey.anchors(confirmed) : es.journey.open} motif={<DayMotif day={day} />} theme={day.visualTheme} artPosition={artPositions[day.id] ?? "back"} active={active} onOpen={onOpen} openLabel={es.journey.coverAria(weekday, number, title)} />;
+  const atmosphere = ["2026-08-06", "2026-08-07", "2026-08-10"].includes(day.id) ? "atmospheric" : "flat";
+  return <DesignSystemDayCover dayNumber={number} weekday={weekday} sequenceLabel={`Día ${index + 1} de 8`} eyebrow={editorial.eyebrow} title={title} status={confirmed ? es.journey.anchors(confirmed) : es.journey.open} motif={<DayMotif day={day} />} theme={day.visualTheme} artPosition={artPositions[day.id] ?? "back"} atmosphere={atmosphere} active={active} onOpen={onOpen} openLabel={es.journey.coverAria(weekday, number, title)} />;
 }

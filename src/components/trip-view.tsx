@@ -5,8 +5,7 @@ import type { TransferPlan, Trip } from "@/domain/models";
 import { areaEs, es, titleEs } from "@/content/es";
 import { formatSpanishShortDate, mapsUrl } from "@/lib/format";
 import { ArrowIcon, CheckIcon, MapIcon, PlaneIcon, TicketIcon } from "./icons";
-import { AppHeader } from "./app-header";
-import { TripSectionCard } from "@/design-system";
+import { FlightTicketCard, TripSectionCard } from "@/design-system";
 
 interface TripViewProps { trip: Trip; onSaveTransfers: (transfers: TransferPlan[]) => void; }
 
@@ -27,14 +26,13 @@ export function TripView({ trip, onSaveTransfers }: TripViewProps) {
 
   return (
     <section className="trip-view" aria-labelledby="trip-title">
-      <AppHeader context="trip" />
       <header className="trip-header">
-        <div><p className="mono-label">6—13 agosto · Londres</p><h1 id="trip-title">El viaje,<br /><span>en claro.</span></h1><p>Todo lo fijo y logístico, sin exponer referencias privadas.</p></div>
+        <div><p className="mono-label">Londres 2026</p><h1 id="trip-title">El viaje,<br /><span>en claro.</span></h1><p>Todo lo fijo y logístico, sin exponer referencias privadas.</p></div>
         <div className="trip-facts"><span><b>{trip.days.length}</b> {es.trip.days}</span><span><b>{trip.travellers.length}</b> {es.trip.travellers}</span><span><b>{anchors.length}</b> confirmados</span></div>
       </header>
 
       <TripSectionCard className="travel-doc travel-doc--flight" index={`01 · ${es.trip.flights}`} title="Ida y vuelta" titleId="flights-title" action={<PlaneIcon />}>
-        <div className="flight-list">{trip.travelSegments.map((segment) => <article className="flight-row" key={segment.id}><div><span>{segment.origin}</span><strong>{segment.startTime}</strong></div><span className="flight-line"><PlaneIcon /></span><div><span>{segment.destination}</span><strong>{segment.endTime}</strong></div><p>{formatSpanishShortDate(segment.date).toUpperCase()} · {segment.service}</p></article>)}</div>
+        <div className="flight-list">{trip.travelSegments.map((segment) => <FlightTicketCard key={segment.id} origin={segment.origin} destination={segment.destination} startTime={segment.startTime} endTime={segment.endTime} meta={`${formatSpanishShortDate(segment.date)} · ${segment.service}`} icon={<PlaneIcon />} />)}</div>
       </TripSectionCard>
 
       <TripSectionCard className="travel-doc travel-doc--stay" index={`02 · ${es.trip.stay}`} title={trip.hotel.name} titleId="stay-title" action={<MapIcon />}>

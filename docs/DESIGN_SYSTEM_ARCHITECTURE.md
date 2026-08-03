@@ -1,4 +1,6 @@
-# Arquitectura de TRAZA Design System 1.0
+# Arquitectura de TRAZA Design System 1.1
+
+La versión 1.1 conserva Core / Patterns / Expression y corrige la composición móvil. Añade `DayDeck`, `DayHeader`, `DayHero`, `PageHeader`, `ActionGroup`, la anatomía explícita de `SavedPlaceCard` y `FlightTicketCard`.
 
 ## Capas
 

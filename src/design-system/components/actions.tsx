@@ -17,3 +17,7 @@ export function FilterChip({ selected = false, className = "", ...props }: Butto
 export function ActionRow({ className = "", ...props }: HTMLAttributes<HTMLDivElement>) {
   return <div {...props} className={`ds-action-row ${className}`.trim()} />;
 }
+
+export function ActionGroup({ primary, secondary, className = "", ...props }: HTMLAttributes<HTMLDivElement> & { primary: ReactNode; secondary?: ReactNode }) {
+  return <div {...props} className={`ds-action-group ${className}`.trim()}><div className="ds-action-group__primary">{primary}</div>{secondary ? <div className="ds-action-group__secondary">{secondary}</div> : null}</div>;
+}
