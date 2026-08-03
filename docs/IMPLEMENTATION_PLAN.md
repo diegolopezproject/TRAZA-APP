@@ -84,3 +84,13 @@ El alcance, riesgos y orden completo están documentados en `ITERATION_03_PLAN.m
 - [x] Añadir Traslados editables y resumen desplegable de 12 anchors reales.
 - [x] Documentar medios, transición y sistema de motion.
 - [x] Validar flujo móvil y los cuatro viewports sin Supabase.
+# Iteración 07 — TRAZA Design System 1.0
+
+- [x] Proteger Iteración 06, capturar baseline y crear `iteration-07-design-system-foundation`.
+- [x] Crear tokens semánticos con salidas CSS, Tailwind y TypeScript.
+- [x] Configurar Storybook 10 con Next/Vite, viewports, themes y preferencias.
+- [x] Construir Core, Patterns y frontera Core/Expression.
+- [x] Implementar DayCover 2.0, Lab, overlays y tests de bounds.
+- [x] Migrar pilotos visibles de Días, Guardados y Viaje.
+- [x] Añadir gate de tokens y documentación operativa/Figma.
+- [x] Cerrar matriz WebKit/Chromium, capturas y commit final.

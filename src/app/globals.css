@@ -1,4 +1,7 @@
 @import "tailwindcss";
+@import "../design-system/tokens/tokens.css";
+@import "../design-system/components/components.css";
+@import "../design-system/patterns/patterns.css";
 
 :root {
   --ink: #0c0c0c;

@@ -1,0 +1,14 @@
+.ds-story-stack { width: min(100%, 42rem); padding: var(--ds-space-5); display: grid; gap: var(--ds-space-4); }
+.ds-story-media { position: relative; height: 14rem; border-radius: var(--ds-radius-card); background: var(--ds-palette-violet); }
+.ds-story-cover-frame { width: min(100vw, 25.125rem); height: min(54rem, calc(100vh - var(--ds-space-8))); padding: var(--ds-space-2); }
+.ds-story-cover-grid { padding: var(--ds-space-4); display: grid; grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr)); gap: var(--ds-space-4); background: var(--ds-color-surface-inverse); }
+.ds-story-cover-grid .ds-story-cover-frame { width: 100%; height: 46rem; }
+.ds-lab-motif { width: 100%; height: 100%; color: var(--cover-fg, var(--ds-color-text-primary)); }
+.ds-lab-motif path, .ds-lab-motif rect { fill: currentColor; }
+.ds-lab-motif path[fill="none"] { fill: none; stroke: var(--cover-accent, var(--ds-color-action-accent)); stroke-width: 5; }
+.ds-lab-motif path:last-child { fill: var(--cover-accent, var(--ds-color-action-accent)); }
+.ds-story-screen { width: min(100%, 26rem); min-height: 50rem; overflow: hidden; border-radius: var(--ds-radius-card); }
+.ds-story-spacer { min-height: 42rem; padding: var(--ds-space-5); }
+.ds-foundation-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: var(--ds-space-4); }.ds-foundation-grid figure { margin: 0; overflow: hidden; border: 1px solid var(--ds-color-border-strong); border-radius: var(--ds-radius-card); }.ds-foundation-grid figure > span { display: block; height: 8rem; }.ds-foundation-grid figcaption { padding: var(--ds-space-3); display: grid; gap: var(--ds-space-1); }.ds-foundation-grid code { font-size: var(--ds-type-caption); }
+.ds-foundation-type { max-width: 42rem; }.ds-foundation-type h1 { font-size: var(--ds-type-display); line-height: .72; letter-spacing: var(--ds-tracking-display); }.ds-foundation-type h2 { font-size: var(--ds-type-title); }.ds-foundation-type > div { display: flex; align-items: end; gap: var(--ds-space-2); }.ds-foundation-type > div span { height: var(--ds-space-8); display: grid; place-items: center; background: var(--ds-color-action-accent); font-size: var(--ds-type-caption); }
+.ds-figma-handoff { display: grid; grid-template-columns: repeat(3, minmax(8rem, 1fr)); gap: var(--ds-space-3); }.ds-figma-handoff > div { display: grid; gap: var(--ds-space-2); }.ds-figma-handoff span { height: var(--ds-space-12); border: 1px solid var(--ds-color-border-default); border-radius: var(--ds-radius-control); }.ds-figma-handoff code { font-size: var(--ds-type-caption); }

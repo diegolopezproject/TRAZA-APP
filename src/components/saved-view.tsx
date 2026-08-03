@@ -8,6 +8,7 @@ import { ArrowIcon, HeartIcon, MapIcon, PlusIcon } from "./icons";
 import { StatusLabel } from "./status-label";
 import { MediaFrame } from "./media-frame";
 import { AppHeader } from "./app-header";
+import { FilterChip, SavedPlaceCard } from "@/design-system";
 
 interface SavedViewProps {
   places: Place[];
@@ -43,25 +44,19 @@ export function SavedView({ places, assignments, onAssignRequest, onAddPlace, on
         <button className="add-place-button primary-button" type="button" onClick={onAddPlace}><PlusIcon /> {es.saved.addPlace}</button>
       </header>
 
-      <div className="filter-row" aria-label={es.saved.filtersLabel}>{filters.map((item) => <button key={item.id} className={filter === item.id ? "active" : ""} type="button" aria-pressed={filter === item.id} onClick={() => setFilter(item.id)}>{item.label}</button>)}</div>
+      <div className="filter-row" aria-label={es.saved.filtersLabel}>{filters.map((item) => <FilterChip key={item.id} selected={filter === item.id} onClick={() => setFilter(item.id)}>{item.label}</FilterChip>)}</div>
 
       <div className="saved-editorial-list">
         {visible.map((place) => (
-          <article className={`saved-card${assignments[place.id] ? " is-assigned" : ""}`} key={place.id}>
-            <div className="saved-media">{place.media ? <MediaFrame media={place.media} sizes="(max-width: 759px) 100vw, 420px" /> : <div className="saved-media-empty"><strong>{place.name}</strong><span>Imagen pendiente</span></div>}</div>
-            <div className="saved-card-copy">
-              <div className="saved-card-top"><span>{es.saved.categories[place.category] ?? place.category}</span><StatusLabel status={place.status} compact /></div>
-              <h2>{place.name.replace(" | ", " / ")}</h2>
-              <p>{place.area ?? "Londres"}</p>
-              {place.tags.length ? <div className="place-tags">{place.tags.slice(0, 3).map((tag) => <span key={tag}>{tag}</span>)}</div> : null}
+          <SavedPlaceCard key={place.id} title={place.name.replace(" | ", " / ")} category={es.saved.categories[place.category] ?? place.category} area={place.area ?? "Londres"} media={place.media ? <MediaFrame media={place.media} sizes="(max-width: 759px) 100vw, 420px" /> : <div className="saved-media-empty"><strong>{place.name}</strong><span>Imagen pendiente</span></div>} action={<>
+              <div className="saved-card-top"><span>{place.tags.slice(0, 3).join(" · ")}</span><StatusLabel status={place.status} compact /></div>
               <div className="saved-card-actions">
                 <button type="button" className={assignments[place.id] ? "is-assigned" : ""} aria-label={es.saved.assignAria(place.name)} onClick={() => onAssignRequest(place.id)}>{assignments[place.id] ? <HeartIcon /> : <PlusIcon />}<span>{assignments[place.id] ? es.saved.assigned(formatSpanishDate(assignments[place.id])) : es.saved.add}</span><ArrowIcon /></button>
                 {place.mapsQuery ? <a className="saved-maps-link" href={mapsUrl(place.mapsQuery)} target="_blank" rel="noreferrer"><MapIcon /> Google Maps</a> : null}
                 <button className="saved-detail-button" type="button" onClick={() => onOpenPlace(place.id)}>Detalle</button>
                 <button className="saved-edit-button" type="button" onClick={() => onEditPlace(place.id)}>{es.saved.edit}</button>
               </div>
-            </div>
-          </article>
+            </>} />
         ))}
       </div>
 

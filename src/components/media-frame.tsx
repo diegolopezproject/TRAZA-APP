@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { CSSProperties } from "react";
 import type { MediaAsset } from "@/domain/models";
 import { mediaClassificationLabel } from "@/lib/media-classification";
+import { MediaAttribution } from "@/design-system";
 
 interface MediaFrameProps {
   media: MediaAsset;
@@ -22,7 +23,7 @@ export function MediaFrame({ media, className = "", priority = false, sizes = "(
     return (
       <figure className={`media-frame media-frame--fallback ${className}`.trim()} style={{ "--fallback-color": hue } as CSSProperties}>
         <span className="media-fallback-art" role="img" aria-label={media.alt}><b>{name}</b><i>Imagen pendiente</i></span>
-        {showProvenance ? <figcaption className="media-provenance">{provenance}</figcaption> : null}
+        {showProvenance ? <MediaAttribution source={media.source ?? provenance} author={media.author} license={media.license} sourceUrl={sourceLink} /> : null}
       </figure>
     );
   }
@@ -36,7 +37,7 @@ export function MediaFrame({ media, className = "", priority = false, sizes = "(
       ) : (
         <Image src={media.src} alt={media.alt} fill priority={priority} sizes={sizes} style={{ objectPosition: media.focalPoint ?? "50% 50%" }} />
       )}
-      {showProvenance ? <figcaption className="media-provenance">{sourceLink ? <a href={sourceLink} target="_blank" rel="noreferrer">{provenance}</a> : provenance}</figcaption> : null}
+      {showProvenance ? <MediaAttribution source={media.source ?? provenance} author={media.author} license={media.license} sourceUrl={sourceLink} /> : null}
     </figure>
   );
 }

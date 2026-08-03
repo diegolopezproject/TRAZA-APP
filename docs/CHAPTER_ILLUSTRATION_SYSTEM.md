@@ -12,7 +12,7 @@ Las ocho portadas son capítulos editoriales, no galerías fotográficas. `DayCo
 - Una tinta principal, el color de fondo de la portada como papel y un único acento semántico.
 - Una textura SVG común con ruido al 5.5 %, contenida dentro del frame.
 - Perspectiva frontal ligeramente editorial; sin mezclar isométrico, collage y fotografía.
-- Radios, ventanas y rutas se construyen con primitivas comunes (`Route`, `Windows`).
+- Radios, ventanas y rutas se construyen con primitivas comunes. TRAZA Design System expone `BuildingBlock`, `ArchBlock`, `DomeBlock`, `BridgeBlock`, `RouteLine`, `EditorialShape` y `GrainTexture`; el SVG histórico se migrará por composición, sin duplicarlo.
 - Cada capítulo contiene un motivo principal, una ruta, hasta dos secundarios y una textura.
 
 ## Grid de portada
@@ -21,13 +21,13 @@ Las ocho portadas son capítulos editoriales, no galerías fotográficas. `DayCo
 | --- | --- |
 | Metadata | Fila superior no interactiva; respeta el safe top del shell |
 | Motivo | Frame central con borde y radio comunes |
-| Número | Anclado abajo/izquierda dentro del frame; conserva más del 70 % visible |
+| Número | Anclado en zona reservada; conserva al menos el 80 % visible |
 | Ruta | Línea discontinua detrás o entre motivos, nunca sobre el titular |
 | Titular | Zona propia bajo el frame; máximo tres líneas salvo copy español largo |
 | Estado | Cápsula bajo el titular |
 | Handle | Fila final de 52 px con objetivo táctil de 44 px |
 
-El motivo y el número pueden cruzarse dentro del frame, pero el titular está fuera de ese plano. En el día abierto, el SVG compacto se confina a la segunda columna para no invadir el título.
+El motivo y el número pueden cruzarse un máximo del 15 % dentro del frame, pero el titular está fuera de ese plano. Solo existen `Number left`, `Number back` y `Number top`. En el día abierto, el SVG compacto se confina a la segunda columna para no invadir el título.
 
 ## Ocho capítulos
 

@@ -1,0 +1,122 @@
+/* TRAZA Design System 1.0 — single source of truth for visual values. */
+:root {
+  /* Foundation palette: never consume directly outside this file. */
+  --ds-palette-ink: #161616;
+  --ds-palette-paper: #f4f1ea;
+  --ds-palette-white: #ffffff;
+  --ds-palette-lime: #d5f43b;
+  --ds-palette-sky: #82d8f7;
+  --ds-palette-pink: #f3a7cf;
+  --ds-palette-orange: #ff6b35;
+  --ds-palette-violet: #6d45e5;
+
+  /* Semantic color. */
+  --ds-color-text-primary: var(--ds-palette-ink);
+  --ds-color-text-inverse: var(--ds-palette-white);
+  --ds-color-text-muted: color-mix(in srgb, var(--ds-palette-ink) 62%, transparent);
+  --ds-color-surface-canvas: var(--ds-palette-paper);
+  --ds-color-surface-raised: var(--ds-palette-white);
+  --ds-color-surface-inverse: var(--ds-palette-ink);
+  --ds-color-surface-glass: color-mix(in srgb, var(--ds-palette-paper) 86%, transparent);
+  --ds-color-border-default: color-mix(in srgb, var(--ds-palette-ink) 28%, transparent);
+  --ds-color-border-strong: var(--ds-palette-ink);
+  --ds-color-focus: var(--ds-palette-violet);
+  --ds-color-action-primary: var(--ds-palette-ink);
+  --ds-color-action-accent: var(--ds-palette-lime);
+  --ds-color-status-confirmed: var(--ds-palette-ink);
+  --ds-color-status-planned: var(--ds-palette-sky);
+  --ds-color-status-open: var(--ds-palette-paper);
+  --ds-color-feedback-error: #b42318;
+
+  /* Spacing: 4px base, named by intent where it matters. */
+  --ds-space-0: 0;
+  --ds-space-1: .25rem;
+  --ds-space-2: .5rem;
+  --ds-space-3: .75rem;
+  --ds-space-4: 1rem;
+  --ds-space-5: 1.25rem;
+  --ds-space-6: 1.5rem;
+  --ds-space-8: 2rem;
+  --ds-space-10: 2.5rem;
+  --ds-space-12: 3rem;
+  --ds-space-page-inline: clamp(1rem, 4.4vw, 1.25rem);
+
+  /* Radius and elevation. */
+  --ds-radius-control: .75rem;
+  --ds-radius-card: 1.5rem;
+  --ds-radius-hero: 2rem;
+  --ds-radius-pill: 999px;
+  --ds-shadow-raised: 0 .75rem 2.5rem color-mix(in srgb, var(--ds-palette-ink) 14%, transparent);
+  --ds-shadow-overlay: 0 -1rem 3rem color-mix(in srgb, var(--ds-palette-ink) 20%, transparent);
+  --ds-shadow-selected: inset 0 0 0 1px var(--ds-color-border-strong);
+
+  /* Typography. */
+  --ds-font-sans: var(--font-geist-sans, Arial), Arial, sans-serif;
+  --ds-font-mono: var(--font-geist-mono, "Courier New"), monospace;
+  --ds-type-caption: .6875rem;
+  --ds-type-body: 1rem;
+  --ds-type-title: clamp(1.75rem, 7vw, 2.5rem);
+  --ds-type-display: clamp(5.9rem, 30vw, 10.75rem);
+  --ds-leading-tight: .92;
+  --ds-leading-body: 1.45;
+  --ds-tracking-display: -.075em;
+
+  /* Motion. */
+  --ds-duration-fast: 120ms;
+  --ds-duration-base: 220ms;
+  --ds-duration-slow: 420ms;
+  --ds-ease-standard: cubic-bezier(.2, .8, .2, 1);
+  --ds-ease-enter: cubic-bezier(.16, 1, .3, 1);
+
+  /* Layout, safe area and layers. */
+  --ds-layout-content: 42.5rem;
+  --ds-layout-wide: 62rem;
+  --ds-touch-target: 2.75rem;
+  --ds-safe-top: env(safe-area-inset-top, 0px);
+  --ds-safe-right: env(safe-area-inset-right, 0px);
+  --ds-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --ds-safe-left: env(safe-area-inset-left, 0px);
+  --ds-layer-base: 0;
+  --ds-layer-behind: -1;
+  --ds-layer-media: 3;
+  --ds-layer-copy: 5;
+  --ds-layer-action: 6;
+  --ds-layer-sticky: 10;
+  --ds-layer-nav: 20;
+  --ds-layer-overlay: 40;
+  --ds-layer-toast: 70;
+}
+
+@theme inline {
+  --color-text-primary: var(--ds-color-text-primary);
+  --color-text-inverse: var(--ds-color-text-inverse);
+  --color-surface-canvas: var(--ds-color-surface-canvas);
+  --color-surface-raised: var(--ds-color-surface-raised);
+  --color-action-accent: var(--ds-color-action-accent);
+  --radius-card: var(--ds-radius-card);
+  --font-sans: var(--ds-font-sans);
+  --font-mono: var(--ds-font-mono);
+}
+
+[data-transparency="reduced"] {
+  --ds-color-surface-glass: var(--ds-color-surface-canvas);
+}
+
+[data-theme="paper"] { --ds-color-action-accent: var(--ds-palette-sky); --ds-color-surface-canvas: var(--ds-palette-white); }
+[data-theme="night"] { --ds-color-text-primary: var(--ds-palette-white); --ds-color-text-muted: color-mix(in srgb, var(--ds-palette-white) 66%, transparent); --ds-color-surface-canvas: var(--ds-palette-ink); --ds-color-surface-raised: color-mix(in srgb, var(--ds-palette-ink) 88%, var(--ds-palette-violet)); --ds-color-border-default: color-mix(in srgb, var(--ds-palette-white) 28%, transparent); --ds-color-border-strong: var(--ds-palette-white); }
+
+[data-motion="reduced"] *,
+[data-motion="reduced"] *::before,
+[data-motion="reduced"] *::after {
+  scroll-behavior: auto !important;
+  animation-duration: .01ms !important;
+  transition-duration: .01ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --ds-duration-fast: .01ms; --ds-duration-base: .01ms; --ds-duration-slow: .01ms; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :root { --ds-color-surface-glass: var(--ds-color-surface-canvas); }
+}

@@ -1,0 +1,23 @@
+import { Meta, Title, Subtitle, Description } from '@storybook/addon-docs/blocks';
+
+<Meta title="TRAZA Design System/Introduction" />
+<Title>TRAZA Design System 1.0</Title>
+<Subtitle>Un contrato mobile-first para un compañero de viaje, no un dashboard.</Subtitle>
+<Description>
+TRAZA separa **Core** —accesibilidad, estados, controles, superficies y formularios— de **Expression** —portadas editoriales, color de capítulo, ilustración y ritmo narrativo—. Los Patterns combinan ambos sin conocer repositorios, viaje ni contenido privado.
+</Description>
+
+## Capas
+
+1. `foundations` y `tokens`: decisiones semánticas y salidas CSS/Tailwind/TypeScript.
+2. `components`: Core estable y agnóstico de datos.
+3. `patterns`: composición de producto; recibe props presentacionales.
+4. `expression`: piezas editoriales reemplazables.
+5. Aplicación: adapta `Trip`, `Day`, `Place` y acciones a los Patterns.
+
+## Reglas rápidas
+
+- Usa siempre un token semántico; la paleta física solo existe dentro de `tokens.css`.
+- Conserva `anchor`, `intention` y `nearby-option` como niveles distintos.
+- No incluyas referencias de reserva ni códigos privados en stories.
+- Toda interacción principal necesita objetivo táctil, foco visible y alternativa a gestos.
