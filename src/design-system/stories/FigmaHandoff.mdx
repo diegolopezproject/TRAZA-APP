@@ -1,0 +1,33 @@
+import { Meta, Title, Subtitle } from '@storybook/addon-docs/blocks';
+
+<Meta title="TRAZA Design System/Figma handoff" />
+<Title>Figma handoff</Title>
+<Subtitle>Nombres y anatomía listos para mapear sin convertir Figma en otra fuente de verdad.</Subtitle>
+
+## Convención de nombres
+
+`TRAZA/Core/{Family}/{Component}/{Variant}` y `TRAZA/Patterns/{Pattern}/{State}`. Los tokens se exponen como `color/text/primary`, `space/4`, `radius/card`, `motion/base` y `layout/safe-bottom`.
+
+## Component sets prioritarios
+
+- Button: Primary / Secondary / Quiet / Danger × Rest / Pressed / Disabled.
+- StatusBadge: Confirmed / Planned / Open / Saved / Researching / Evaluating.
+- DayCover: Left / Back / Top × Day 06–13, con regiones `Kicker`, `Art`, `Number`, `Copy`, `Action`.
+- Sheet: Default / Wide × Rest / Keyboard / Reduced motion.
+- BottomNavigation: Journey / Saved / Trip.
+
+## Auto-layout
+
+Respeta el orden de anatomía de Storybook. Usa variables en lugar de estilos separados y documenta excepciones editoriales en la descripción del componente. Storybook y los tests de bounds son la referencia ejecutable.
+
+## Muestra ejecutable
+
+<div className="ds-figma-handoff">
+  <div><span style={{background: 'var(--ds-color-text-primary)'}}></span><code>color/text/primary</code></div>
+  <div><span style={{background: 'var(--ds-color-action-accent)'}}></span><code>color/action/accent</code></div>
+  <div><span style={{background: 'var(--ds-color-status-planned)'}}></span><code>color/status/planned</code></div>
+</div>
+
+<p className="ds-eyebrow">Label / mono data</p>
+<h2 style={{fontSize: 'var(--ds-type-title)', lineHeight: 'var(--ds-leading-tight)'}}>Section title / balance editorial</h2>
+<div className="ds-action-row"><button className="ds-button ds-button--primary">Primary</button><button className="ds-button ds-button--secondary">Secondary</button><span className="ds-status-badge ds-status-badge--confirmed">Confirmado</span></div>

@@ -1,0 +1,43 @@
+{
+  "name": "electric-london-trip",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "storybook": "storybook dev -p 6006 --no-open",
+    "build-storybook": "storybook build",
+    "lint:tokens": "node scripts/check-design-tokens.mjs",
+    "test:design-system": "vitest run src/design-system",
+    "test:visual": "node scripts/visual-iteration-07.mjs",
+    "test:visual:chromium": "set PW_ENGINE=chromium&& node scripts/visual-iteration-07.mjs"
+  },
+  "dependencies": {
+    "geist": "1.7.2",
+    "motion": "12.43.0",
+    "next": "16.2.12",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@storybook/addon-a11y": "^10.5.5",
+    "@storybook/addon-docs": "^10.5.5",
+    "@storybook/addon-themes": "^10.5.5",
+    "@storybook/nextjs-vite": "^10.5.5",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.2.12",
+    "playwright-core": "1.62.1",
+    "storybook": "^10.5.5",
+    "tailwindcss": "4.3.3",
+    "typescript": "6.0.3",
+    "vitest": "4.1.10"
+  }
+}

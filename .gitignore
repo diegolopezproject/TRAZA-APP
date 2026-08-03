@@ -1,0 +1,11 @@
+node_modules/
+.next/
+coverage/
+storybook-static/
+*.log
+*.tsbuildinfo
+.env*
+!.env.example
+screenshots/*.png
+screenshots/**/*.png
+screenshots/**/*.json
