@@ -1,4 +1,3 @@
-import { useId } from "react";
 import type { ReactNode } from "react";
 import type { Day } from "@/domain/models";
 
@@ -56,15 +55,11 @@ const chapters: Record<string, () => ReactNode> = {
 };
 
 export function DayMotif({ day, compact = false }: DayMotifProps) {
-  const textureId = useId().replaceAll(":", "");
   const Chapter = chapters[day.id] ?? ChapterTwelve;
   return (
     <div className={`day-motif chapter-illustration motif-${day.visualTheme}${compact ? " day-motif--compact" : ""}`} aria-hidden="true">
-      <svg viewBox="0 0 320 360" role="img" focusable="false">
-        <defs><filter id={textureId} x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" seed="6" result="noise" /><feComposite in="noise" in2="SourceGraphic" operator="in" result="texture" /><feBlend in="SourceGraphic" in2="texture" mode="multiply" /></filter></defs>
-        <g className="chapter-plane chapter-plane--shadow" transform="translate(8 9)"><Chapter /></g>
+      <svg viewBox="0 0 320 360" preserveAspectRatio={compact ? "xMidYMid meet" : "xMidYMid slice"} role="img" focusable="false">
         <g className="chapter-plane chapter-plane--ink"><Chapter /></g>
-        <rect className="chapter-texture" width="320" height="360" filter={`url(#${textureId})`} />
       </svg>
     </div>
   );

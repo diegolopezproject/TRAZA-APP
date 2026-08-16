@@ -31,7 +31,7 @@ export function TripView({ trip, editingTransfers, onStartTransferEditing, onSav
       </header>
 
       <TripSectionCard className="travel-doc travel-doc--flight" index={`01 · ${es.trip.flights}`} title="Ida y vuelta" titleId="flights-title" action={<PlaneIcon />}>
-        <div className="flight-list">{trip.travelSegments.map((segment) => <FlightTicketCard key={segment.id} origin={segment.origin} destination={segment.destination} startTime={segment.startTime} endTime={segment.endTime} meta={`${formatSpanishShortDate(segment.date)} · ${segment.service}`} icon={<PlaneIcon />} />)}</div>
+        <div className="flight-list">{trip.travelSegments.map((segment) => <FlightTicketCard key={segment.id} origin={segment.origin} destination={segment.destination} startTime={segment.startTime} endTime={segment.endTime} meta={`${formatSpanishShortDate(segment.date)} · ${segment.service}`} />)}</div>
       </TripSectionCard>
 
       <TripSectionCard className="travel-doc travel-doc--stay" index={`02 · ${es.trip.stay}`} title={trip.hotel.name} titleId="stay-title" action={<MapIcon />}>

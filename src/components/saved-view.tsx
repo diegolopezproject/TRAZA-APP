@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import type { Place } from "@/domain/models";
 import { es } from "@/content/es";
 import { formatSpanishDate, mapsUrl } from "@/lib/format";
-import { PlusIcon } from "./icons";
+import { ArrowIcon, MapIcon, MoreIcon, PlusIcon } from "./icons";
 import { MediaFrame } from "./media-frame";
 import { Button, FilterChip, PageHeader, SavedPlaceCard } from "@/design-system";
 
@@ -39,7 +39,7 @@ export function SavedView({ places, assignments, onAssignRequest, onAddPlace, on
 
       <div className="saved-editorial-list">
         {visible.map((place) => (
-          <SavedPlaceCard key={place.id} title={place.name.replace(" | ", " / ")} category={es.saved.categories[place.category] ?? place.category} area={place.area ?? "Londres"} tags={place.tags} media={place.media ? <MediaFrame media={place.media} sizes="(max-width: 759px) 100vw, 420px" /> : <div className="saved-media-empty"><strong>{place.name}</strong><span>Imagen pendiente</span></div>} assignedLabel={assignments[place.id] ? `Asignado al ${formatSpanishDate(assignments[place.id])}` : undefined} onAssign={() => onAssignRequest(place.id)} mapsHref={place.mapsQuery ? mapsUrl(place.mapsQuery) : undefined} onDetail={() => onOpenPlace(place.id)} onEdit={() => onEditPlace(place.id)} />
+          <SavedPlaceCard key={place.id} title={place.name.replace(" | ", " / ")} category={es.saved.categories[place.category] ?? place.category} area={place.area ?? "Londres"} tags={place.tags} media={place.media ? <MediaFrame media={place.media} sizes="(max-width: 759px) 100vw, 420px" /> : <div className="saved-media-empty"><strong>{place.name}</strong><span>Imagen pendiente</span></div>} assignedLabel={assignments[place.id] ? `Asignado al ${formatSpanishDate(assignments[place.id])}` : undefined} onAssign={() => onAssignRequest(place.id)} mapsHref={place.mapsQuery ? mapsUrl(place.mapsQuery) : undefined} onDetail={() => onOpenPlace(place.id)} onEdit={() => onEditPlace(place.id)} assignIcon={<PlusIcon />} assignEndIcon={<ArrowIcon />} mapsIcon={<MapIcon />} moreIcon={<MoreIcon />} />
         ))}
       </div>
 

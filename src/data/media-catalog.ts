@@ -114,7 +114,7 @@ export const placeMedia: Record<string, MediaAsset> = {
     alt: "Exterior real del Hard Rock Cafe de Old Park Lane, Londres",
     width: 1063,
     height: 1400,
-    focalPoint: "50% 48%",
+    focalPoint: "50% 72%",
     sourceUrl: "https://commons.wikimedia.org/wiki/File:The_Hard_Rock_Cafe_-_geograph.org.uk_-_2321056.jpg",
     author: "Geograph Britain and Ireland",
     license: "CC BY-SA 2.0",

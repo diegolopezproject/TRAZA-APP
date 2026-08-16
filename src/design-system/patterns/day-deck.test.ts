@@ -27,4 +27,9 @@ describe("resolveDayDeckGesture", () => {
     expect(css).not.toMatch(/\.ds-day-deck__card[^}]*brightness\(/);
     expect(css).not.toMatch(/is-settling[^}]*opacity/);
   });
+  it("integrates progress into the DayCover action row", () => {
+    const css = readFileSync(new URL("./patterns.css", import.meta.url), "utf8");
+    expect(css).toContain(".ds-day-cover__progress");
+    expect(css).not.toContain(".ds-day-deck__indicator");
+  });
 });

@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 import type { Activity } from "@/domain/models";
 import { activityTimeLabelEs, activityTitleEs, areaEs, es } from "@/content/es";
 import { mapsUrl } from "@/lib/format";
-import { ArrowIcon, MapIcon } from "./icons";
+import { ArrowIcon, CheckIcon, ClockIcon, MapIcon, PlusIcon } from "./icons";
 import { MediaFrame } from "./media-frame";
 import { StatusLabel } from "./status-label";
 
@@ -52,11 +52,13 @@ export function ActivityCard({ activity, onOpen, featured = false, actionLabel }
     );
   }
 
+  const LevelIcon = activity.level === "anchor" ? CheckIcon : activity.level === "intention" ? ClockIcon : PlusIcon;
+  const levelLabel = es.levels[activity.level];
+  const statusLabel = activity.timeNeedsVerification ? es.status.timeVerify : es.status[activity.status];
+  const showLevelLabel = levelLabel !== statusLabel;
+
   return (
     <article className={`activity-card activity-card--${activity.level}`}>
-      <div className="activity-type-mark" aria-hidden="true">
-        <span>{activity.level === "anchor" ? "✓" : activity.level === "intention" ? "~" : "+"}</span>
-      </div>
       <div className="activity-card-body activity-card-body--compact">
         <div className="activity-topline">
           <span className="activity-time">{timeFor(activity)}</span>
@@ -64,10 +66,10 @@ export function ActivityCard({ activity, onOpen, featured = false, actionLabel }
         </div>
         <h3>{activityTitleEs(activity)}</h3>
         <p>{activity.venue ?? areaEs(activity.area) ?? (activity.type === "meal" ? es.activity.chooseAround : (es.activity.types[activity.type] ?? activity.type))}</p>
-        <div className="activity-footer">
-          <span>{es.levels[activity.level]}</span>
+        {showLevelLabel || activity.partySize ? <div className="activity-footer">
+          {showLevelLabel ? <span className="activity-level"><LevelIcon /><span>{levelLabel}</span></span> : <span />}
           {activity.partySize ? <span>{es.activity.people(activity.partySize)}</span> : null}
-        </div>
+        </div> : null}
         {onOpen && actionLabel ? <button className="activity-inline-action" type="button" onClick={onOpen}>{actionLabel} <ArrowIcon /></button> : null}
       </div>
     </article>

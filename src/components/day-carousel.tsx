@@ -8,7 +8,7 @@ interface DayCarouselProps { days: Day[]; selectedIndex: number; onSelect: (inde
 
 export function DayCarousel({ days, selectedIndex, onSelect, onOpen }: DayCarouselProps) {
   return <section className="journey-view" aria-label={es.journey.label}>
-    <DayDeck total={days.length} currentIndex={selectedIndex} label={es.journey.label} getItemKey={(index) => days[index].id} onIndexChange={onSelect} onOpenCurrent={() => onOpen(days[selectedIndex])} renderItem={(index, active) => <DayCover day={days[index]} index={index} active={active} onOpen={() => onOpen(days[index])} />} />
+    <DayDeck total={days.length} currentIndex={selectedIndex} label={es.journey.label} getItemKey={(index) => days[index].id} onIndexChange={onSelect} onOpenCurrent={() => onOpen(days[selectedIndex])} renderItem={(index, active, progress) => <DayCover day={days[index]} index={index} active={active} progress={progress} onOpen={() => onOpen(days[index])} />} />
     <p className="sr-only" aria-live="polite">{es.journey.currentAnnouncement(weekdayEs(days[selectedIndex]), dayNumber(days[selectedIndex].date))}</p>
   </section>;
 }

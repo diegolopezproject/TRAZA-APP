@@ -1,5 +1,20 @@
 # Plan de implementación
 
+## Iteración 11 — auditoría visual y aplicación mobile-first
+
+- [x] Auditar producción y Storybook en Chromium/WebKit para 360×800, 390×844, 412×915 y 430×932.
+- [x] Documentar hallazgos, prioridades y propuesta DayCover A/B sin alterar navegación, datos ni CRUD.
+- [x] Validar y aprobar DayCover A con Open Design como dirección de implementación.
+- [x] Aplicar correcciones seguras: tipo funcional, apertura táctil, iconos, crop de Hard Rock y stories móviles reales.
+- [x] Implementar la retícula editorial estable de DayCover A en los ocho días.
+- [x] Simplificar ActivityCard conservando anchor / intention / nearby-option.
+- [x] Refinar SavedPlaceCard, TripSectionCard y FlightTicketCard sin cambiar comportamiento.
+- [x] Migrar estilos visibles heredados a tokens DS mediante cambios acotados.
+- [x] Actualizar documentación de ilustraciones, decisiones y evidencia before/after.
+- [x] Ejecutar lint, typecheck, tests, token gate, build y matriz visual móvil antes de cualquier despliegue.
+
+Decisión móvil: 390×844 es la referencia de composición; 360×800 y 430×932 son límites obligatorios. Todos los controles interactivos mantienen al menos 44 px y la navegación Días / Guardados / Viaje no cambia.
+
 ## Iteración 09 — Navigation & Motion Polish
 
 - [x] Proteger `744c16d`, crear `iteration-09-navigation-motion-polish` y capturar baseline Chromium/WebKit.

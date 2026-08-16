@@ -1,24 +1,25 @@
 import type { Day } from "@/domain/models";
+import type { ReactNode } from "react";
 import { coverTitleEs, dayEditorial, es, weekdayEs } from "@/content/es";
 import { dayNumber } from "@/lib/format";
 import { DayMotif } from "./day-motif";
-import { DayCover as DesignSystemDayCover, type DayCoverArtPosition } from "@/design-system";
+import { ArrowIcon } from "./icons";
+import { DayCover as DesignSystemDayCover } from "@/design-system";
 
 interface DayCoverProps {
   day: Day;
   index: number;
   active: boolean;
+  progress: ReactNode;
   onOpen: () => void;
 }
 
-export function DayCover({ day, index, active, onOpen }: DayCoverProps) {
+export function DayCover({ day, index, active, progress, onOpen }: DayCoverProps) {
   const number = dayNumber(day.date);
   const confirmed = day.activities.filter((activity) => activity.status === "confirmed").length;
   const weekday = weekdayEs(day);
   const title = coverTitleEs(day);
   const editorial = dayEditorial[day.id];
 
-  const artPositions: Record<string, DayCoverArtPosition> = { "2026-08-06": "left", "2026-08-07": "back", "2026-08-08": "top", "2026-08-10": "left" };
-  const atmosphere = ["2026-08-06", "2026-08-07", "2026-08-10"].includes(day.id) ? "atmospheric" : "flat";
-  return <DesignSystemDayCover dayNumber={number} weekday={weekday} sequenceLabel={`Día ${index + 1} de 8`} eyebrow={editorial.eyebrow} title={title} status={confirmed ? es.journey.anchors(confirmed) : es.journey.open} motif={<DayMotif day={day} />} theme={day.visualTheme} artPosition={artPositions[day.id] ?? "back"} atmosphere={atmosphere} active={active} onOpen={onOpen} openLabel={es.journey.coverAria(weekday, number, title)} />;
+  return <DesignSystemDayCover dayNumber={number} weekday={weekday} sequenceLabel={`Día ${index + 1} de 8`} eyebrow={editorial.eyebrow} title={title} status={confirmed ? es.journey.anchors(confirmed) : es.journey.open} motif={<DayMotif day={day} />} theme={day.visualTheme} artPosition="back" active={active} onOpen={onOpen} openLabel={es.journey.coverAria(weekday, number, title)} openText={es.journey.openDay} openIcon={<ArrowIcon />} progress={progress} />;
 }

@@ -47,7 +47,7 @@ export interface DayDeckProps {
   total: number;
   currentIndex: number;
   label: string;
-  renderItem: (index: number, active: boolean) => ReactNode;
+  renderItem: (index: number, active: boolean, progress: ReactNode) => ReactNode;
   getItemKey?: (index: number) => Key;
   onIndexChange: (index: number) => void;
   onOpenCurrent: () => void;
@@ -83,8 +83,12 @@ export function DayDeck({ total, currentIndex, label, renderItem, getItemKey, on
     [currentIndex, total],
   );
   const renderedOffset = diagnosticOffset ?? offset;
-  const dragProgress = Math.min(1, Math.abs(renderedOffset.x) / Math.max(1, stageWidth));
-  const incomingIndex = renderedOffset.x < 0 ? currentIndex + 1 : renderedOffset.x > 0 ? currentIndex - 1 : currentIndex;
+
+  function renderProgress(index: number) {
+    return <span className="ds-day-cover__progress" aria-hidden="true">
+      {Array.from({ length: total }, (_, segment) => <i key={segment} className={segment === index ? "is-current" : ""} />)}
+    </span>;
+  }
 
   function reset(duration = reducedMotion ? 0 : 220) {
     setSettling(duration > 0);
@@ -215,15 +219,7 @@ export function DayDeck({ total, currentIndex, label, renderItem, getItemKey, on
           const style = {
             transform: `translate3d(calc(${slot * 100}% + ${slot * 12}px + ${renderedOffset.x}px), ${index === currentIndex ? renderedOffset.y : 0}px, 0)`,
           } as CSSProperties;
-          return <div className={`ds-day-deck__card${index === currentIndex ? " is-current" : ""}`} data-index={index} data-slot={slot} key={getItemKey?.(index) ?? index} style={style}>{renderItem(index, index === currentIndex)}</div>;
-        })}
-      </div>
-      <div className="ds-day-deck__indicator" role="progressbar" aria-label={`${currentIndex + 1} de ${total}`} aria-valuemin={1} aria-valuemax={total} aria-valuenow={currentIndex + 1}>
-        {Array.from({ length: total }, (_, index) => {
-          const active = index === currentIndex;
-          const incoming = index === incomingIndex && incomingIndex !== currentIndex;
-          const scale = active ? 1 + dragProgress * .22 : incoming ? .78 + dragProgress * .22 : .78;
-          return <span key={index} className={`${active ? "is-active" : ""}${incoming ? " is-incoming" : ""}`} style={{ "--segment-scale": scale, "--segment-progress": dragProgress } as CSSProperties} />;
+          return <div className={`ds-day-deck__card${index === currentIndex ? " is-current" : ""}`} data-index={index} data-slot={slot} key={getItemKey?.(index) ?? index} style={style}>{renderItem(index, index === currentIndex, renderProgress(index))}</div>;
         })}
       </div>
     </div>

@@ -36,7 +36,6 @@ export function ActivityDetail({ activity, nearbyPlaces, onBack }: ActivityDetai
         <button type="button" className="detail-back" onClick={onBack} aria-label={es.detail.backAria}>
           <CloseIcon /><span className="sr-only">{es.detail.back}</span>
         </button>
-        <span className="detail-code">LDN / SG</span>
       </header>
 
       <motion.div className="detail-hero" layoutId="sky-garden-media">

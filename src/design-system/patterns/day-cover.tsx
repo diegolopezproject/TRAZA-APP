@@ -14,16 +14,19 @@ export interface DayCoverProps {
   active?: boolean;
   onOpen?: () => void;
   openLabel?: string;
+  openText?: string;
+  openIcon?: ReactNode;
+  progress?: ReactNode;
   debugBounds?: boolean;
-  atmosphere?: "flat" | "atmospheric";
 }
 
-export function DayCover({ dayNumber, weekday, sequenceLabel, eyebrow, title, status, motif, theme, artPosition = "back", active = true, onOpen, openLabel = "Abrir día", debugBounds = false, atmosphere = "flat" }: DayCoverProps) {
-  return <article className={`ds-day-cover theme-${theme} ds-day-cover--art-${artPosition} ds-day-cover--${atmosphere}${active ? " is-active" : ""}${debugBounds ? " ds-debug-bounds" : ""}`} aria-label={`${weekday} ${dayNumber}. ${title}`}>
+export function DayCover({ dayNumber, weekday, sequenceLabel, eyebrow, title, status, motif, theme, artPosition = "back", active = true, onOpen, openLabel = "Abrir día", openText = "Abrir día", openIcon, progress, debugBounds = false }: DayCoverProps) {
+  return <article className={`ds-day-cover theme-${theme} ds-day-cover--art-${artPosition}${active ? " is-active" : ""}${debugBounds ? " ds-debug-bounds" : ""}`} aria-label={`${weekday} ${dayNumber}. ${title}`}>
     <header className="ds-day-cover__kicker" data-bounds="kicker"><span>{weekday.slice(0, 3)} {dayNumber} · Londres</span><span>{sequenceLabel}</span></header>
-    <div className="ds-day-cover__art" data-bounds="art"><div className="ds-day-cover__motif">{motif}</div><div className="ds-day-cover__number" data-bounds="number" aria-hidden="true">{dayNumber}</div></div>
+    <div className="ds-day-cover__art" data-bounds="art"><div className="ds-day-cover__motif">{motif}</div></div>
+    <div className="ds-day-cover__anchor"><div className="ds-day-cover__number" data-bounds="number" aria-hidden="true">{dayNumber}</div></div>
     <div className="ds-day-cover__copy" data-bounds="copy"><p>{eyebrow}</p><h2>{title}</h2><span>{status}</span></div>
-    <div className="ds-day-cover__action" data-bounds="action"><button type="button" onClick={onOpen} aria-label={openLabel}><span /></button></div>
+    <div className="ds-day-cover__action" data-bounds="action"><button type="button" onClick={onOpen} aria-label={openLabel}>{progress}<span className="ds-day-cover__open-label">{openText}{openIcon}</span></button></div>
   </article>;
 }
 
