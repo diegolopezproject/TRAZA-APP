@@ -3,16 +3,20 @@ import { describe, expect, it } from "vitest";
 import { validateDayCoverBounds } from "./day-cover";
 
 const rect = (left: number, top: number, width: number, height: number) => ({ left, top, width, height, right: left + width, bottom: top + height });
-describe("DayCover 2.0 bounds", () => {
-  it.each([360, 390, 430, 768])("keeps number, copy and art contract at %ipx", (width) => {
-    const result = validateDayCoverBounds({ cover: rect(0, 0, width, 800), number: rect(12, 190, width * .72, 220), art: rect(12, 60, width - 24, 450), copy: rect(18, 500, width - 36, 110) });
-    expect(result.numberVisible).toBe(true); expect(result.artOverlapSafe).toBe(true); expect(result.withinCover).toBe(true);
+describe("DayCover Full Bleed bounds", () => {
+  it.each([360, 390, 412, 430])("keeps every functional region inside at %ipx", (width) => {
+    const result = validateDayCoverBounds({ cover: rect(0, 0, width, 800), header: rect(24, 24, width - 48, 44), title: rect(24, 96, width - 48, 172), details: rect(24, 628, width - 48, 42), action: rect(24, 688, width - 48, 86) });
+    expect(result.withinCover).toBe(true); expect(result.titleClear).toBe(true); expect(result.actionClear).toBe(true);
   });
-  it("detects excessive editorial overlap", () => expect(validateDayCoverBounds({ cover: rect(0, 0, 390, 800), number: rect(12, 160, 270, 220), art: rect(12, 60, 366, 560), copy: rect(18, 500, 354, 110) }).artOverlapSafe).toBe(false));
-  it("uses the approved flat 4:3 mobile grid", () => {
+  it("detects title and action collisions", () => {
+    const result = validateDayCoverBounds({ cover: rect(0, 0, 390, 800), header: rect(24, 24, 342, 44), title: rect(24, 96, 342, 560), details: rect(24, 620, 342, 60), action: rect(24, 660, 342, 116) });
+    expect(result.titleClear).toBe(false); expect(result.actionClear).toBe(false);
+  });
+  it("uses the approved integrated Full Bleed structure", () => {
     const css = readFileSync(new URL("./patterns.css", import.meta.url), "utf8");
-    expect(css).toMatch(/\.ds-day-cover__art[^}]*aspect-ratio:\s*4\s*\/\s*3/);
+    expect(css).toMatch(/\.ds-day-cover__art[^}]*position:\s*absolute/);
     expect(css).toMatch(/\.ds-day-cover__action button[^}]*min-height:\s*3\.375rem/);
-    expect(css).not.toContain("ds-day-cover--atmospheric");
+    expect(css).toContain("--ds-day-cover-ui");
+    expect(css).not.toContain("ds-day-cover__number");
   });
 });

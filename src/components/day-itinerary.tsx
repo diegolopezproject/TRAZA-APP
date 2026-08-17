@@ -131,11 +131,11 @@ export function DayItinerary({ day, dayIndex, onClose, onOpenActivity, assignedI
     <motion.section
       className="day-open-layer"
       aria-label={es.day.itineraryAria(weekday, dayNumber(day.date))}
-      initial={reducedMotion ? false : { y: navigationMotion.distance, scale: .985, rotateX: 5 }}
-      animate={{ y: 0, scale: 1, rotateX: 0 }}
-      exit={reducedMotion ? { opacity: 0 } : { y: navigationMotion.distance, scale: .985, rotateX: 4 }}
+      initial={reducedMotion ? false : { y: "100%" }}
+      animate={{ y: 0 }}
+      exit={reducedMotion ? { y: 0 } : { y: "100%" }}
       transition={reducedMotion ? { duration: motionDuration.instant } : navigationMotion.spring}
-      style={{ transformOrigin: "50% 0%", x: backSwipe.x }}
+      style={{ x: backSwipe.x }}
     >
       <div className="app-back-swipe-zone" aria-hidden="true" {...backSwipe.zoneProps} />
       <div ref={scrollerRef} className="itinerary-scroll" style={pullStyle} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd} data-testid="itinerary-scroll" data-navigation-scroll={`day:${day.id}`}>

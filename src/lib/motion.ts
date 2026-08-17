@@ -1,7 +1,7 @@
 export const motionDuration = {
   instant: 0.08,
-  fast: 0.16,
-  standard: 0.24,
+  fast: 0.12,
+  standard: 0.22,
   expressive: 0.42,
 } as const;
 
@@ -27,7 +27,7 @@ export const modalMotion = {
 export const microInteractionMotion = {
   duration: motionDuration.fast,
   ease: motionEase,
-  pressedScale: .97,
+  pressedScale: .98,
 };
 
 export const backSwipeMotion = {
@@ -39,4 +39,3 @@ export const backSwipeMotion = {
 // Compatibility aliases for existing expression components.
 export const gestureSpring = deckMotion.spring;
 export const sheetSpring = modalMotion.spring;
-

@@ -20,6 +20,7 @@ export function DayCover({ day, index, active, progress, onOpen }: DayCoverProps
   const weekday = weekdayEs(day);
   const title = coverTitleEs(day);
   const editorial = dayEditorial[day.id];
+  const route = editorial.eyebrow.replaceAll(" → ", " · ").replaceAll(" / ", " · ");
 
-  return <DesignSystemDayCover dayNumber={number} weekday={weekday} sequenceLabel={`Día ${index + 1} de 8`} eyebrow={editorial.eyebrow} title={title} status={confirmed ? es.journey.anchors(confirmed) : es.journey.open} motif={<DayMotif day={day} />} theme={day.visualTheme} artPosition="back" active={active} onOpen={onOpen} openLabel={es.journey.coverAria(weekday, number, title)} openText={es.journey.openDay} openIcon={<ArrowIcon />} progress={progress} />;
+  return <DesignSystemDayCover dayNumber={number} weekday={weekday} sequenceLabel={`${index + 1} / 8`} eyebrow={route} title={title} status={confirmed ? es.journey.anchors(confirmed) : es.journey.open} motif={<DayMotif day={day} cover />} theme={day.visualTheme} active={active} onOpen={onOpen} openLabel={`${es.journey.openDay}: ${es.journey.coverAria(weekday, number, title)}`} openText={es.journey.openDay} openIcon={<ArrowIcon />} progress={progress} />;
 }

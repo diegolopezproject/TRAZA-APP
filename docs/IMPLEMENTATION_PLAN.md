@@ -1,5 +1,31 @@
 # Plan de implementación
 
+## Iteración 12 — Mobile Experience Polish
+
+- [x] Extender el color Base de cada DayCover a todo el viewport, también detrás de la navegación flotante.
+- [x] Mantener la navbar fija fuera del transform del deck y reservar CTA/progreso desde altura de navegación, gap y `safe-area` compartidos.
+- [x] Afinar axis lock, seguimiento directo, cancelación, snap de un solo día y resistencia acotada en los extremos.
+- [x] Convertir el progreso 06–13 en feedback continuo durante el drag sin añadir otro indicador.
+- [x] Unificar CTA y gesto vertical sobre la misma apertura; presentar DayDetail desde abajo conservando DayCover debajo.
+- [x] Conservar Día 07 al volver mediante Android/Browser Back, swipe-edge y botón de cierre.
+- [x] Eliminar escalas tipográficas por longitud y usar una única jerarquía DayCoverTitle / FunctionalMeta / CTA.
+- [x] Validar Chromium y WebKit en 360×800, 390×844, 412×915 y 430×932, con los ocho crops a 390×844.
+- [x] Completar quality gate final con lint, tipos, 44 tests, token gate, build, Storybook y navegación histórica.
+- [ ] Crear commit, push y Vercel Preview; no desplegar a producción.
+
+Decisión de interacción: `DayDeck` sigue montando únicamente anterior / actual / siguiente y nunca avanza más de un día. La navegación Días / Guardados / Viaje permanece fija e independiente; su reserva inferior es el único origen geométrico para CTA y progreso. El detalle entra como una capa desde abajo sin sustituir previamente la portada, y todas sus salidas convergen en la misma operación de historial.
+
+## Iteración 12 — DayCover Full Bleed aprobada
+
+- [x] Aprobar en Open Design la dirección B — Full Bleed, su respuesta móvil y el sistema cromático 06–13.
+- [x] Limitar la implementación a `DayCover`, sin modificar Guardados, Viaje ni navegación.
+- [x] Sustituir frame y fecha gigante por fondo continuo, cabecera funcional, titular editorial, ilustración integrada y CTA Lime.
+- [x] Aplicar los roles Base / Texto / Apoyo / Ink a las ocho portadas; reservar Electric Lime para interacción y posición activa.
+- [x] Validar lint, tipos, tests, build y Preview local en Chromium/WebKit para 360×800, 390×844, 412×915 y 430×932.
+- [ ] Esperar aprobación de Preview antes de cualquier despliegue a producción.
+
+Decisión de alcance: la variante Full Bleed sustituye únicamente la presentación cerrada de las DayCover. El día abierto conserva su composición y paleta previas. La ilustración refinada del Día 07 se activa solo en portada; los demás motivos mantienen su semántica existente dentro de la nueva lógica cromática de colección.
+
 ## Iteración 11 — auditoría visual y aplicación mobile-first
 
 - [x] Auditar producción y Storybook en Chromium/WebKit para 360×800, 390×844, 412×915 y 430×932.

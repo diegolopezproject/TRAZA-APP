@@ -586,7 +586,6 @@ button:disabled { opacity: .32; cursor: not-allowed; }
 .open-day-visual > div:first-child { width: 72%; }
 .open-day-visual .day-motif { left: 39%; top: -7%; right: -7%; bottom: -7%; }
 .open-day-visual h1 { font-size: clamp(1.8rem, 7.7vw, 2.7rem); }
-.open-day-hero.theme-orange-night .open-day-visual h1 { font-size: clamp(1.65rem, 6.8vw, 2.25rem); }
 .open-day-hero .icon-button { color: var(--cover-fg); border-color: color-mix(in srgb, var(--cover-fg) 34%, transparent); }
 .pull-indicator { width: 52px; height: 22px; padding: 0; justify-content: center; }
 .pull-indicator span { width: 26px; height: 4px; border-radius: 99px; background: currentColor; }
@@ -980,6 +979,14 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-colo
 
 .app-shell { width: 100%; height: 100dvh; min-height: 100svh; overflow: hidden; padding-left: var(--safe-left); padding-right: var(--safe-right); }
 .app-shell--saved, .app-shell--trip { height: 100dvh; }
+.app-shell--journey[data-journey-theme="orange-night"] { background: var(--ds-day-cover-06-base); }
+.app-shell--journey[data-journey-theme="sky-lime-orange"] { background: var(--ds-day-cover-07-base); }
+.app-shell--journey[data-journey-theme="pink-orange"] { background: var(--ds-day-cover-08-base); }
+.app-shell--journey[data-journey-theme="violet-lime"] { background: var(--ds-day-cover-09-base); }
+.app-shell--journey[data-journey-theme="orange-black"] { background: var(--ds-day-cover-10-base); }
+.app-shell--journey[data-journey-theme="blue-pink"] { background: var(--ds-day-cover-11-base); }
+.app-shell--journey[data-journey-theme="illustrated-open-day"] { background: var(--ds-day-cover-12-base); }
+.app-shell--journey[data-journey-theme="sky-white"] { background: var(--ds-day-cover-13-base); }
 
 .bottom-nav {
   bottom: calc(var(--safe-bottom) + var(--nav-gap));
@@ -996,7 +1003,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-colo
   grid-template-rows: minmax(0, 1fr);
   height: 100dvh;
   min-height: 100svh;
-  padding: var(--top-safe-content) 0 var(--nav-reserve);
+  padding: 0;
 }
 .journey-view > .ds-day-deck { min-height: 0; }
 .day-carousel {

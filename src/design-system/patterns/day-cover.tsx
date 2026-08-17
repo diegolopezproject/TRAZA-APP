@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 
-export type DayCoverArtPosition = "left" | "back" | "top";
 export interface DayCoverProps {
   dayNumber: string;
   weekday: string;
@@ -10,7 +9,6 @@ export interface DayCoverProps {
   status: string;
   motif: ReactNode;
   theme: string;
-  artPosition?: DayCoverArtPosition;
   active?: boolean;
   onOpen?: () => void;
   openLabel?: string;
@@ -20,23 +18,28 @@ export interface DayCoverProps {
   debugBounds?: boolean;
 }
 
-export function DayCover({ dayNumber, weekday, sequenceLabel, eyebrow, title, status, motif, theme, artPosition = "back", active = true, onOpen, openLabel = "Abrir día", openText = "Abrir día", openIcon, progress, debugBounds = false }: DayCoverProps) {
-  return <article className={`ds-day-cover theme-${theme} ds-day-cover--art-${artPosition}${active ? " is-active" : ""}${debugBounds ? " ds-debug-bounds" : ""}`} aria-label={`${weekday} ${dayNumber}. ${title}`}>
-    <header className="ds-day-cover__kicker" data-bounds="kicker"><span>{weekday.slice(0, 3)} {dayNumber} · Londres</span><span>{sequenceLabel}</span></header>
+export function DayCover({ dayNumber, weekday, sequenceLabel, eyebrow, title, status, motif, theme, active = true, onOpen, openLabel = "Abrir día", openText = "Abrir día", openIcon, progress, debugBounds = false }: DayCoverProps) {
+  return <article className={`ds-day-cover theme-${theme}${active ? " is-active" : ""}${debugBounds ? " ds-debug-bounds" : ""}`} aria-label={`${weekday} ${dayNumber}. ${title}`}>
+    <header className="ds-day-cover__header" data-bounds="header">
+      <span className="ds-day-cover__date"><b>{weekday.slice(0, 3)} {dayNumber} ago</b><b>Londres</b></span>
+      <span className="ds-day-cover__count">{sequenceLabel}</span>
+    </header>
+    <div className="ds-day-cover__title" data-bounds="title"><h2>{title}</h2></div>
     <div className="ds-day-cover__art" data-bounds="art"><div className="ds-day-cover__motif">{motif}</div></div>
-    <div className="ds-day-cover__anchor"><div className="ds-day-cover__number" data-bounds="number" aria-hidden="true">{dayNumber}</div></div>
-    <div className="ds-day-cover__copy" data-bounds="copy"><p>{eyebrow}</p><h2>{title}</h2><span>{status}</span></div>
-    <div className="ds-day-cover__action" data-bounds="action"><button type="button" onClick={onOpen} aria-label={openLabel}>{progress}<span className="ds-day-cover__open-label">{openText}{openIcon}</span></button></div>
+    <div className="ds-day-cover__details" data-bounds="details"><p>{eyebrow}</p><span>{status}</span></div>
+    <div className="ds-day-cover__action" data-bounds="action">
+      <button type="button" onClick={onOpen} aria-label={openLabel}><span>{openText}</span>{openIcon}</button>
+      {progress}
+    </div>
   </article>;
 }
 
 export interface BoundsRect { left: number; top: number; right: number; bottom: number; width: number; height: number; }
-export interface DayCoverBoundsInput { cover: BoundsRect; number: BoundsRect; art: BoundsRect; copy: BoundsRect; }
-export function validateDayCoverBounds({ cover, number, art, copy }: DayCoverBoundsInput) {
-  const visibleWidth = Math.max(0, Math.min(number.right, cover.right) - Math.max(number.left, cover.left));
-  const visibleHeight = Math.max(0, Math.min(number.bottom, cover.bottom) - Math.max(number.top, cover.top));
-  const visibleRatio = number.width && number.height ? visibleWidth * visibleHeight / (number.width * number.height) : 0;
-  const overlapHeight = Math.max(0, Math.min(art.bottom, copy.bottom) - Math.max(art.top, copy.top));
-  const overlapRatio = Math.min(1, overlapHeight / Math.max(1, copy.height));
-  return { visibleRatio, overlapRatio, numberVisible: visibleRatio >= .8, artOverlapSafe: overlapRatio <= .15, withinCover: copy.left >= cover.left && copy.right <= cover.right && copy.bottom <= cover.bottom };
+export interface DayCoverBoundsInput { cover: BoundsRect; header: BoundsRect; title: BoundsRect; details: BoundsRect; action: BoundsRect; }
+export function validateDayCoverBounds({ cover, header, title, details, action }: DayCoverBoundsInput) {
+  const regions = [header, title, details, action];
+  const withinCover = regions.every((region) => region.left >= cover.left && region.right <= cover.right && region.top >= cover.top && region.bottom <= cover.bottom);
+  const titleDetailsGap = details.top - title.bottom;
+  const detailsActionGap = action.top - details.bottom;
+  return { withinCover, titleDetailsGap, detailsActionGap, titleClear: titleDetailsGap >= 0, actionClear: detailsActionGap >= 0 };
 }

@@ -192,7 +192,7 @@ export function TripApp({ trip }: TripAppProps) {
 
   return (
     <LayoutGroup>
-      <AppShell activeTab={state.tab}>
+      <AppShell activeTab={state.tab} journeyTheme={effectiveTrip.days[state.selectedDay]?.visualTheme}>
         {state.tab === "journey" ? <DayCarousel days={effectiveTrip.days} selectedIndex={state.selectedDay} onSelect={selectDay} onOpen={(day) => navigation.push((current) => ({ ...current, tab: "journey", openDayId: day.id, dayMode: "view", detailActivityId: null, assignmentPlaceId: null, placeEditorId: null, placeDetailId: null, planSheet: null, mealActivityId: null }))} /> : null}
         {state.tab === "saved" ? <SavedView places={local.places} assignments={assignmentsByPlace} filter={state.savedFilter} onFilterChange={(filter) => navigation.replace((current) => ({ ...current, savedFilter: filter }))} onAssignRequest={(placeId) => navigation.push((current) => ({ ...current, assignmentPlaceId: placeId, assignmentStep: 1 }))} onAddPlace={() => navigation.push((current) => ({ ...current, placeEditorId: "new" }))} onEditPlace={(placeEditorId) => navigation.push((current) => ({ ...current, placeEditorId }))} onOpenPlace={(placeDetailId) => navigation.push((current) => ({ ...current, placeDetailId }))} onReset={resetLocalData} /> : null}
         {state.tab === "trip" ? <TripView trip={effectiveTrip} editingTransfers={state.tripEditingTransfers} onStartTransferEditing={() => navigation.push((current) => ({ ...current, tripEditingTransfers: true }))} onSaveTransfers={saveTransfers} /> : null}

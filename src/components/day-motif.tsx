@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { Day } from "@/domain/models";
 
-interface DayMotifProps { day: Day; compact?: boolean; }
+interface DayMotifProps { day: Day; compact?: boolean; cover?: boolean; }
 
 function Route({ d, accent = "accent" }: { d: string; accent?: "accent" | "paper" }) {
   return <path className={`chapter-route chapter-${accent}`} d={d} pathLength="1" />;
@@ -54,10 +54,30 @@ const chapters: Record<string, () => ReactNode> = {
   "2026-08-13": ChapterThirteen,
 };
 
-export function DayMotif({ day, compact = false }: DayMotifProps) {
+function FullBleedLondon() {
+  return <svg viewBox="0 0 430 380" preserveAspectRatio="xMidYMax slice" role="img" focusable="false">
+    <path className="chapter-city-support" d="M0 300L38 270L73 286L109 246L142 274L181 230L218 270L257 214L294 257L335 224L379 265L430 238V380H0Z" />
+    <path className="chapter-city-ink" d="M0 380V292H24V270H43V380ZM58 380V238H78V222H104V238H121V380ZM132 380V282H154V252H177V380ZM187 380V215H220V380ZM232 380V271H258V248H277V380Z" />
+    <path className="chapter-city-paper" d="M43 380V207H60V179H51L45 158L69 143L97 158L91 179H82V207H106V380Z" />
+    <path className="chapter-city-support" d="M50 178H92L86 193H56Z" />
+    <path className="chapter-city-paper" d="M164 380V235H181L187 194L193 235H209V380Z" />
+    <path className="chapter-city-support" d="M217 380V170L235 147L253 170V380Z" />
+    <path className="chapter-city-paper" d="M273 380V111H315V380Z" />
+    <path className="chapter-city-support" d="M283 127H305V380H283Z" />
+    <path className="chapter-city-paper" d="M323 380V62H365V380Z" />
+    <path className="chapter-city-support" d="M332 78H356V380H332Z" />
+    <path className="chapter-city-ink" d="M374 380V136H407V380Z" />
+  </svg>;
+}
+
+export function DayMotif({ day, compact = false, cover = false }: DayMotifProps) {
+  if (cover && day.id === "2026-08-07") {
+    return <div className="day-motif day-motif--full-bleed day-motif--london" aria-hidden="true"><FullBleedLondon /></div>;
+  }
+
   const Chapter = chapters[day.id] ?? ChapterTwelve;
   return (
-    <div className={`day-motif chapter-illustration motif-${day.visualTheme}${compact ? " day-motif--compact" : ""}`} aria-hidden="true">
+    <div className={`day-motif chapter-illustration motif-${day.visualTheme}${compact ? " day-motif--compact" : ""}${cover ? " day-motif--full-bleed" : ""}`} aria-hidden="true">
       <svg viewBox="0 0 320 360" preserveAspectRatio={compact ? "xMidYMid meet" : "xMidYMid slice"} role="img" focusable="false">
         <g className="chapter-plane chapter-plane--ink"><Chapter /></g>
       </svg>

@@ -17,7 +17,8 @@
     "test:visual:chromium": "set PW_ENGINE=chromium&& node scripts/visual-iteration-08.mjs",
     "test:visual:webkit": "set PW_ENGINE=webkit&& node scripts/visual-iteration-08.mjs",
     "test:visual:iteration07": "node scripts/visual-iteration-07.mjs",
-    "test:iteration09": "node scripts/test-iteration-09-navigation.mjs"
+    "test:iteration09": "node scripts/test-iteration-09-navigation.mjs",
+    "test:iteration12:mobile": "node scripts/visual-iteration-12-mobile-polish.mjs"
   },
   "dependencies": {
     "geist": "1.7.2",

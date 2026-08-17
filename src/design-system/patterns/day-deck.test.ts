@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { resolveDayDeckGesture, visibleDayDeckIndices } from "./day-deck";
+import { resistDayDeckEdge, resolveDayDeckAxis, resolveDayDeckGesture, visibleDayDeckIndices } from "./day-deck";
 
 describe("resolveDayDeckGesture", () => {
   it("moves at most one day after a very strong flick", () => {
@@ -17,6 +17,17 @@ describe("resolveDayDeckGesture", () => {
   it("returns below threshold", () => {
     expect(resolveDayDeckGesture({ axis: "x", currentIndex: 3, total: 8, offsetX: -34, offsetY: 4, velocityX: -.1, velocityY: 0, width: 393 }).index).toBe(3);
   });
+  it("locks to one axis only after intentional movement", () => {
+    expect(resolveDayDeckAxis(5, 5)).toBeNull();
+    expect(resolveDayDeckAxis(14, 6)).toBe("x");
+    expect(resolveDayDeckAxis(5, -14)).toBe("y");
+  });
+  it("adds bounded resistance at the collection edges", () => {
+    expect(resistDayDeckEdge(180, false)).toBe(180);
+    expect(resistDayDeckEdge(180, true)).toBeGreaterThan(0);
+    expect(resistDayDeckEdge(180, true)).toBeLessThanOrEqual(36);
+    expect(resistDayDeckEdge(-900, true)).toBeCloseTo(-36, 3);
+  });
   it("mounts only previous, active and next before a commit", () => {
     expect(visibleDayDeckIndices(3, 8)).toEqual([2, 3, 4]);
     expect(visibleDayDeckIndices(0, 8)).toEqual([0, 1]);
@@ -31,5 +42,6 @@ describe("resolveDayDeckGesture", () => {
     const css = readFileSync(new URL("./patterns.css", import.meta.url), "utf8");
     expect(css).toContain(".ds-day-cover__progress");
     expect(css).not.toContain(".ds-day-deck__indicator");
+    expect(css).toContain("--ds-segment-active");
   });
 });

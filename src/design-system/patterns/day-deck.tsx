@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, Key, KeyboardEvent, PointerEvent, ReactNode } from "react";
 import { useReducedMotion } from "motion/react";
+import { deckMotion } from "@/lib/motion";
 
 export type DayDeckAxis = "x" | "y";
 
@@ -31,6 +32,18 @@ export function resolveDayDeckGesture(input: DayDeckGestureInput) {
   };
 }
 
+export const dayDeckAxisLockDistance = 10;
+
+export function resolveDayDeckAxis(offsetX: number, offsetY: number, lockDistance = dayDeckAxisLockDistance): DayDeckAxis | null {
+  if (Math.hypot(offsetX, offsetY) < lockDistance) return null;
+  return Math.abs(offsetX) >= Math.abs(offsetY) ? "x" : "y";
+}
+
+export function resistDayDeckEdge(offset: number, atEdge: boolean) {
+  if (!atEdge) return offset;
+  return Math.sign(offset) * Math.min(36, 36 * (1 - Math.exp(-Math.abs(offset) / 72)));
+}
+
 interface GestureState {
   pointerId: number;
   startX: number;
@@ -40,6 +53,8 @@ interface GestureState {
   lastTime: number;
   velocityX: number;
   velocityY: number;
+  offsetX: number;
+  offsetY: number;
   axis: DayDeckAxis | null;
 }
 
@@ -56,8 +71,6 @@ export interface DayDeckProps {
   diagnosticPressed?: boolean;
   diagnosticSettling?: boolean;
 }
-
-const axisLockDistance = 10;
 
 export function visibleDayDeckIndices(currentIndex: number, total: number): number[] {
   return [currentIndex - 1, currentIndex, currentIndex + 1].filter((index) => index >= 0 && index < total);
@@ -83,14 +96,24 @@ export function DayDeck({ total, currentIndex, label, renderItem, getItemKey, on
     [currentIndex, total],
   );
   const renderedOffset = diagnosticOffset ?? offset;
+  const horizontalProgress = axis === "x" ? Math.min(1, Math.abs(renderedOffset.x) / Math.max(1, stageWidth)) : 0;
+  const horizontalTarget = renderedOffset.x < 0 ? currentIndex + 1 : currentIndex - 1;
 
   function renderProgress(index: number) {
     return <span className="ds-day-cover__progress" aria-hidden="true">
-      {Array.from({ length: total }, (_, segment) => <i key={segment} className={segment === index ? "is-current" : ""} />)}
+      {Array.from({ length: total }, (_, segment) => {
+        let strength = segment === index ? 1 : 0;
+        if (index === currentIndex && horizontalProgress > 0 && horizontalTarget >= 0 && horizontalTarget < total) {
+          if (segment === currentIndex) strength = 1 - horizontalProgress;
+          if (segment === horizontalTarget) strength = horizontalProgress;
+        }
+        return <i key={segment} style={{ "--ds-segment-active": strength } as CSSProperties} />;
+      })}
     </span>;
   }
 
-  function reset(duration = reducedMotion ? 0 : 220) {
+  function reset(duration = reducedMotion ? 0 : deckMotion.settleDurationMs) {
+    if (timerRef.current) window.clearTimeout(timerRef.current);
     setSettling(duration > 0);
     setOffset({ x: 0, y: 0 });
     setAxis(null);
@@ -111,6 +134,8 @@ export function DayDeck({ total, currentIndex, label, renderItem, getItemKey, on
       lastTime: now,
       velocityX: 0,
       velocityY: 0,
+      offsetX: 0,
+      offsetY: 0,
       axis: null,
     };
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -123,8 +148,8 @@ export function DayDeck({ total, currentIndex, label, renderItem, getItemKey, on
     if (!gesture || gesture.pointerId !== event.pointerId) return;
     const x = event.clientX - gesture.startX;
     const y = event.clientY - gesture.startY;
-    if (!gesture.axis && Math.hypot(x, y) >= axisLockDistance) {
-      gesture.axis = Math.abs(x) >= Math.abs(y) ? "x" : "y";
+    if (!gesture.axis) {
+      gesture.axis = resolveDayDeckAxis(x, y);
       setAxis(gesture.axis);
     }
     const now = performance.now();
@@ -138,10 +163,14 @@ export function DayDeck({ total, currentIndex, label, renderItem, getItemKey, on
       event.preventDefault();
       const atStart = currentIndex === 0 && x > 0;
       const atEnd = currentIndex === total - 1 && x < 0;
-      setOffset({ x: atStart || atEnd ? x * .2 : x, y: 0 });
+      gesture.offsetX = resistDayDeckEdge(x, atStart || atEnd);
+      gesture.offsetY = 0;
+      setOffset({ x: gesture.offsetX, y: 0 });
     } else if (gesture.axis === "y") {
       event.preventDefault();
-      setOffset({ x: 0, y: y < 0 ? Math.max(-132, y) : y * .14 });
+      gesture.offsetX = 0;
+      gesture.offsetY = y < 0 ? Math.max(-132, y) : resistDayDeckEdge(y, true);
+      setOffset({ x: 0, y: gesture.offsetY });
     }
   }
 
@@ -153,8 +182,8 @@ export function DayDeck({ total, currentIndex, label, renderItem, getItemKey, on
       axis: gesture.axis,
       currentIndex,
       total,
-      offsetX: offset.x,
-      offsetY: offset.y,
+      offsetX: gesture.offsetX,
+      offsetY: gesture.offsetY,
       velocityX: gesture.velocityX,
       velocityY: gesture.velocityY,
       width: stageWidth,
@@ -168,7 +197,7 @@ export function DayDeck({ total, currentIndex, label, renderItem, getItemKey, on
         setSettling(false);
         setAxis(null);
         onOpenCurrent();
-      }, reducedMotion ? 0 : 120);
+      }, reducedMotion ? 0 : deckMotion.settleDurationMs / 2);
       return;
     }
     if (resolved.index !== currentIndex) {
@@ -176,15 +205,21 @@ export function DayDeck({ total, currentIndex, label, renderItem, getItemKey, on
       const width = stageWidth;
       setPressed(false);
       setSettling(!reducedMotion);
-      setOffset({ x: direction * (width + 12), y: 0 });
+      setOffset({ x: direction * width, y: 0 });
       timerRef.current = window.setTimeout(() => {
         onIndexChange(resolved.index);
         setSettling(false);
         setAxis(null);
         setOffset({ x: 0, y: 0 });
-      }, reducedMotion ? 0 : 220);
+      }, reducedMotion ? 0 : deckMotion.settleDurationMs);
       return;
     }
+    reset();
+  }
+
+  function cancelPointer(event: PointerEvent<HTMLDivElement>) {
+    if (gestureRef.current?.pointerId !== event.pointerId) return;
+    gestureRef.current = null;
     reset();
   }
 
@@ -200,7 +235,7 @@ export function DayDeck({ total, currentIndex, label, renderItem, getItemKey, on
   }
 
   return (
-    <div className="ds-day-deck" data-axis={axis ?? "pending"} data-pressed={diagnosticPressed || pressed || undefined}>
+    <div className="ds-day-deck" data-axis={axis ?? "pending"} data-drag-progress={horizontalProgress.toFixed(3)} data-pressed={diagnosticPressed || pressed || undefined}>
       <div
         ref={stageRef}
         className={`ds-day-deck__stage${diagnosticSettling || settling ? " is-settling" : ""}`}
@@ -212,12 +247,12 @@ export function DayDeck({ total, currentIndex, label, renderItem, getItemKey, on
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={finishPointer}
-        onPointerCancel={finishPointer}
+        onPointerCancel={cancelPointer}
       >
         {visibleIndices.map((index) => {
           const slot = index - currentIndex;
           const style = {
-            transform: `translate3d(calc(${slot * 100}% + ${slot * 12}px + ${renderedOffset.x}px), ${index === currentIndex ? renderedOffset.y : 0}px, 0)`,
+            transform: `translate3d(calc(${slot * 100}% + ${renderedOffset.x}px), ${index === currentIndex ? renderedOffset.y : 0}px, 0)`,
           } as CSSProperties;
           return <div className={`ds-day-deck__card${index === currentIndex ? " is-current" : ""}`} data-index={index} data-slot={slot} key={getItemKey?.(index) ?? index} style={style}>{renderItem(index, index === currentIndex, renderProgress(index))}</div>;
         })}

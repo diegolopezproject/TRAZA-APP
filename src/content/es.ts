@@ -26,7 +26,7 @@ export const es = {
     currentAnnouncement: (day: string, number: string) => `${day} ${number} de agosto seleccionado`,
   },
   coverTitles: {
-    "2026-08-06": "Primera tarde en Londres. De Gatwick a Ealing. Londres al anochecer.",
+    "2026-08-06": "Llegada a Londres. De Gatwick a Ealing.",
     "2026-08-07": "La City desde las alturas. Canary Wharf al anochecer.",
     "2026-08-08": "Notting Hill a todo color",
     "2026-08-09": "El centro de Londres se vuelve verde",

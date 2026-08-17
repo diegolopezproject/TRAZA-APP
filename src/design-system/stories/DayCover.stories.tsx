@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { CSSProperties } from "react";
 import { DayCover } from "@/design-system";
 import { ArrowIcon } from "@/components/icons";
 import { DayMotif } from "@/components/day-motif";
@@ -19,12 +20,13 @@ const days = [
 function RealDayCover({ index = 1, debugBounds = false }: { index?: number; debugBounds?: boolean }) {
   const day = days[index];
   const number = day.date.slice(-2);
-  const progress = <span className="ds-day-cover__progress" aria-hidden="true">{days.map((item, segment) => <i key={item.id} className={segment === index ? "is-current" : ""} />)}</span>;
-  return <DayCover dayNumber={number} weekday={day.weekday} sequenceLabel={`Día ${index + 1} de 8`} eyebrow={dayEditorial[day.id].eyebrow} title={day.coverTitle} status={index === 3 || index === 5 || index === 6 ? es.journey.open : es.journey.anchors(index === 1 ? 2 : 1)} theme={day.visualTheme} artPosition="back" motif={<DayMotif day={day} />} openText={es.journey.openDay} openIcon={<ArrowIcon />} progress={progress} debugBounds={debugBounds} />;
+  const route = dayEditorial[day.id].eyebrow.replaceAll(" → ", " · ").replaceAll(" / ", " · ");
+  const progress = <span className="ds-day-cover__progress" aria-hidden="true">{days.map((item, segment) => <i key={item.id} style={{ "--ds-segment-active": segment === index ? 1 : 0 } as CSSProperties} />)}</span>;
+  return <DayCover dayNumber={number} weekday={day.weekday} sequenceLabel={`${index + 1} / 8`} eyebrow={route} title={day.coverTitle} status={index === 3 || index === 5 || index === 6 ? es.journey.open : es.journey.anchors(index === 1 ? 2 : 1)} theme={day.visualTheme} motif={<DayMotif day={day} cover />} openText={es.journey.openDay} openIcon={<ArrowIcon />} progress={progress} debugBounds={debugBounds} />;
 }
 
 const meta = {
-  title: "Patterns/DayCover/Iteration 11",
+  title: "Patterns/DayCover/Full Bleed",
   parameters: { layout: "centered", viewport: { defaultViewport: "mobile390" } },
   decorators: [(Story) => <div className="ds-story-cover-frame"><Story /></div>],
 } satisfies Meta;
