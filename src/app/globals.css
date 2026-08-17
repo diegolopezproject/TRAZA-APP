@@ -946,13 +946,13 @@ html, body { background: var(--cloud); }
 
 /* Iteration 06 · iPhone-first viewport and chapter system */
 :root {
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-right: env(safe-area-inset-right, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-top: var(--ds-safe-top);
+  --safe-right: var(--ds-safe-right);
+  --safe-bottom: var(--ds-safe-bottom);
+  --safe-left: var(--ds-safe-left);
   --safe-top-gap: 12px;
   --safe-bottom-gap: 14px;
-  --top-safe-content: calc(var(--safe-top) + var(--safe-top-gap));
+  --top-safe-content: var(--ds-safe-top-content);
   --bottom-safe-content: calc(var(--safe-bottom) + var(--safe-bottom-gap));
   --nav-height: 56px;
   --nav-gap: 10px;
@@ -979,14 +979,14 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-colo
 
 .app-shell { width: 100%; height: 100dvh; min-height: 100svh; overflow: hidden; padding-left: var(--safe-left); padding-right: var(--safe-right); }
 .app-shell--saved, .app-shell--trip { height: 100dvh; }
-.app-shell--journey[data-journey-theme="orange-night"] { background: var(--ds-day-cover-06-base); }
-.app-shell--journey[data-journey-theme="sky-lime-orange"] { background: var(--ds-day-cover-07-base); }
-.app-shell--journey[data-journey-theme="pink-orange"] { background: var(--ds-day-cover-08-base); }
-.app-shell--journey[data-journey-theme="violet-lime"] { background: var(--ds-day-cover-09-base); }
-.app-shell--journey[data-journey-theme="orange-black"] { background: var(--ds-day-cover-10-base); }
-.app-shell--journey[data-journey-theme="blue-pink"] { background: var(--ds-day-cover-11-base); }
-.app-shell--journey[data-journey-theme="illustrated-open-day"] { background: var(--ds-day-cover-12-base); }
-.app-shell--journey[data-journey-theme="sky-white"] { background: var(--ds-day-cover-13-base); }
+.app-shell--journey[data-journey-theme="orange-night"] { background: var(--ds-day-06-base); }
+.app-shell--journey[data-journey-theme="sky-lime-orange"] { background: var(--ds-day-07-base); }
+.app-shell--journey[data-journey-theme="pink-orange"] { background: var(--ds-day-08-base); }
+.app-shell--journey[data-journey-theme="violet-lime"] { background: var(--ds-day-09-base); }
+.app-shell--journey[data-journey-theme="orange-black"] { background: var(--ds-day-10-base); }
+.app-shell--journey[data-journey-theme="blue-pink"] { background: var(--ds-day-11-base); }
+.app-shell--journey[data-journey-theme="illustrated-open-day"] { background: var(--ds-day-12-base); }
+.app-shell--journey[data-journey-theme="sky-white"] { background: var(--ds-day-13-base); }
 
 .bottom-nav {
   bottom: calc(var(--safe-bottom) + var(--nav-gap));
@@ -1076,6 +1076,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-colo
   width: min(880px, 100%);
   height: 100dvh;
   min-height: 0;
+  padding-top: var(--ds-safe-top);
   padding-bottom: var(--nav-reserve);
   scroll-padding-top: var(--top-safe-content);
   scroll-padding-bottom: var(--nav-reserve);
@@ -1177,10 +1178,18 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-colo
 
 /* Iteration 08 · product layouts consume Design System 1.1 patterns. */
 .open-day-hero { min-height: 0; padding: 0; border-radius: 0 0 var(--ds-radius-hero) var(--ds-radius-hero); background: var(--cover-bg); color: var(--cover-fg); }
+.open-day-hero.theme-orange-night { --day-base: var(--ds-day-06-base); --day-surface: var(--ds-day-06-surface); --cover-bg: var(--day-surface); --cover-fg: var(--ds-day-06-ink); --cover-accent: var(--ds-day-06-support); }
+.open-day-hero.theme-sky-lime-orange { --day-base: var(--ds-day-07-base); --day-surface: var(--ds-day-07-surface); --cover-bg: var(--day-surface); --cover-fg: var(--ds-day-07-ink); --cover-accent: var(--ds-day-07-support); }
+.open-day-hero.theme-pink-orange { --day-base: var(--ds-day-08-base); --day-surface: var(--ds-day-08-surface); --cover-bg: var(--day-surface); --cover-fg: var(--ds-day-08-ink); --cover-accent: var(--ds-day-08-support); }
+.open-day-hero.theme-violet-lime { --day-base: var(--ds-day-09-base); --day-surface: var(--ds-day-09-surface); --cover-bg: var(--day-surface); --cover-fg: var(--ds-day-09-ink); --cover-accent: var(--ds-day-09-support); }
+.open-day-hero.theme-orange-black { --day-base: var(--ds-day-10-base); --day-surface: var(--ds-day-10-surface); --cover-bg: var(--day-surface); --cover-fg: var(--ds-day-10-ink); --cover-accent: var(--ds-day-10-support); }
+.open-day-hero.theme-blue-pink { --day-base: var(--ds-day-11-base); --day-surface: var(--ds-day-11-surface); --cover-bg: var(--day-surface); --cover-fg: var(--ds-day-11-ink); --cover-accent: var(--ds-day-11-support); }
+.open-day-hero.theme-illustrated-open-day { --day-base: var(--ds-day-12-base); --day-surface: var(--ds-day-12-surface); --cover-bg: var(--day-surface); --cover-fg: var(--ds-day-12-ink); --cover-accent: var(--ds-day-12-support); }
+.open-day-hero.theme-sky-white { --day-base: var(--ds-day-13-base); --day-surface: var(--ds-day-13-surface); --cover-bg: var(--day-surface); --cover-fg: var(--ds-day-13-ink); --cover-accent: var(--ds-day-13-support); }
 .open-day-hero .ds-day-header { position: relative; z-index: var(--ds-layer-sticky); }
 .open-day-hero .ds-day-hero { padding-top: 0; }
-.open-day-hero .ds-day-hero__motif .day-motif--compact { position: relative; inset: auto; width: 100%; height: 100%; opacity: 1; }
-.open-day-hero .ds-day-hero__motif .day-motif--compact svg { transform: scale(.86) translate(18px, 10px); transform-origin: center; }
+.open-day-hero .ds-day-hero__motif .day-motif--compact { position: relative; inset: auto; width: 100%; height: 100%; padding-bottom: var(--ds-space-6); display: flex; align-items: flex-end; opacity: 1; transform-origin: center bottom; }
+.open-day-hero .ds-day-hero__motif .day-motif--compact svg { display: block; flex: 0 0 auto; transform: scale(.86) translate(18px, 10px); transform-origin: center bottom; }
 .itinerary-content { padding-top: var(--ds-space-5); padding-bottom: var(--ds-navigation-reserve); }
 .itinerary-actions.ds-action-group { justify-content: flex-start; margin: 0 0 var(--ds-space-6); padding-inline: var(--ds-space-1); }
 .itinerary-actions .ds-button { width: auto; min-height: var(--ds-touch-target); margin: 0; font-size: .8125rem; }

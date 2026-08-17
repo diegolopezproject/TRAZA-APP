@@ -101,7 +101,7 @@ function coverFailures(audit) {
     !audit.regionsInside && `day ${audit.index}: content outside cover`,
     audit.titleLines > 4.05 && `day ${audit.index}: ${audit.titleLines.toFixed(1)} title lines`,
     audit.titleDetailsGap < 0 && `day ${audit.index}: title/details collision`,
-    audit.artDetailsGap < -4 && `day ${audit.index}: art/details collision`,
+    audit.artDetailsGap < 16 && `day ${audit.index}: illustration/metadata gap ${audit.artDetailsGap.toFixed(1)}px`,
     audit.detailsActionGap < 12 && `day ${audit.index}: details/action gap`,
     audit.actionNavGap < 12 && `day ${audit.index}: action/navigation gap`,
     !audit.equalNavItems && `day ${audit.index}: unequal navigation items`,

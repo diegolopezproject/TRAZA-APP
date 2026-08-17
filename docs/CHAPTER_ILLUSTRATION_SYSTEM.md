@@ -11,6 +11,7 @@ Las ocho portadas son capítulos editoriales, no galerías fotográficas. `DayCo
 - Los motivos existentes conservan su `viewBox 0 0 320 360`; el skyline refinado del Día 07 usa `430 380` para controlar su crop horizontal.
 - Un solo plano de dibujo y masas geométricas planas; no hay efectos 3D ni decoración arbitraria.
 - El motivo se integra en el tercio medio-bajo y cede encuadre antes de reducir la escala tipográfica.
+- La caja compartida de arte recorta cualquier desborde y termina 20 px antes de la metadata. El whitespace interno del SVG puede ampliar, pero nunca reducir, esa separación funcional.
 - Perspectiva frontal ligeramente editorial; sin mezclar isométrico, collage y fotografía.
 - Radios, ventanas y rutas se construyen con primitivas comunes. TRAZA Design System expone `BuildingBlock`, `ArchBlock`, `DomeBlock`, `BridgeBlock`, `RouteLine`, `EditorialShape` y `GrainTexture`; el SVG histórico se migrará por composición, sin duplicarlo.
 - Cada capítulo contiene un motivo principal, una ruta y hasta dos secundarios.
@@ -26,22 +27,24 @@ Las ocho portadas son capítulos editoriales, no galerías fotográficas. `DayCo
 | Estado | Una única línea funcional, sin cápsula decorativa |
 | Apertura | Botón Lime de 54 px y, debajo, ocho marcas sin texto ni flechas |
 
-Titular, arte y zona funcional tienen reservas independientes. La referencia de composición es 390×844; 360×800 reduce moderadamente el crop y 412×915–430×932 mantienen los márgenes y contienen la escala máxima. La portada ocupa el viewport completo detrás de la navegación, mientras CTA y progreso usan la reserva semántica de navbar y `safe-area`. En el día abierto, el SVG compacto conserva el sistema anterior y se confina a la segunda columna; solo cambia la continuidad de entrada y salida de la capa.
+Titular, arte y zona funcional tienen reservas independientes. La referencia de composición final es 393×852; 360×800 reduce moderadamente el crop y 412×915–430×932 mantienen los márgenes y contienen la escala máxima. La portada ocupa el viewport completo detrás de la navegación, mientras CTA y progreso usan la reserva semántica de navbar y `safe-area`. En el día abierto, el texto ocupa el eje completo y el mismo motivo canónico se recompone en el plano inferior derecho mediante crop y escala; no existe un asset alternativo por estado.
 
 ## Color de colección 06–13
 
-| Día | Base | Texto | Apoyo | Ink |
-| --- | --- | --- | --- | --- |
-| 06 | `#7C3A43` | `#FFF7ED` | `#B98086` | `#321B20` |
-| 07 | `#0F5A50` | `#FFF8EC` | `#66A094` | `#082F2A` |
-| 08 | `#8A3F76` | `#FFF7F3` | `#C37AAA` | `#3D1D35` |
-| 09 | `#4C3973` | `#FCF8F2` | `#8273A5` | `#211A35` |
-| 10 | `#A4452E` | `#FFF8EF` | `#D07B64` | `#462016` |
-| 11 | `#2F4F8F` | `#F8FAFF` | `#6F8CC3` | `#152540` |
-| 12 | `#3F5A34` | `#FAF8ED` | `#82986E` | `#1D2A18` |
-| 13 | `#292E33` | `#F7F4EC` | `#747D84` | `#15191C` |
+| Día | dayBase | daySurface | Texto | Apoyo | Ink |
+| --- | --- | --- | --- | --- | --- |
+| 06 | `#7C3A43` | `#C8A8A6` | `#FFF7ED` | `#B98086` | `#321B20` |
+| 07 | `#0F5A50` | `#9AB6AA` | `#FFF8EC` | `#66A094` | `#082F2A` |
+| 08 | `#8A3F76` | `#CEAABF` | `#FFF7F3` | `#C37AAA` | `#3D1D35` |
+| 09 | `#4C3973` | `#B2A8BD` | `#FCF8F2` | `#8273A5` | `#211A35` |
+| 10 | `#A4452E` | `#D9AD9E` | `#FFF8EF` | `#D07B64` | `#462016` |
+| 11 | `#2F4F8F` | `#A4B2D0` | `#F8FAFF` | `#6F8CC3` | `#152540` |
+| 12 | `#3F5A34` | `#ABB69F` | `#FAF8ED` | `#82986E` | `#1D2A18` |
+| 13 | `#292E33` | `#A0A19E` | `#F7F4EC` | `#747D84` | `#15191C` |
 
 Electric Lime usa `#C7F25B` solo dentro de la interacción de DayCover.
+
+`daySurface` no es una segunda paleta arbitraria: en los ocho días se deriva con 42% `dayBase` + 58% Texto. DayCover consume `dayBase`; el hero de DayDetail consume `daySurface` con Ink; el itinerario continúa sobre `#F4F1EA`. Los ratios surface/Ink quedan entre 6.64:1 y 7.29:1.
 
 ## Ocho capítulos
 

@@ -28,39 +28,47 @@
   --ds-color-status-open: var(--ds-palette-paper);
   --ds-color-feedback-error: #b42318;
 
-  /* DayCover collection — approved Full Bleed roles, isolated from product chrome. */
-  --ds-day-cover-06-base: #7c3a43;
-  --ds-day-cover-06-text: #fff7ed;
-  --ds-day-cover-06-support: #b98086;
-  --ds-day-cover-06-ink: #321b20;
-  --ds-day-cover-07-base: #0f5a50;
-  --ds-day-cover-07-text: #fff8ec;
-  --ds-day-cover-07-support: #66a094;
-  --ds-day-cover-07-ink: #082f2a;
-  --ds-day-cover-08-base: #8a3f76;
-  --ds-day-cover-08-text: #fff7f3;
-  --ds-day-cover-08-support: #c37aaa;
-  --ds-day-cover-08-ink: #3d1d35;
-  --ds-day-cover-09-base: #4c3973;
-  --ds-day-cover-09-text: #fcf8f2;
-  --ds-day-cover-09-support: #8273a5;
-  --ds-day-cover-09-ink: #211a35;
-  --ds-day-cover-10-base: #a4452e;
-  --ds-day-cover-10-text: #fff8ef;
-  --ds-day-cover-10-support: #d07b64;
-  --ds-day-cover-10-ink: #462016;
-  --ds-day-cover-11-base: #2f4f8f;
-  --ds-day-cover-11-text: #f8faff;
-  --ds-day-cover-11-support: #6f8cc3;
-  --ds-day-cover-11-ink: #152540;
-  --ds-day-cover-12-base: #3f5a34;
-  --ds-day-cover-12-text: #faf8ed;
-  --ds-day-cover-12-support: #82986e;
-  --ds-day-cover-12-ink: #1d2a18;
-  --ds-day-cover-13-base: #292e33;
-  --ds-day-cover-13-text: #f7f4ec;
-  --ds-day-cover-13-support: #747d84;
-  --ds-day-cover-13-ink: #15191c;
+  /* Day identity — Surface is the 42/58 Base→Text companion used by DayDetail. */
+  --ds-day-06-base: #7c3a43;
+  --ds-day-06-surface: #c8a8a6;
+  --ds-day-06-text: #fff7ed;
+  --ds-day-06-support: #b98086;
+  --ds-day-06-ink: #321b20;
+  --ds-day-07-base: #0f5a50;
+  --ds-day-07-surface: #9ab6aa;
+  --ds-day-07-text: #fff8ec;
+  --ds-day-07-support: #66a094;
+  --ds-day-07-ink: #082f2a;
+  --ds-day-08-base: #8a3f76;
+  --ds-day-08-surface: #ceaabf;
+  --ds-day-08-text: #fff7f3;
+  --ds-day-08-support: #c37aaa;
+  --ds-day-08-ink: #3d1d35;
+  --ds-day-09-base: #4c3973;
+  --ds-day-09-surface: #b2a8bd;
+  --ds-day-09-text: #fcf8f2;
+  --ds-day-09-support: #8273a5;
+  --ds-day-09-ink: #211a35;
+  --ds-day-10-base: #a4452e;
+  --ds-day-10-surface: #d9ad9e;
+  --ds-day-10-text: #fff8ef;
+  --ds-day-10-support: #d07b64;
+  --ds-day-10-ink: #462016;
+  --ds-day-11-base: #2f4f8f;
+  --ds-day-11-surface: #a4b2d0;
+  --ds-day-11-text: #f8faff;
+  --ds-day-11-support: #6f8cc3;
+  --ds-day-11-ink: #152540;
+  --ds-day-12-base: #3f5a34;
+  --ds-day-12-surface: #abb69f;
+  --ds-day-12-text: #faf8ed;
+  --ds-day-12-support: #82986e;
+  --ds-day-12-ink: #1d2a18;
+  --ds-day-13-base: #292e33;
+  --ds-day-13-surface: #a0a19e;
+  --ds-day-13-text: #f7f4ec;
+  --ds-day-13-support: #747d84;
+  --ds-day-13-ink: #15191c;
   --ds-day-cover-ui: #c7f25b;
 
   /* Spacing: 4px base, named by intent where it matters. */
@@ -74,7 +82,7 @@
   --ds-space-8: 2rem;
   --ds-space-10: 2.5rem;
   --ds-space-12: 3rem;
-  --ds-space-page-inline: clamp(1rem, 4.4vw, 1.25rem);
+  --ds-space-page-inline: clamp(1.25rem, 5.6vw, 1.5rem);
 
   /* Radius and elevation. */
   --ds-radius-control: .75rem;
@@ -117,13 +125,15 @@
   --ds-touch-target: 2.75rem;
   --ds-navigation-height: 3.875rem;
   --ds-navigation-max-width: 22rem;
-  --ds-navigation-item-height: 3.375rem;
+  --ds-navigation-item-height: 3.25rem;
   --ds-navigation-icon-size: 1.125rem;
   --ds-navigation-gap: .625rem;
   --ds-safe-top: env(safe-area-inset-top, 0px);
   --ds-safe-right: env(safe-area-inset-right, 0px);
   --ds-safe-bottom: env(safe-area-inset-bottom, 0px);
   --ds-safe-left: env(safe-area-inset-left, 0px);
+  --ds-safe-top-content: calc(var(--ds-safe-top) + var(--ds-space-3));
+  --ds-safe-bottom-content: calc(var(--ds-safe-bottom) + var(--ds-navigation-gap));
   --ds-navigation-safe: calc(var(--ds-navigation-height) + var(--ds-safe-bottom) + var(--ds-navigation-gap));
   --ds-navigation-reserve: calc(var(--ds-navigation-safe) + var(--ds-space-4));
   --ds-navigation-overlay-reserve: var(--ds-navigation-reserve);

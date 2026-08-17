@@ -1,5 +1,27 @@
 # Plan de implementación
 
+## Iteración 12 — consistencia de ritmo y sistema cromático de día
+
+### Device fit y safe areas
+
+- [x] Derivar cabeceras, navegación y reservas inferiores de `env(safe-area-inset-*)` mediante tokens compartidos.
+- [x] Colocar metadata de DayCover y la fila completa de DayDetail después del safe area superior.
+- [x] Priorizar el titular de DayDetail y desplazar el motivo al plano inferior/derecho sin excepciones por día.
+- [x] Reutilizar el skyline canónico del Día 07 en Cover y Detail con crop distinto.
+- [x] Centrar icono y label de los tres estados activos de BottomNavigation con una columna flex compartida.
+- [x] Validar 360×800, 390×844, 393×852, 412×915 y 430×932 en Chromium/WebKit con simulación QA 47/34.
+- [x] Generar las doce capturas iPhone 17 y la lámina de aprobación desde UI real.
+
+- [x] Separar el límite de ilustración y la metadata mediante una reserva compartida de 20 px, independiente de la geometría SVG.
+- [x] Mantener crops y asimetrías por capítulo, recortando únicamente el desborde que invadiría la zona funcional.
+- [x] Formalizar `dayBase` y `daySurface` para 06–13 con una derivación Base→Texto común.
+- [x] Aplicar `daySurface` e Ink al hero compartido de los ocho DayDetail, conservando el itinerario warm neutral y el radio inferior.
+- [x] Comprobar automáticamente contraste de título, ruta, descripción, fecha, posición e iconos.
+- [x] Generar `iteration-12-day-system.png` y `iteration-12-daycover-rhythm.png`.
+- [x] Validar 64 pares cover/detail en Chromium y WebKit sobre cuatro viewports móviles sin overflow ni excepciones por día.
+
+Decisión de sistema: cada superficie de detalle se obtiene con la misma relación cromática, 42% `dayBase` + 58% Texto. Todos los heroes permiten Ink con contraste mínimo superior a 6.6:1. El ritmo funcional queda fijado por layout en 20 px ilustración→metadata, 20 px metadata→CTA, 8 px CTA→progreso y al menos 12 px progreso→navbar.
+
 ## Iteración 12 — Mobile Experience Polish
 
 - [x] Extender el color Base de cada DayCover a todo el viewport, también detrás de la navegación flotante.

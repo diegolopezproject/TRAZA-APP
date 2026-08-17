@@ -71,8 +71,8 @@ function FullBleedLondon() {
 }
 
 export function DayMotif({ day, compact = false, cover = false }: DayMotifProps) {
-  if (cover && day.id === "2026-08-07") {
-    return <div className="day-motif day-motif--full-bleed day-motif--london" aria-hidden="true"><FullBleedLondon /></div>;
+  if (day.id === "2026-08-07") {
+    return <div className={`day-motif day-motif--london${compact ? " day-motif--compact" : ""}${cover ? " day-motif--full-bleed" : ""}`} aria-hidden="true"><FullBleedLondon /></div>;
   }
 
   const Chapter = chapters[day.id] ?? ChapterTwelve;
