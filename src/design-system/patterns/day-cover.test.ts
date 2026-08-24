@@ -16,7 +16,11 @@ describe("DayCover Full Bleed bounds", () => {
     const css = readFileSync(new URL("./patterns.css", import.meta.url), "utf8");
     expect(css).toMatch(/\.ds-day-cover__art[^}]*position:\s*absolute/);
     expect(css).toMatch(/\.ds-day-cover__action button[^}]*min-height:\s*3\.375rem/);
-    expect(css).toContain("--ds-day-cover-ui");
+    expect(css).toContain("background: var(--ds-color-action-accent)");
+    expect(css).not.toContain("--ds-day-cover-ui");
+    expect(css).toMatch(/\.ds-icon-chevron-up[^}]*width:\s*1\.125rem/);
+    expect(css).toMatch(/\.ds-icon-chevron-up path[^}]*transform:\s*scale\(2\.5\)/);
+    expect(css).toContain("vector-effect: non-scaling-stroke");
     expect(css).not.toContain("ds-day-cover__number");
   });
   it("owns illustration-to-metadata rhythm in the shared layout", () => {
@@ -35,10 +39,13 @@ describe("DayCover Full Bleed bounds", () => {
     expect(css).toMatch(/\.ds-day-header__close[^}]*width:\s*var\(--ds-touch-target\)[^}]*height:\s*var\(--ds-touch-target\)/);
     expect(css).toMatch(/\.ds-day-hero[^}]*max\(var\(--ds-space-page-inline\), var\(--ds-safe-right\)\)/);
   });
-  it("derives detail hero height from copy and the shared motif reserve", () => {
+  it("derives detail hero height from copy and the shared in-flow motif", () => {
     const css = readFileSync(new URL("./patterns.css", import.meta.url), "utf8");
     expect(css).toMatch(/\.ds-day-hero[^}]*min-height:\s*0/);
-    expect(css).toMatch(/\.ds-day-hero[^}]*padding:[^;]*calc\(var\(--ds-day-hero-motif-height\) - var\(--ds-space-5\)\)/);
+    expect(css).toMatch(/\.ds-day-hero[^}]*padding:[^;]*var\(--ds-space-6\)/);
+    expect(css).toMatch(/\.ds-day-hero[^}]*display:\s*grid/);
+    expect(css).toMatch(/\.ds-day-hero__motif[^}]*position:\s*relative[^}]*margin-top:\s*var\(--ds-space-6\)/);
+    expect(css).not.toMatch(/\.ds-day-hero[^}]*padding:[^;]*calc\(var\(--ds-day-hero-motif-height\)/);
     expect(css).not.toMatch(/\.ds-day-hero[^}]*min-height:\s*clamp/);
   });
 });

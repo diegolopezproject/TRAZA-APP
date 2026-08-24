@@ -1188,8 +1188,8 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-colo
 .open-day-hero.theme-sky-white { --day-base: var(--ds-day-13-base); --day-surface: var(--ds-day-13-surface); --cover-bg: var(--day-surface); --cover-fg: var(--ds-day-13-ink); --cover-accent: var(--ds-day-13-support); }
 .open-day-hero .ds-day-header { position: relative; z-index: var(--ds-layer-sticky); }
 .open-day-hero .ds-day-hero { padding-top: 0; }
-.open-day-hero .ds-day-hero__motif .day-motif--compact { position: relative; inset: auto; width: 100%; height: 100%; padding-bottom: var(--ds-space-6); display: flex; align-items: flex-end; opacity: 1; transform-origin: center bottom; }
-.open-day-hero .ds-day-hero__motif .day-motif--compact svg { display: block; flex: 0 0 auto; transform: scale(.86) translate(18px, 10px); transform-origin: center bottom; }
+.open-day-hero .ds-day-hero__motif .day-motif--compact { position: relative; inset: auto; width: 100%; height: 100%; overflow: visible; opacity: 1; transform: none; }
+.open-day-hero .ds-day-hero__motif .day-motif--compact svg { display: block; width: 100%; height: 100%; overflow: visible; transform: none; }
 .itinerary-content { padding-top: var(--ds-space-5); padding-bottom: var(--ds-navigation-reserve); }
 .itinerary-actions.ds-action-group { justify-content: flex-start; margin: 0 0 var(--ds-space-6); padding-inline: var(--ds-space-1); }
 .itinerary-actions .ds-button { width: auto; min-height: var(--ds-touch-target); margin: 0; font-size: .8125rem; }

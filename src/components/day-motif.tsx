@@ -54,8 +54,8 @@ const chapters: Record<string, () => ReactNode> = {
   "2026-08-13": ChapterThirteen,
 };
 
-function FullBleedLondon() {
-  return <svg viewBox="0 0 430 380" preserveAspectRatio="xMidYMax slice" role="img" focusable="false">
+function FullBleedLondon({ compact = false }: { compact?: boolean }) {
+  return <svg viewBox="0 0 430 380" preserveAspectRatio={compact ? "xMidYMax meet" : "xMidYMax slice"} role="img" focusable="false">
     <path className="chapter-city-support" d="M0 300L38 270L73 286L109 246L142 274L181 230L218 270L257 214L294 257L335 224L379 265L430 238V380H0Z" />
     <path className="chapter-city-ink" d="M0 380V292H24V270H43V380ZM58 380V238H78V222H104V238H121V380ZM132 380V282H154V252H177V380ZM187 380V215H220V380ZM232 380V271H258V248H277V380Z" />
     <path className="chapter-city-paper" d="M43 380V207H60V179H51L45 158L69 143L97 158L91 179H82V207H106V380Z" />
@@ -72,7 +72,7 @@ function FullBleedLondon() {
 
 export function DayMotif({ day, compact = false, cover = false }: DayMotifProps) {
   if (day.id === "2026-08-07") {
-    return <div className={`day-motif day-motif--london${compact ? " day-motif--compact" : ""}${cover ? " day-motif--full-bleed" : ""}`} aria-hidden="true"><FullBleedLondon /></div>;
+    return <div className={`day-motif day-motif--london${compact ? " day-motif--compact" : ""}${cover ? " day-motif--full-bleed" : ""}`} aria-hidden="true"><FullBleedLondon compact={compact} /></div>;
   }
 
   const Chapter = chapters[day.id] ?? ChapterTwelve;

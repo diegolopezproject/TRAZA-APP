@@ -179,3 +179,17 @@ El alcance, riesgos y orden completo están documentados en `ITERATION_03_PLAN.m
 - [x] Migrar pilotos visibles de Días, Guardados y Viaje.
 - [x] Añadir gate de tokens y documentación operativa/Figma.
 - [x] Cerrar matriz WebKit/Chromium, capturas y commit final.
+## Microiteración — approval gate CTA + swipe de DayCover 07
+
+- [x] Mantener CTA ancho y swipe-up como accesos equivalentes sin modificar navegación ni transición.
+- [x] Reutilizar `ChevronIcon` del sistema local de TRAZA como chevron ascendente y centrar el grupo label + icono.
+- [x] Consolidar CTA, progreso activo y BottomNavigation activa sobre `--ds-color-action-accent` (`#d5f43b`).
+- [x] Prototipar un único hint vertical de 8 px / 420 ms con el easing estándar y exclusión para Reduced Motion.
+- [x] Aprobar visualmente DayCover 07 y extender la misma regla CTA, sin variantes, a los días 06–13.
+- [x] Regenerar y revisar las ocho capturas finales y la contact sheet específica sin UI de desarrollo.
+
+## Microiteración — compactación y safe zone del motif en DayDetail
+
+- [x] Sustituir la reserva vertical fija del hero por una composición en flujo basada en copy, pausa, motif y padding compartido.
+- [x] Aplicar una safe zone común al motif y mostrar la composición completa en el uso compacto de DayDetail.
+- [x] Auditar DayDetail 06–13 en la matriz móvil y actualizar únicamente la captura final afectada.

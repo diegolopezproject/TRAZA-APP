@@ -7,7 +7,7 @@ import type { CoreStatus } from "../foundations/foundations";
 
 export function DayHeader({ date, position, closeLabel, onClose, closeIcon }: { date: string; position: string; closeLabel: string; onClose: () => void; closeIcon?: ReactNode }) { return <header className="ds-day-header"><button type="button" className="ds-day-header__close" aria-label={closeLabel} onClick={onClose}>{closeIcon ?? "×"}</button><span>{date}</span><span>{position}</span></header>; }
 
-export function DayHero({ route, title, motif, summary }: { route: string; title: string; motif?: ReactNode; summary?: string }) { return <section className="ds-day-hero"><div className="ds-day-hero__copy"><Eyebrow>{route}</Eyebrow><h1>{title}</h1>{summary ? <p>{summary}</p> : null}</div>{motif ? <div className="ds-day-hero__motif">{motif}</div> : null}</section>; }
+export function DayHero({ route, title, motif, summary }: { route: string; title: string; motif?: ReactNode; summary?: string }) { return <section className="ds-day-hero"><div className="ds-day-hero__copy"><Eyebrow>{route}</Eyebrow><h1>{title}</h1>{summary ? <p className="ds-day-hero__summary">{summary}</p> : null}</div>{motif ? <div className="ds-day-hero__motif">{motif}</div> : null}</section>; }
 
 export function PlanCard({ time, title, meta, status, media, action }: { time?: string; title: string; meta?: string; status: CoreStatus; media?: ReactNode; action?: ReactNode }) { const body = <><div className="ds-plan-card__top">{time ? <Tag>{time}</Tag> : <span />}<StatusBadge status={status} /></div><h3>{title}</h3>{meta ? <p>{meta}</p> : null}{action}</>; return media ? <MediaCard className="ds-plan-card" media={media}>{body}</MediaCard> : <Card className="ds-plan-card">{body}</Card>; }
 

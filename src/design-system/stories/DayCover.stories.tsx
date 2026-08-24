@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import type { CSSProperties } from "react";
 import { DayCover } from "@/design-system";
-import { ArrowIcon } from "@/components/icons";
+import { ChevronIcon } from "@/components/icons";
 import { DayMotif } from "@/components/day-motif";
 import { dayEditorial, es } from "@/content/es";
 import type { Day } from "@/domain/models";
@@ -21,8 +21,9 @@ function RealDayCover({ index = 1, debugBounds = false }: { index?: number; debu
   const day = days[index];
   const number = day.date.slice(-2);
   const route = dayEditorial[day.id].eyebrow.replaceAll(" → ", " · ").replaceAll(" / ", " · ");
+  const showEntryHint = day.id === "2026-08-07";
   const progress = <span className="ds-day-cover__progress" aria-hidden="true">{days.map((item, segment) => <i key={item.id} style={{ "--ds-segment-active": segment === index ? 1 : 0 } as CSSProperties} />)}</span>;
-  return <DayCover dayNumber={number} weekday={day.weekday} sequenceLabel={`${index + 1} / 8`} eyebrow={route} title={day.coverTitle} status={index === 3 || index === 5 || index === 6 ? es.journey.open : es.journey.anchors(index === 1 ? 2 : 1)} theme={day.visualTheme} motif={<DayMotif day={day} cover />} openText={es.journey.openDay} openIcon={<ArrowIcon />} progress={progress} debugBounds={debugBounds} />;
+  return <DayCover dayNumber={number} weekday={day.weekday} sequenceLabel={`${index + 1} / 8`} eyebrow={route} title={day.coverTitle} status={index === 3 || index === 5 || index === 6 ? es.journey.open : es.journey.anchors(index === 1 ? 2 : 1)} theme={day.visualTheme} motif={<DayMotif day={day} cover />} openText={es.journey.openDay} openIcon={<ChevronIcon className="ds-icon-chevron-up" />} openComposition="centered" entryHint={showEntryHint} progress={progress} debugBounds={debugBounds} />;
 }
 
 const meta = {

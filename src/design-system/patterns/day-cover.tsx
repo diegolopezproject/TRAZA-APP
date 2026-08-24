@@ -14,12 +14,14 @@ export interface DayCoverProps {
   openLabel?: string;
   openText?: string;
   openIcon?: ReactNode;
+  openComposition?: "split" | "centered";
   progress?: ReactNode;
+  entryHint?: boolean;
   debugBounds?: boolean;
 }
 
-export function DayCover({ dayNumber, weekday, sequenceLabel, eyebrow, title, status, motif, theme, active = true, onOpen, openLabel = "Abrir día", openText = "Abrir día", openIcon, progress, debugBounds = false }: DayCoverProps) {
-  return <article className={`ds-day-cover theme-${theme}${active ? " is-active" : ""}${debugBounds ? " ds-debug-bounds" : ""}`} aria-label={`${weekday} ${dayNumber}. ${title}`}>
+export function DayCover({ dayNumber, weekday, sequenceLabel, eyebrow, title, status, motif, theme, active = true, onOpen, openLabel = "Abrir día", openText = "Abrir día", openIcon, openComposition = "split", progress, entryHint = false, debugBounds = false }: DayCoverProps) {
+  return <article className={`ds-day-cover theme-${theme}${active ? " is-active" : ""}${entryHint ? " has-entry-hint" : ""}${debugBounds ? " ds-debug-bounds" : ""}`} aria-label={`${weekday} ${dayNumber}. ${title}`}>
     <header className="ds-day-cover__header" data-bounds="header">
       <span className="ds-day-cover__date"><b>{weekday.slice(0, 3)} {dayNumber} ago</b><b>Londres</b></span>
       <span className="ds-day-cover__count">{sequenceLabel}</span>
@@ -28,7 +30,7 @@ export function DayCover({ dayNumber, weekday, sequenceLabel, eyebrow, title, st
     <div className="ds-day-cover__art" data-bounds="art"><div className="ds-day-cover__motif">{motif}</div></div>
     <div className="ds-day-cover__details" data-bounds="details"><p>{eyebrow}</p><span>{status}</span></div>
     <div className="ds-day-cover__action" data-bounds="action">
-      <button type="button" onClick={onOpen} aria-label={openLabel}><span>{openText}</span>{openIcon}</button>
+      <button className={openComposition === "centered" ? "is-centered" : undefined} type="button" onClick={onOpen} aria-label={openLabel}><span>{openText}</span>{openIcon}</button>
       {progress}
     </div>
   </article>;
