@@ -1,5 +1,15 @@
 # Plan de implementación
 
+## Google Maps → TRAZA — Phase 3B
+
+- [x] Componer parser, resolución segura, contexto Maps, Text Search/selección, Details, normalización, alcance Londres y clasificación en un único orquestador server-only.
+- [x] Definir un resultado pre-persistencia que separa identidad/categoría durable preparada de metadatos Google transitorios y nunca inventa `recordId`.
+- [x] Inyectar transporte de redirects, cliente Places y evaluador de Londres; mantener normalizador y clasificador como fronteras puras sustituibles en tests.
+- [x] Mapear fallos de share, resolución, Places, normalización e identidad al modelo provider-independent sin exponer payloads o detalles internos.
+- [x] Cubrir los caminos Text Search y Place ID directo, alcance, categoría ambigua, fallos terminales e idempotencia con 12 tests integrados sin red ni persistencia.
+
+Decisión de alcance: Phase 3B termina en `ready-to-save`, `needs-category`, `outside-scope` o `failed`. No importa ni invoca el repositorio de Phase 2, no usa Supabase y no crea PWA, `/share`, UI, fotos ni tráfico real de Google. El evaluador de Londres es obligatorio como dependencia; la regla productiva de Phase 1 continúa fallando de forma segura mientras falte el asset autoritativo.
+
 ## Google Maps → TRAZA — Phase 3A
 
 - [x] Preservar los contratos provider-independent de Phase 1 y la frontera de persistencia de Phase 2.
@@ -10,7 +20,7 @@
 - [x] Seleccionar candidatos de forma determinista y mantener ambiguos los empates materiales.
 - [x] Normalizar Place Details al `NormalizedPlaceCandidate` de Phase 1 sin persistencia ni acceso a Supabase.
 - [x] Cubrir parser, SSRF, redirects, contexto, Places mockeado, selección y normalización con tests sin red.
-- [ ] Phase 3B: componer estas fronteras en un servicio de orquestación y mapear fallos internos sin crear todavía PWA, `/share` ni UI.
+- [x] Phase 3B: componer estas fronteras en un servicio de orquestación y mapear fallos internos sin crear todavía PWA, `/share` ni UI.
 
 Decisión de alcance: Phase 3A no contiene un `importGoogleMapsPlace()` monolítico. Parser, autoridad/resolución URL, contexto Maps, HTTP Places, selección y normalización permanecen independientes. Los tres enlaces Android reales son fixtures de parser y no se resuelven. La mitigación DNS se apoya en hosts exactos de Google; DNS rebinding no se considera resuelto por validación textual y no se añade infraestructura de red en esta fase.
 
