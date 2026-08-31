@@ -1,5 +1,19 @@
 # Plan de implementación
 
+## Google Maps → TRAZA — Phase 3A
+
+- [x] Preservar los contratos provider-independent de Phase 1 y la frontera de persistencia de Phase 2.
+- [x] Extraer un único enlace Maps desde `url`, `text` o `title` con límites del SDD y allow-list exacta compartida.
+- [x] Resolver únicamente short links aprobados mediante transporte inyectado, redirects manuales, tres saltos y presupuestos 2 s / 5 s.
+- [x] Derivar Place ID solo desde `api=1&query_place_id=` documentado; usar contexto de Text Search para rutas/nombres/coordenadas reconocibles.
+- [x] Implementar Text Search y Place Details de Places API (New) con máscaras mínimas, validación runtime, timeout y clave server-only.
+- [x] Seleccionar candidatos de forma determinista y mantener ambiguos los empates materiales.
+- [x] Normalizar Place Details al `NormalizedPlaceCandidate` de Phase 1 sin persistencia ni acceso a Supabase.
+- [x] Cubrir parser, SSRF, redirects, contexto, Places mockeado, selección y normalización con tests sin red.
+- [ ] Phase 3B: componer estas fronteras en un servicio de orquestación y mapear fallos internos sin crear todavía PWA, `/share` ni UI.
+
+Decisión de alcance: Phase 3A no contiene un `importGoogleMapsPlace()` monolítico. Parser, autoridad/resolución URL, contexto Maps, HTTP Places, selección y normalización permanecen independientes. Los tres enlaces Android reales son fixtures de parser y no se resuelven. La mitigación DNS se apoya en hosts exactos de Google; DNS rebinding no se considera resuelto por validación textual y no se añade infraestructura de red en esta fase.
+
 ## Iteración 12 — consistencia de ritmo y sistema cromático de día
 
 ### Device fit y safe areas
