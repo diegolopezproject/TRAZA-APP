@@ -1,5 +1,16 @@
 # Plan de implementación
 
+## Google Maps → TRAZA — Phase 3D
+
+- [x] Añadir una composition root server-only que conecta las fronteras productivas existentes y mantiene transportes, cliente Places y evaluación de Londres inyectables.
+- [x] Resolver de forma controlada los tres enlaces Android reales mediante la allow-list existente, sin scraping ni interpretación de payloads opacos.
+- [x] Validar con Places API (New) identidad, Details, normalización, Greater London y categoría hasta el contrato pre-persistencia.
+- [x] Registrar evidencia segura: A y B terminan `ready-to-save`; C termina `identity-ambiguous` antes de Details al no existir identidad única demostrable.
+- [x] Mantener el harness real fuera de la suite ordinaria y eliminarlo después de la ejecución.
+- [x] Cerrar lint, typecheck, tests, build, revisión de secretos y checkpoint Git de Phase 3D.
+
+Decisión de alcance: Phase 3D prueba el proveedor real sólo hasta pre-persistencia. No invoca `ImportedPlaceRepository`, no escribe en Supabase y no añade UI, `localStorage`, `/share`, PWA o fotos. La evidencia sanitizada y la incidencia de restricción IP resuelta están en `docs/PHASE_3D_REAL_GOOGLE_VALIDATION.md`.
+
 ## Google Maps → TRAZA — Phase 3C
 
 - [x] Aprobar y registrar el recurso dedicado “Greater London boundary” del London Datastore, publicado por Greater London Authority y mantenido por GLA GIS bajo OGL v2.
