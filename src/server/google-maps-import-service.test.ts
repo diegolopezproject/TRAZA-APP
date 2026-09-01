@@ -59,7 +59,7 @@ describe("createGoogleMapsImportService", () => {
     });
   });
 
-  it("preserves an injected London evaluator", async () => {
+  it("preserves an injected London evaluator as non-blocking context", async () => {
     const boundaries = createOfflineBoundaries();
     const evaluateLondonScope = vi.fn<() => LondonScopeResult>(() => ({
       kind: "outside",
@@ -70,8 +70,9 @@ describe("createGoogleMapsImportService", () => {
       evaluateLondonScope,
     });
 
-    await expect(service.prepare({ sharePayload: { url: SHORT_LINK } })).resolves.toEqual({
-      kind: "outside-scope",
+    await expect(service.prepare({ sharePayload: { url: SHORT_LINK } })).resolves.toMatchObject({
+      kind: "ready-to-save",
+      place: { externalPlaceId: "ChIJ_fixture_westminster", category: "attraction" },
     });
     expect(evaluateLondonScope).toHaveBeenCalledOnce();
   });

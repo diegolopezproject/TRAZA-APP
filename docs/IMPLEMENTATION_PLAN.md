@@ -13,10 +13,16 @@
 - [x] Mantener enlaces manuales por query y aceptar URI canónica Google validada únicamente para importados.
 - [x] Cubrir identidad, tickets, share, resultados, hidratación, UI reutilizada, finalización, borrado y roundtrip local con una suite ordinaria offline.
 - [x] Validar de forma real y controlada una fixture londinense: insert, duplicado, hidratación y cleanup de la fila dedicada.
+- [x] Añadir fallback textual únicamente para short links Maps ya validados que fallen por disponibilidad; conservar redirects rechazados y fuentes no soportadas como terminales.
+- [x] Mantener Text Search y la selección determinista como autoridad de identidad también en el fallback, sin persistir ni reflejar `title`/`text`.
+- [x] Convertir Greater London de bloqueo de producto a contexto evaluado: los lugares exteriores continúan a categoría y persistencia, incluidos los pendientes de categoría.
+- [x] Retirar el resultado/toast terminal `outside-scope` del flujo productivo sin eliminar el asset GLA, su evaluador ni sus pruebas históricas.
 - [ ] Configurar los dos secretos de cookies en local/Preview y completar la nueva aceptación física end-to-end desde Android.
 - [ ] Implementar fotos y atribución Google en Phase 7.
 
 Decisión de arquitectura: Guardados es híbrido por diseño. `LocalTripRepository` conserva seed/manual, asignaciones y estado de viaje; Supabase conserva solo relaciones importadas. La hidratación Google es transitoria, no entra en `localStorage` ni en `imported_places`. No se modificó el manifiesto, `share_target`, la navegación, la dirección visual, el sistema de toast ni la tarjeta aprobada.
+
+Decisión posterior a validación física: algunos `maps.app.goo.gl` válidos abren en Android pero devuelven 404 sin `Location` desde Vercel. Solo después de validar la fuente Maps, los fallos tipados de disponibilidad pueden usar `title`/`text` saneados como contexto de Text Search; un redirect inseguro nunca habilita fallback. La misma validación mostró que una excursión legítima puede quedar fuera del límite administrativo GLA, por lo que `outside` deja de bloquear el guardado. `invalid-or-unknown` continúa fallando de forma segura.
 
 ## Google Maps → TRAZA — Phase 4
 

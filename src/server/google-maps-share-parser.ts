@@ -23,6 +23,7 @@ export type GoogleMapsShareParseResult =
       sourceField: GoogleMapsShareField;
       mapsUrl: SupportedGoogleMapsUrl;
       title?: string;
+      text?: string;
     }
   | {
       kind: "failed";
@@ -117,5 +118,6 @@ export function parseGoogleMapsSharePayload(input: unknown): GoogleMapsSharePars
     kind: "success",
     ...selected,
     ...(parsedPayload.fields.title ? { title: parsedPayload.fields.title } : {}),
+    ...(parsedPayload.fields.text ? { text: parsedPayload.fields.text } : {}),
   };
 }

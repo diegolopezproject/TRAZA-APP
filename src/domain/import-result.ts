@@ -1,7 +1,6 @@
 export const IMPORT_RESULT_CODES = [
   "saved",
   "duplicate",
-  "outside-scope",
   "needs-category",
   "failed",
 ] as const;
@@ -13,7 +12,6 @@ export const IMPORT_RESULT_MESSAGES: Readonly<
 > = {
   saved: "Lugar guardado",
   duplicate: "Ya tienes guardado este sitio",
-  "outside-scope": "Este sitio está fuera de tu viaje a Londres",
   failed: "No hemos podido guardar este sitio. Inténtalo de nuevo.",
 };
 

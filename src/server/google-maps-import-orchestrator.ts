@@ -11,13 +11,17 @@ import type {
   TrazaImportCategory,
 } from "../domain/place-import";
 import type { LondonScopeResult } from "../domain/london-scope";
-import { googleMapsUrlToPlaceResolutionInput } from "./google-maps-place-resolution";
+import {
+  googleMapsShareContextToPlaceResolutionInput,
+  googleMapsUrlToPlaceResolutionInput,
+} from "./google-maps-place-resolution";
 import {
   parseGoogleMapsSharePayload,
   type GoogleMapsShareParseResult,
   type GoogleMapsSharePayload,
 } from "./google-maps-share-parser";
 import {
+  allowsValidatedShareContextFallback,
   resolveGoogleMapsUrl,
   type GoogleMapsRedirectTransport,
   type GoogleMapsUrlResolutionResult,
@@ -56,7 +60,6 @@ export type PreparedPlaceImportOutcome =
       externalPlaceId: string;
       transient: GooglePlacePresentationMetadata;
     }
-  | { kind: "outside-scope" }
   | { kind: "failed"; reason: ImportFailureReason };
 
 export interface GoogleMapsImportPlacesClient {
@@ -155,11 +158,25 @@ export async function prepareGoogleMapsPlaceImport(
   } catch {
     return failed("external-service-failure");
   }
-  if (resolved.kind === "failed") {
-    return failed(mapResolverFailure(resolved));
+  let resolutionInput: ReturnType<typeof googleMapsUrlToPlaceResolutionInput>;
+  if (resolved.kind === "resolved") {
+    resolutionInput = googleMapsUrlToPlaceResolutionInput(resolved.mapsUrl);
+  } else {
+    if (
+      !parsed.mapsUrl.remotelyResolvable ||
+      !allowsValidatedShareContextFallback(resolved)
+    ) {
+      return failed(mapResolverFailure(resolved));
+    }
+    resolutionInput = googleMapsShareContextToPlaceResolutionInput({
+      ...(parsed.title ? { title: parsed.title } : {}),
+      ...(parsed.text ? { text: parsed.text } : {}),
+    });
+    if (resolutionInput.kind === "insufficient") {
+      return failed(mapResolverFailure(resolved));
+    }
   }
 
-  const resolutionInput = googleMapsUrlToPlaceResolutionInput(resolved.mapsUrl);
   const placeId = await resolveCanonicalPlaceId(resolutionInput, dependencies.placesClient);
   if (typeof placeId !== "string") {
     return placeId;
@@ -184,9 +201,6 @@ export async function prepareGoogleMapsPlaceImport(
     londonScope = dependencies.evaluateLondonScope(normalized.candidate);
   } catch {
     return failed("invalid-external-response");
-  }
-  if (londonScope.kind === "outside") {
-    return { kind: "outside-scope" };
   }
   if (londonScope.kind === "invalid-or-unknown") {
     return failed("invalid-external-response");

@@ -4,12 +4,20 @@
 
 `POST /share` conserva el límite multipart de 16 KiB y las fronteras de seguridad de Phase 4, pero ahora compone el servicio productivo completo: parser allow-listed, resolución controlada, Places API (New), normalización, Greater London, categoría y persistencia. Todos los resultados terminan en un 303 cerrado a Guardados; ningún payload compartido, Place ID o error técnico entra en la URL.
 
+## Decisiones posteriores a validación física
+
+La prueba Android real confirmó que algunos short links `maps.app.goo.gl` válidos abren correctamente en el dispositivo, pero desde Vercel responden 404 sin `Location`. La importación ya no depende de que todos esos tokens sean resolubles server-to-server: tras validar primero una fuente Maps allow-listed, un fallo tipado de disponibilidad puede derivar una query acotada desde `title` o `text` saneados y continuar por Text Search y el selector determinista existente.
+
+El fallback elimina URLs, boilerplate y whitespace duplicado, prioriza un título útil y no persiste, registra ni refleja el texto compartido. No se habilita para fuentes no soportadas, redirects rechazados, downgrade HTTP, hosts engañosos, puertos no permitidos, localhost o IPs. No hay scraping, lectura de HTML ni selección del primer resultado.
+
+La misma validación cambió una regla de producto: Greater London sigue evaluándose con el asset autoritativo GLA, pero ahora es contexto y no una frontera de persistencia. Un lugar exterior continúa a categoría y guardado, porque un viaje puede incluir excursiones. Los resultados `invalid-or-unknown` continúan cerrándose como fallo; el resultado y toast terminal `outside-scope` se retiraron sin eliminar el trabajo de boundary ni sus pruebas.
+
 ## Identidad y tickets
 
 - `__Host-traza-installation` lleva un UUID generado por servidor y autenticado con HMAC usando `TRAZA_INSTALLATION_COOKIE_SECRET`. Es `Secure`, `HttpOnly`, `SameSite=Lax`, `Path=/`, sin `Domain` y con duración máxima de 400 días.
 - La navegación normal crea la identidad mediante `/api/installation/bootstrap`. Un share sin cookie no inventa una segunda identidad: pasa por bootstrap y muestra un fallo seguro sin importar.
 - `__Host-traza-import-ticket` está autenticada con `TRAZA_IMPORT_TICKET_SECRET`, ligada a instalación y `london-2026`, contiene solo provider, Place ID, timestamps y nonce, y expira a los diez minutos. No existe fila pendiente ni payload Google durable.
-- Finalización y borrado requieren mismo origen. La finalización vuelve a hidratar y validar Greater London, consume la cookie y delega duplicados a PostgreSQL.
+- Finalización y borrado requieren mismo origen. La finalización vuelve a hidratar y evaluar Greater London como contexto, consume la cookie y delega duplicados a PostgreSQL.
 
 ## Persistencia y Guardados híbrido
 
@@ -28,7 +36,7 @@ El borrado usa record ID + installation ID + trip ID, elimina la relación remot
 
 ## Verificación
 
-La suite ordinaria es offline y cubre firma/tampering/expiración, instalación estable, share saved/duplicate/outside/failed/needs-category, categorías válidas e inválidas, tickets rechazados, consumo one-shot, mezcla híbrida, fallo aislado, enlaces, borrado con ownership y roundtrip de asignación.
+La suite ordinaria es offline y cubre firma/tampering/expiración, instalación estable, share saved/duplicate/failed/needs-category, fallback por disponibilidad, rechazo de fallback inseguro, ambigüedad de identidad, lugares exteriores, categorías válidas e inválidas, tickets rechazados, consumo one-shot, mezcla híbrida, fallo aislado, enlaces, borrado con ownership y roundtrip de asignación.
 
 Validación real controlada, 1 de septiembre de 2026:
 
@@ -39,7 +47,7 @@ Validación real controlada, 1 de septiembre de 2026:
 - la fila dedicada se eliminó en `finally`;
 - no se imprimieron secretos ni valores de entorno.
 
-No se ejecutó una fixture exterior ni ambigua real porque no había una evidencia estable aprobada; ambos caminos se validan offline con fronteras inyectadas. El ciclo HTTP local completo requiere añadir `TRAZA_INSTALLATION_COOKIE_SECRET` y `TRAZA_IMPORT_TICKET_SECRET` al entorno. La configuración de Preview se comprueba después del push.
+El short link físico que motivó el fallback es `https://maps.app.goo.gl/Ux3ZEovmVFPLA1Ja7?g_st=ac`, pero el payload exacto de `title`/`text` entregado por Android no quedó capturado. No se inventó: la regresión usa contexto realista controlado y la confirmación final queda para el dispositivo físico sobre el nuevo Preview. No se ejecutó una fixture exterior o ambigua real; esos caminos se validan offline con fronteras inyectadas. El ciclo HTTP local completo requiere añadir `TRAZA_INSTALLATION_COOKIE_SECRET` y `TRAZA_IMPORT_TICKET_SECRET` al entorno. La configuración de Preview se comprueba después del push.
 
 ## Limitaciones y Phase 7
 

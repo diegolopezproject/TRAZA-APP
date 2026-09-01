@@ -18,6 +18,7 @@ import type {
 const FIXTURE_A = "https://maps.app.goo.gl/EJoMkxSzVytZT5gB9?g_st=ac";
 const FIXTURE_B = "https://maps.app.goo.gl/LQMKg8hE9XopoSa68";
 const FIXTURE_C = "https://maps.app.goo.gl/NjSorR34a7x1QLqV8?g_st=ac";
+const FALLBACK_FIXTURE = "https://maps.app.goo.gl/Ux3ZEovmVFPLA1Ja7?g_st=ac";
 const TEXT_SEARCH_FINAL_URL =
   "https://www.google.com/maps/place/Tate+Modern/@51.5076,-0.0994,17z";
 const DIRECT_PLACE_ID = "ChIJ_direct_1";
@@ -93,6 +94,98 @@ function createHarness() {
 }
 
 describe("prepareGoogleMapsPlaceImport", () => {
+  it("continues through strict Text Search when a validated short link has an availability failure", async () => {
+    const harness = createHarness();
+    harness.resolveHop.mockResolvedValue({ status: 404, location: null });
+    harness.textSearch.mockResolvedValue([searchCandidate("ChIJ_flat_iron", "Flat Iron")]);
+    harness.placeDetails.mockResolvedValue(placeDetails({
+      id: "ChIJ_flat_iron",
+      displayName: "Flat Iron",
+      primaryType: "restaurant",
+      types: ["restaurant", "food", "establishment"],
+    }));
+
+    const result = await prepareGoogleMapsPlaceImport(
+      {
+        sharePayload: {
+          title: "Shared from Google Maps — Flat Iron",
+          text: `Flat Iron, 17 Beak Street ${FALLBACK_FIXTURE}`,
+          url: FALLBACK_FIXTURE,
+        },
+      },
+      harness.dependencies,
+    );
+
+    expect(result).toMatchObject({
+      kind: "ready-to-save",
+      place: { externalPlaceId: "ChIJ_flat_iron", category: "food-drink" },
+    });
+    expect(harness.textSearch).toHaveBeenCalledWith({ query: "Flat Iron" });
+    expect(harness.placeDetails).toHaveBeenCalledWith("ChIJ_flat_iron");
+    expect(JSON.stringify(result)).not.toContain("17 Beak Street");
+    expect(JSON.stringify(result)).not.toContain(FALLBACK_FIXTURE);
+  });
+
+  it("uses useful share text when title is absent after a validated short-link availability failure", async () => {
+    const harness = createHarness();
+    harness.resolveHop.mockResolvedValue({ status: 404, location: null });
+
+    await prepareGoogleMapsPlaceImport(
+      { sharePayload: { text: `Flat Iron, 17 Beak Street\n${FALLBACK_FIXTURE}` } },
+      harness.dependencies,
+    );
+
+    expect(harness.textSearch).toHaveBeenCalledWith({
+      query: "Flat Iron, 17 Beak Street",
+    });
+  });
+
+  it("does not use share fallback after an attacker redirect", async () => {
+    const harness = createHarness();
+    harness.resolveHop.mockResolvedValue({
+      status: 302,
+      location: "https://attacker.test/maps/place/Flat+Iron",
+    });
+
+    await expect(
+      prepareGoogleMapsPlaceImport(
+        { sharePayload: { title: "Flat Iron", url: FALLBACK_FIXTURE } },
+        harness.dependencies,
+      ),
+    ).resolves.toEqual({ kind: "failed", reason: "unsupported-source" });
+    expect(harness.textSearch).not.toHaveBeenCalled();
+  });
+
+  it("does not make an unsupported source eligible through title-only fallback", async () => {
+    const harness = createHarness();
+
+    await expect(
+      prepareGoogleMapsPlaceImport(
+        { sharePayload: { title: "Flat Iron", url: "https://attacker.test/place" } },
+        harness.dependencies,
+      ),
+    ).resolves.toEqual({ kind: "failed", reason: "unsupported-source" });
+    expect(harness.resolveHop).not.toHaveBeenCalled();
+    expect(harness.textSearch).not.toHaveBeenCalled();
+  });
+
+  it("keeps fallback Text Search identity-ambiguous instead of choosing the first result", async () => {
+    const harness = createHarness();
+    harness.resolveHop.mockResolvedValue({ status: 404, location: null });
+    harness.textSearch.mockResolvedValue([
+      searchCandidate("ChIJ_first", "Flat Iron Soho"),
+      searchCandidate("ChIJ_second", "Flat Iron Covent Garden"),
+    ]);
+
+    await expect(
+      prepareGoogleMapsPlaceImport(
+        { sharePayload: { title: "Flat Iron", url: FALLBACK_FIXTURE } },
+        harness.dependencies,
+      ),
+    ).resolves.toEqual({ kind: "failed", reason: "identity-ambiguous" });
+    expect(harness.placeDetails).not.toHaveBeenCalled();
+  });
+
   it("prepares a Text Search import end-to-end from observed Fixture A", async () => {
     const harness = createHarness();
 
@@ -159,7 +252,7 @@ describe("prepareGoogleMapsPlaceImport", () => {
     expect(harness.placeDetails).toHaveBeenCalledWith(DIRECT_PLACE_ID);
   });
 
-  it("returns outside-scope before category classification", async () => {
+  it("treats outside Greater London as context and continues to classification", async () => {
     const harness = createHarness();
     harness.placeDetails.mockResolvedValue(placeDetails({ id: DIRECT_PLACE_ID }));
     harness.evaluateLondonScope.mockReturnValue({ kind: "outside", reason: "boundary" });
@@ -169,10 +262,13 @@ describe("prepareGoogleMapsPlaceImport", () => {
         { sharePayload: { url: DIRECT_PLACE_ID_URL } },
         harness.dependencies,
       ),
-    ).resolves.toEqual({ kind: "outside-scope" });
+    ).resolves.toMatchObject({
+      kind: "ready-to-save",
+      place: { externalPlaceId: DIRECT_PLACE_ID, category: "museum-culture" },
+    });
 
     expect(harness.normalizePlaceDetails).toHaveBeenCalledTimes(1);
-    expect(harness.classifyCategory).not.toHaveBeenCalled();
+    expect(harness.classifyCategory).toHaveBeenCalledTimes(1);
   });
 
   it("returns needs-category with canonical identity and transient metadata for Fixture C", async () => {

@@ -23,7 +23,6 @@ export async function persistPreparedPlaceImport(
     repository: ImportedPlaceInsertPort;
   },
 ): Promise<PersistedPreparedImportResult> {
-  if (prepared.kind === "outside-scope") return { kind: "outside-scope" };
   if (prepared.kind === "failed") return { kind: "failed" };
   if (prepared.kind === "needs-category") {
     return { kind: "needs-category", externalPlaceId: prepared.externalPlaceId };

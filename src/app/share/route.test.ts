@@ -84,7 +84,6 @@ describe("POST /share end-to-end adapter", () => {
   });
 
   it.each([
-    [{ kind: "outside-scope" } as PreparedPlaceImportOutcome, "outside-scope"],
     [{ kind: "failed", reason: "external-service-failure" } as PreparedPlaceImportOutcome, "failed"],
   ])("maps %s without a partial row", async (prepared, result) => {
     const test = harness(prepared);

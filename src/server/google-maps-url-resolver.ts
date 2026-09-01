@@ -22,18 +22,20 @@ export interface GoogleMapsRedirectTransport {
   ): Promise<GoogleMapsRedirectResponse>;
 }
 
+export type GoogleMapsResolutionAvailabilityFailure = {
+  kind: "failed";
+  reason: "missing-location" | "too-many-redirects" | "timeout" | "transport-failure";
+};
+
+export type GoogleMapsResolutionSecurityFailure = {
+  kind: "failed";
+  reason: "not-resolvable" | "redirect-rejected";
+};
+
 export type GoogleMapsUrlResolutionResult =
   | { kind: "resolved"; mapsUrl: SupportedGoogleMapsUrl; redirectCount: number }
-  | {
-      kind: "failed";
-      reason:
-        | "not-resolvable"
-        | "redirect-rejected"
-        | "missing-location"
-        | "too-many-redirects"
-        | "timeout"
-        | "transport-failure";
-    };
+  | GoogleMapsResolutionAvailabilityFailure
+  | GoogleMapsResolutionSecurityFailure;
 
 interface GoogleMapsResolverOptions {
   maxRedirects?: number;
@@ -42,6 +44,17 @@ interface GoogleMapsResolverOptions {
 }
 
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
+
+export function allowsValidatedShareContextFallback(
+  result: Exclude<GoogleMapsUrlResolutionResult, { kind: "resolved" }>,
+): result is GoogleMapsResolutionAvailabilityFailure {
+  return (
+    result.reason === "missing-location" ||
+    result.reason === "too-many-redirects" ||
+    result.reason === "timeout" ||
+    result.reason === "transport-failure"
+  );
+}
 
 function isAbortError(error: unknown): boolean {
   return (

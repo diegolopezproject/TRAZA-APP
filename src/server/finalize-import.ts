@@ -37,8 +37,7 @@ export async function finalizePendingImport(
     const scope: LondonScopeResult = (
       dependencies.evaluateLondonScope ?? evaluateProductionGreaterLondonScope
     )(normalized.candidate);
-    if (scope.kind === "outside") return "outside-scope";
-    if (scope.kind !== "inside") return "failed";
+    if (scope.kind === "invalid-or-unknown") return "failed";
 
     const inserted = await dependencies.repository.insert({
       installationId: input.installationId,

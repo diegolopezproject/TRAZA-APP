@@ -45,6 +45,20 @@ describe("parseGoogleMapsSharePayload", () => {
     ).toMatchObject({ kind: "success", sourceField: "url" });
   });
 
+  it("preserves bounded sanitized title and text as provider context", () => {
+    expect(
+      parseGoogleMapsSharePayload({
+        title: "  Flat Iron  ",
+        text: `  Flat Iron Soho ${FIXTURES[0]}  `,
+        url: FIXTURES[0],
+      }),
+    ).toMatchObject({
+      kind: "success",
+      title: "Flat Iron",
+      text: `Flat Iron Soho ${FIXTURES[0]}`,
+    });
+  });
+
   it("fails rather than choosing between distinct supported URLs", () => {
     expect(parseGoogleMapsSharePayload({ url: FIXTURES[0], text: FIXTURES[1] })).toEqual({
       kind: "failed",

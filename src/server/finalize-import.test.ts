@@ -43,13 +43,16 @@ describe("finalizePendingImport", () => {
     });
   });
 
-  it("does not insert when revalidation is outside London", async () => {
-    const insert = vi.fn();
+  it("allows a non-London UK place after contextual scope evaluation", async () => {
+    const insert = vi.fn(async () => ({
+      kind: "saved" as const,
+      place: { recordId: "record", provider: "google", externalPlaceId: "ChIJ_test", category: "attraction" as const, tripId: "london-2026" },
+    }));
     await expect(finalizePendingImport(
       { installationId: ticket.installationId, ticket, category: "attraction" },
       { placeDetails: async () => details(), evaluateLondonScope: () => ({ kind: "outside", reason: "boundary" }), repository: { insert } },
-    )).resolves.toBe("outside-scope");
-    expect(insert).not.toHaveBeenCalled();
+    )).resolves.toBe("saved");
+    expect(insert).toHaveBeenCalledOnce();
   });
 
   it("maps duplicate and provider failure safely", async () => {

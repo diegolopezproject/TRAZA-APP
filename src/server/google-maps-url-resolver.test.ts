@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { validateGoogleMapsUrl, type SupportedGoogleMapsUrl } from "./google-maps-url";
 import {
+  allowsValidatedShareContextFallback,
   resolveGoogleMapsUrl,
   type GoogleMapsRedirectResponse,
   type GoogleMapsRedirectTransport,
@@ -96,10 +97,13 @@ describe("resolveGoogleMapsUrl", () => {
       { status: 302, location: "https://maps.app.goo.gl/hop-3" },
     ]);
 
-    await expect(resolveGoogleMapsUrl(supported(SHORT), transport)).resolves.toEqual({
+    const result = await resolveGoogleMapsUrl(supported(SHORT), transport);
+    expect(result).toEqual({
       kind: "failed",
       reason: "too-many-redirects",
     });
+    if (result.kind !== "failed") throw new Error("Expected a typed resolver failure");
+    expect(allowsValidatedShareContextFallback(result)).toBe(true);
     expect(transport.calls).toHaveLength(3);
   });
 
@@ -114,10 +118,13 @@ describe("resolveGoogleMapsUrl", () => {
     "https://www.google.com:444/maps/place/Test",
   ])("rejects an unsafe redirect before transport can fetch it: %s", async (location) => {
     const transport = new FakeRedirectTransport([{ status: 302, location }]);
-    await expect(resolveGoogleMapsUrl(supported(SHORT), transport)).resolves.toEqual({
+    const result = await resolveGoogleMapsUrl(supported(SHORT), transport);
+    expect(result).toEqual({
       kind: "failed",
       reason: "redirect-rejected",
     });
+    if (result.kind !== "failed") throw new Error("Expected a typed resolver failure");
+    expect(allowsValidatedShareContextFallback(result)).toBe(false);
     expect(transport.calls).toEqual([SHORT]);
   });
 
@@ -129,6 +136,14 @@ describe("resolveGoogleMapsUrl", () => {
         totalTimeoutMs: 20,
       }),
     ).resolves.toEqual({ kind: "failed", reason: "timeout" });
+  });
+
+  it("types terminal 404/no Location as fallback-eligible availability failure", async () => {
+    const transport = new FakeRedirectTransport([{ status: 404, location: null }]);
+    const result = await resolveGoogleMapsUrl(supported(SHORT), transport);
+    expect(result).toEqual({ kind: "failed", reason: "missing-location" });
+    if (result.kind !== "failed") throw new Error("Expected a typed resolver failure");
+    expect(allowsValidatedShareContextFallback(result)).toBe(true);
   });
 
   it.each([

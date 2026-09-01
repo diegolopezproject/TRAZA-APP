@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { validateGoogleMapsUrl, type SupportedGoogleMapsUrl } from "./google-maps-url";
-import { googleMapsUrlToPlaceResolutionInput } from "./google-maps-place-resolution";
+import {
+  googleMapsShareContextToPlaceResolutionInput,
+  googleMapsUrlToPlaceResolutionInput,
+} from "./google-maps-place-resolution";
 
 function supported(url: string): SupportedGoogleMapsUrl {
   const result = validateGoogleMapsUrl(url);
@@ -71,5 +74,35 @@ describe("googleMapsUrlToPlaceResolutionInput", () => {
     expect(
       googleMapsUrlToPlaceResolutionInput(supported("https://www.google.com/maps/data=!opaque")),
     ).toEqual({ kind: "insufficient", reason: "unrecognized-context" });
+  });
+});
+
+describe("googleMapsShareContextToPlaceResolutionInput", () => {
+  it("prefers a useful normalized title and removes surrounding Maps boilerplate", () => {
+    expect(
+      googleMapsShareContextToPlaceResolutionInput({
+        title: "  Shared from Google Maps —   Flat Iron   ",
+        text: "Flat Iron, 17 Beak Street https://maps.app.goo.gl/Ux3ZEovmVFPLA1Ja7?g_st=ac",
+      }),
+    ).toEqual({ kind: "text-search", query: "Flat Iron" });
+  });
+
+  it("falls back to recognizable text after removing the shared Maps URL", () => {
+    expect(
+      googleMapsShareContextToPlaceResolutionInput({
+        text: "  Flat Iron, 17 Beak Street  \nhttps://maps.app.goo.gl/Ux3ZEovmVFPLA1Ja7?g_st=ac  ",
+      }),
+    ).toEqual({ kind: "text-search", query: "Flat Iron, 17 Beak Street" });
+  });
+
+  it.each([
+    [{ title: "Google Maps", text: "https://maps.app.goo.gl/Ux3ZEovmVFPLA1Ja7" }],
+    [{ title: "--", text: "Shared from Google Maps" }],
+    [{ title: "x".repeat(300) }],
+  ])("keeps insufficient textual context typed", (context) => {
+    expect(googleMapsShareContextToPlaceResolutionInput(context)).toEqual({
+      kind: "insufficient",
+      reason: "unrecognized-context",
+    });
   });
 });

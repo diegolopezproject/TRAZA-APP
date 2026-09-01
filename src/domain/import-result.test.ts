@@ -9,7 +9,6 @@ describe("import result adapter", () => {
   it.each([
     ["saved", "Lugar guardado"],
     ["duplicate", "Ya tienes guardado este sitio"],
-    ["outside-scope", "Este sitio está fuera de tu viaje a Londres"],
     ["failed", "No hemos podido guardar este sitio. Inténtalo de nuevo."],
   ] as const)("owns the exact %s toast copy in the UI boundary", (result, message) => {
     expect(IMPORT_RESULT_MESSAGES[result]).toBe(message);

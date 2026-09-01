@@ -8,6 +8,28 @@ export type GooglePlaceResolutionInput =
 
 const DOCUMENTED_PLACE_ID = /^[A-Za-z0-9_-]{3,255}$/u;
 const COORDINATE_PATH = /@(-?\d{1,3}(?:\.\d+)?),(-?\d{1,3}(?:\.\d+)?)(?:,|\/|$)/u;
+const SHARE_URL_TOKEN = /https:\/\/[^\s<>"'`]+/giu;
+const SHARE_QUERY_MAX_LENGTH = 256;
+const MAPS_SHARE_PREFIX = /^(?:(?:shared|sent)\s+(?:from|via)|compartido\s+(?:desde|mediante|a\s+trav[eé]s\s+de)|enviado\s+desde)\s+google\s+maps\s*(?:[-–—:|]\s*)?/iu;
+const MAPS_ONLY = /^(?:google\s+maps|maps)$/iu;
+
+function normalizedShareQuery(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+
+  let query = value.replace(SHARE_URL_TOKEN, " ").replace(/\s+/gu, " ").trim();
+  query = query.replace(MAPS_SHARE_PREFIX, "").trim();
+  query = query.replace(/^[\s\-–—:|,.;]+|[\s\-–—:|,.;]+$/gu, "").trim();
+
+  if (
+    query.length < 2 ||
+    query.length > SHARE_QUERY_MAX_LENGTH ||
+    !/[\p{Letter}\p{Number}]/u.test(query) ||
+    MAPS_ONLY.test(query)
+  ) {
+    return undefined;
+  }
+  return query;
+}
 
 function decodedPlaceName(pathname: string): string | undefined {
   const segments = pathname.split("/");
@@ -76,4 +98,18 @@ export function googleMapsUrlToPlaceResolutionInput(
   }
 
   return { kind: "insufficient", reason: "unrecognized-context" };
+}
+
+/**
+ * Derives provider-specific search context only after the caller has validated a Maps source.
+ * URLs and common share boilerplate are excluded so untrusted transport data is never reflected.
+ */
+export function googleMapsShareContextToPlaceResolutionInput(input: {
+  title?: string;
+  text?: string;
+}): GooglePlaceResolutionInput {
+  const query = normalizedShareQuery(input.title) ?? normalizedShareQuery(input.text);
+  return query
+    ? { kind: "text-search", query }
+    : { kind: "insufficient", reason: "unrecognized-context" };
 }
