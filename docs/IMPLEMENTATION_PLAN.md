@@ -1,5 +1,17 @@
 # Plan de implementación
 
+## Google Maps → TRAZA — Phase 4
+
+- [x] Publicar el manifiesto App Router de TRAZA con identidad instalable, colores de producto, iconos PNG 192/512 y variante maskable derivadas del asset de marca existente.
+- [x] Registrar `/share` como Web Share Target `POST multipart/form-data` para `title`, `text` y `url`, sin archivos.
+- [x] Implementar el Route Handler de transporte con límite total de 16 KiB, allow-list de campos, rechazo de `File`, parser único de Phase 3A y redirects 303 cerrados a Guardados.
+- [x] Añadir y registrar un service worker mínimo de instalación/activación, sin fetch handler, cachés ni interceptación offline.
+- [x] Cubrir manifiesto, assets, registro y los casos válidos/inválidos del POST con pruebas offline sin Google, Places ni Supabase.
+- [x] Cerrar lint, typecheck, tests, build y validación estática local de Phase 4.
+- [x] Crear el checkpoint Git de Phase 4 sin incluir `.env.local` ni `exports/`.
+
+Decisión de alcance: Phase 4 demuestra únicamente instalación/transporte Android PWA. `/share` no resuelve enlaces, no llama a Google Places, no usa el orquestador completo, no persiste ni accede a Supabase y no conecta el resultado con la UI. La identidad `__Host-traza-installation` se difiere a Phase 5 porque el transporte no la necesita y crearla ahora exigiría introducir prematuramente su secreto y bootstrap. El parámetro cerrado `shareTarget=accepted|invalid` no contiene payload compartido y aterriza en `#saved`; su feedback/consumo final también queda para Phase 5–6.
+
 ## Google Maps → TRAZA — Phase 3D
 
 - [x] Añadir una composition root server-only que conecta las fronteras productivas existentes y mantiene transportes, cliente Places y evaluación de Londres inyectables.
