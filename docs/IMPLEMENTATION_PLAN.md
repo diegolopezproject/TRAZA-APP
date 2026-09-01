@@ -1,5 +1,23 @@
 # Plan de implementación
 
+## Google Maps → TRAZA — Phases 5 + 6
+
+- [x] Registrar la aceptación física de Phase 4 en Android: Días → Google Maps → Compartir → TRAZA → Guardados, PASS.
+- [x] Crear una identidad de instalación UUID firmada en `__Host-traza-installation`, con bootstrap normal y fallo seguro si `/share` no recibe la cookie existente.
+- [x] Conectar `POST /share` al parser, resolver, Places API (New), normalización, Greater London, categoría y `ImportedPlaceRepository`.
+- [x] Persistir únicamente identidad Google y estado TRAZA, delegando duplicados a la restricción PostgreSQL `23505`.
+- [x] Añadir ticket ambiguo firmado, ligado a instalación/viaje y con diez minutos de validez; finalizar desde una sheet basada en `MobileSheet`.
+- [x] Consumir resultados cerrados una sola vez y mostrarlos con el toast `.assignment-toast` existente, sin nuevas variantes visuales.
+- [x] Cargar e hidratar relaciones importadas server-side, degradar fallos por elemento y mezclarlas después de los 28 lugares locales mediante `SavedPlaceCard`.
+- [x] Conservar asignación local con `imported:{record UUID}` y borrar la relación remota con scope de record/instalación/viaje más su limpieza local.
+- [x] Mantener enlaces manuales por query y aceptar URI canónica Google validada únicamente para importados.
+- [x] Cubrir identidad, tickets, share, resultados, hidratación, UI reutilizada, finalización, borrado y roundtrip local con una suite ordinaria offline.
+- [x] Validar de forma real y controlada una fixture londinense: insert, duplicado, hidratación y cleanup de la fila dedicada.
+- [ ] Configurar los dos secretos de cookies en local/Preview y completar la nueva aceptación física end-to-end desde Android.
+- [ ] Implementar fotos y atribución Google en Phase 7.
+
+Decisión de arquitectura: Guardados es híbrido por diseño. `LocalTripRepository` conserva seed/manual, asignaciones y estado de viaje; Supabase conserva solo relaciones importadas. La hidratación Google es transitoria, no entra en `localStorage` ni en `imported_places`. No se modificó el manifiesto, `share_target`, la navegación, la dirección visual, el sistema de toast ni la tarjeta aprobada.
+
 ## Google Maps → TRAZA — Phase 4
 
 - [x] Publicar el manifiesto App Router de TRAZA con identidad instalable, colores de producto, iconos PNG 192/512 y variante maskable derivadas del asset de marca existente.
@@ -10,7 +28,7 @@
 - [x] Cerrar lint, typecheck, tests, build y validación estática local de Phase 4.
 - [x] Crear el checkpoint Git de Phase 4 sin incluir `.env.local` ni `exports/`.
 
-Decisión de alcance: Phase 4 demuestra únicamente instalación/transporte Android PWA. `/share` no resuelve enlaces, no llama a Google Places, no usa el orquestador completo, no persiste ni accede a Supabase y no conecta el resultado con la UI. La identidad `__Host-traza-installation` se difiere a Phase 5 porque el transporte no la necesita y crearla ahora exigiría introducir prematuramente su secreto y bootstrap. El parámetro cerrado `shareTarget=accepted|invalid` no contiene payload compartido y aterriza en `#saved`; su feedback/consumo final también queda para Phase 5–6.
+Decisión histórica del checkpoint: Phase 4 demostró únicamente instalación/transporte Android PWA. La aceptación física posterior confirmó PASS en Días → Google Maps → Compartir → TRAZA → Guardados. Phases 5–6 sustituyen ahora el resultado temporal `shareTarget` por el pipeline, identidad, persistencia y estados finales documentados arriba, sin cambiar el contrato del manifiesto.
 
 ## Google Maps → TRAZA — Phase 3D
 

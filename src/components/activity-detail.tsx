@@ -3,7 +3,7 @@
 import { motion, useReducedMotion } from "motion/react";
 import type { Activity, Place } from "@/domain/models";
 import { areaEs, es } from "@/content/es";
-import { mapsUrl } from "@/lib/format";
+import { placeMapsUrl } from "@/lib/format";
 import { ArrowIcon, CheckIcon, CloseIcon, MapIcon } from "./icons";
 import { MediaFrame } from "./media-frame";
 import { StatusLabel } from "./status-label";
@@ -85,7 +85,7 @@ export function ActivityDetail({ activity, nearbyPlaces, onBack }: ActivityDetai
             <p className="mono-label" id="location-title">03 / {es.detail.location}</p>
             <h2>{es.detail.city.split("\n").map((line) => <span key={line}>{line}</span>)}</h2>
             <p>20 Fenchurch Street<br />London EC3M</p>
-            <a className="primary-action" href={mapsUrl(activity.mapsQuery ?? activity.title)} target="_blank" rel="noreferrer">
+            <a className="primary-action" href={placeMapsUrl(activity) ?? placeMapsUrl({ mapsQuery: activity.title })} target="_blank" rel="noreferrer">
               {es.activity.maps} <ArrowIcon />
             </a>
           </div>

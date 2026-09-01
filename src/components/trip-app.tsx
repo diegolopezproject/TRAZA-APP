@@ -3,8 +3,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, LayoutGroup, motion } from "motion/react";
 import type { Activity, ActivityLevel, ActivityPlacement, DaySection, Place, PlaceAssignment, TransferPlan, Trip, UserPlan } from "@/domain/models";
+import type { ImportedPlaceViewModel } from "@/domain/place-import";
+import { consumeImportResultUrl, IMPORT_RESULT_MESSAGES } from "@/domain/import-result";
+import { mergeHybridPlaces } from "@/domain/hybrid-places";
 import { activityTitleEs, es } from "@/content/es";
-import { createInitialLocalState, LocalTripRepository } from "@/data/local-trip-repository";
+import { createInitialLocalState, LocalTripRepository, removeLocalReferences } from "@/data/local-trip-repository";
 import type { LocalTripState } from "@/data/local-trip-repository";
 import { formatSpanishDate } from "@/lib/format";
 import { useAppNavigation } from "@/lib/use-app-navigation";
@@ -21,16 +24,20 @@ import { SavedView } from "./saved-view";
 import { TripView } from "./trip-view";
 import { AppShell } from "./app-shell";
 import { motionDuration, motionEase } from "@/lib/motion";
+import { ImportCategorySheet } from "./import-category-sheet";
 
-interface TripAppProps { trip: Trip; }
+interface TripAppProps { trip: Trip; importedPlaces: readonly ImportedPlaceViewModel[]; }
 interface Notice { message: string; undo?: () => void; }
 
-export function TripApp({ trip }: TripAppProps) {
+export function TripApp({ trip, importedPlaces }: TripAppProps) {
   const navigation = useAppNavigation();
   const { state } = navigation;
   const [local, setLocal] = useState<LocalTripState>(() => createInitialLocalState(trip));
   const repositoryRef = useRef<LocalTripRepository | null>(null);
   const [notice, setNotice] = useState<Notice | null>(null);
+  const [imported, setImported] = useState<readonly ImportedPlaceViewModel[]>(importedPlaces);
+  const [categorySheetOpen, setCategorySheetOpen] = useState(false);
+  const [deletingImportedId, setDeletingImportedId] = useState<string | null>(null);
 
   useEffect(() => {
     const repository = new LocalTripRepository(trip, window.localStorage);
@@ -39,11 +46,16 @@ export function TripApp({ trip }: TripAppProps) {
     return () => window.cancelAnimationFrame(frame);
   }, [trip]);
 
+  const combinedPlaces = useMemo<Place[]>(
+    () => mergeHybridPlaces(local.places, imported),
+    [imported, local.places],
+  );
+
   const effectiveTrip = useMemo<Trip>(() => {
     const days = trip.days.map((day) => {
       const activities = day.activities.map((activity) => {
         const meal = local.mealSelections.find((selection) => selection.mealSlotId === activity.id);
-        const place = meal ? local.places.find((item) => item.id === meal.sourcePlaceId) : undefined;
+        const place = meal ? combinedPlaces.find((item) => item.id === meal.sourcePlaceId) : undefined;
         return place ? {
           ...activity,
           displayTitle: `${activityTitleEs(activity)} · ${place.name}`,
@@ -51,6 +63,7 @@ export function TripApp({ trip }: TripAppProps) {
           mealSlotId: activity.id,
           area: place.area ?? activity.area,
           mapsQuery: place.mapsQuery ?? activity.mapsQuery,
+          mapsDestination: place.mapsDestination ?? activity.mapsDestination,
           media: place.media,
         } : activity;
       });
@@ -63,26 +76,42 @@ export function TripApp({ trip }: TripAppProps) {
       });
       return { ...day, activities: withSections };
     });
-    return { ...trip, days, savedPlaces: local.places, transfers: local.transfers };
-  }, [local, trip]);
+    return { ...trip, days, savedPlaces: combinedPlaces, transfers: local.transfers };
+  }, [combinedPlaces, local, trip]);
 
   const openDay = effectiveTrip.days.find((day) => day.id === state.openDayId) ?? null;
   const openDayIndex = openDay ? effectiveTrip.days.findIndex((day) => day.id === openDay.id) : -1;
   const detailActivity = openDay?.activities.find((activity) => activity.id === state.detailActivityId) ?? null;
-  const assignmentPlace = local.places.find((place) => place.id === state.assignmentPlaceId) ?? null;
+  const assignmentPlace = combinedPlaces.find((place) => place.id === state.assignmentPlaceId) ?? null;
   const assignment = local.assignments.find((item) => item.placeId === state.assignmentPlaceId);
   const assignedItems = openDay ? local.assignments.filter((item) => item.dayId === openDay.id).flatMap((item) => {
-    const place = local.places.find((candidate) => candidate.id === item.placeId);
+    const place = combinedPlaces.find((candidate) => candidate.id === item.placeId);
     return place ? [{ place, assignment: item }] : [];
   }) : [];
   const assignmentsByPlace = Object.fromEntries(local.assignments.map((item) => [item.placeId, item.dayId]));
   const nearbyPlaces = local.places.filter((place) => ["GAIL's Bakery London Bridge", "Kova Patisserie Aldgate East", "Reflection Garden"].includes(place.name));
   const editedPlace = state.placeEditorId && state.placeEditorId !== "new" ? local.places.find((place) => place.id === state.placeEditorId) : undefined;
-  const detailPlace = local.places.find((place) => place.id === state.placeDetailId);
+  const detailPlace = combinedPlaces.find((place) => place.id === state.placeDetailId);
   const planDay = state.planSheet ? effectiveTrip.days.find((day) => day.id === state.planSheet?.dayId) : undefined;
   const editedPlan = state.planSheet?.planId ? local.userPlans.find((plan) => plan.id === state.planSheet?.planId) : undefined;
   const mealActivity = openDay?.activities.find((activity) => activity.id === state.mealActivityId) ?? null;
   const mealSelection = mealActivity ? local.mealSelections.find((selection) => selection.mealSlotId === mealActivity.id) : undefined;
+
+  useEffect(() => {
+    const consumed = consumeImportResultUrl(window.location.href);
+    if (!consumed) return;
+    window.history.replaceState(window.history.state, "", consumed.cleanedUrl);
+    let active = true;
+    window.queueMicrotask(() => {
+      if (!active) return;
+      if (consumed.result === "needs-category") {
+        setCategorySheetOpen(true);
+      } else {
+        setNotice({ message: IMPORT_RESULT_MESSAGES[consumed.result] });
+      }
+    });
+    return () => { active = false; };
+  }, []);
 
   function persist(next: LocalTripState) {
     setLocal(repositoryRef.current?.save(next) ?? next);
@@ -95,9 +124,9 @@ export function TripApp({ trip }: TripAppProps) {
   }
 
   useEffect(() => {
-    document.body.classList.toggle("is-layer-open", Boolean(openDay || assignmentPlace || state.placeEditorId || state.placeDetailId || state.planSheet || mealActivity));
+    document.body.classList.toggle("is-layer-open", Boolean(openDay || assignmentPlace || state.placeEditorId || state.placeDetailId || state.planSheet || mealActivity || categorySheetOpen));
     return () => document.body.classList.remove("is-layer-open");
-  }, [assignmentPlace, mealActivity, openDay, state.placeDetailId, state.placeEditorId, state.planSheet]);
+  }, [assignmentPlace, categorySheetOpen, mealActivity, openDay, state.placeDetailId, state.placeEditorId, state.planSheet]);
 
   useEffect(() => {
     if (!notice) return;
@@ -114,7 +143,7 @@ export function TripApp({ trip }: TripAppProps) {
   }
 
   function assignPlace(placeId: string, dayId: string, section: DaySection, level: ActivityLevel) {
-    const place = local.places.find((item) => item.id === placeId);
+    const place = combinedPlaces.find((item) => item.id === placeId);
     const nextAssignment: PlaceAssignment = { placeId, dayId, section, level };
     const next = { ...local, assignments: [...local.assignments.filter((item) => item.placeId !== placeId), nextAssignment] };
     persistWithUndo(next, place ? es.assignment.success(place.name, formatSpanishDate(dayId)) : es.forms.saved);
@@ -142,6 +171,35 @@ export function TripApp({ trip }: TripAppProps) {
     navigation.back();
   }
 
+  async function deleteImportedPlace(place: Place) {
+    if (!place.importedRecordId || deletingImportedId) return;
+    setDeletingImportedId(place.importedRecordId);
+    try {
+      const response = await fetch(
+        `/api/imported-places/${encodeURIComponent(place.importedRecordId)}`,
+        { method: "DELETE", headers: { Accept: "application/json" } },
+      );
+      if (!response.ok) throw new Error("delete-failed");
+      persist(removeLocalReferences(local, place.id));
+      setImported((items) => items.filter((item) => item.recordId !== place.importedRecordId));
+      setNotice({ message: `${place.name}: ${es.forms.removed.toLowerCase()}` });
+      navigation.back();
+    } catch {
+      setNotice({ message: "No hemos podido eliminar este sitio." });
+    } finally {
+      setDeletingImportedId(null);
+    }
+  }
+
+  function cancelCategorySelection() {
+    setCategorySheetOpen(false);
+    void fetch("/api/imported-places/finalize", {
+      method: "DELETE",
+      headers: { Accept: "application/json" },
+      keepalive: true,
+    });
+  }
+
   function savePlan(plan: UserPlan) {
     const exists = local.userPlans.some((item) => item.id === plan.id);
     persistWithUndo({ ...local, userPlans: exists ? local.userPlans.map((item) => item.id === plan.id ? plan : item) : [...local.userPlans, plan] }, es.forms.saved);
@@ -155,7 +213,7 @@ export function TripApp({ trip }: TripAppProps) {
 
   function chooseSavedForDay(placeId: string, section: DaySection) {
     if (!state.planSheet) return;
-    const place = local.places.find((item) => item.id === placeId);
+    const place = combinedPlaces.find((item) => item.id === placeId);
     const nextAssignment: PlaceAssignment = { placeId, dayId: state.planSheet.dayId, section, level: "nearby-option" };
     persistWithUndo({ ...local, assignments: [...local.assignments.filter((item) => item.placeId !== placeId), nextAssignment] }, place ? es.assignment.success(place.name, formatSpanishDate(state.planSheet.dayId)) : es.forms.saved);
     navigation.backSteps(state.planSheet.view === "placement" ? 3 : 1);
@@ -194,7 +252,7 @@ export function TripApp({ trip }: TripAppProps) {
     <LayoutGroup>
       <AppShell activeTab={state.tab} journeyTheme={effectiveTrip.days[state.selectedDay]?.visualTheme}>
         {state.tab === "journey" ? <DayCarousel days={effectiveTrip.days} selectedIndex={state.selectedDay} onSelect={selectDay} onOpen={(day) => navigation.push((current) => ({ ...current, tab: "journey", openDayId: day.id, dayMode: "view", detailActivityId: null, assignmentPlaceId: null, placeEditorId: null, placeDetailId: null, planSheet: null, mealActivityId: null }))} /> : null}
-        {state.tab === "saved" ? <SavedView places={local.places} assignments={assignmentsByPlace} filter={state.savedFilter} onFilterChange={(filter) => navigation.replace((current) => ({ ...current, savedFilter: filter }))} onAssignRequest={(placeId) => navigation.push((current) => ({ ...current, assignmentPlaceId: placeId, assignmentStep: 1 }))} onAddPlace={() => navigation.push((current) => ({ ...current, placeEditorId: "new" }))} onEditPlace={(placeEditorId) => navigation.push((current) => ({ ...current, placeEditorId }))} onOpenPlace={(placeDetailId) => navigation.push((current) => ({ ...current, placeDetailId }))} onReset={resetLocalData} /> : null}
+        {state.tab === "saved" ? <SavedView places={combinedPlaces} assignments={assignmentsByPlace} filter={state.savedFilter} onFilterChange={(filter) => navigation.replace((current) => ({ ...current, savedFilter: filter }))} onAssignRequest={(placeId) => navigation.push((current) => ({ ...current, assignmentPlaceId: placeId, assignmentStep: 1 }))} onAddPlace={() => navigation.push((current) => ({ ...current, placeEditorId: "new" }))} onEditPlace={(placeId) => navigation.push((current) => combinedPlaces.find((place) => place.id === placeId)?.source === "imported-google" ? { ...current, placeDetailId: placeId } : { ...current, placeEditorId: placeId })} onOpenPlace={(placeDetailId) => navigation.push((current) => ({ ...current, placeDetailId }))} onReset={resetLocalData} /> : null}
         {state.tab === "trip" ? <TripView trip={effectiveTrip} editingTransfers={state.tripEditingTransfers} onStartTransferEditing={() => navigation.push((current) => ({ ...current, tripEditingTransfers: true }))} onSaveTransfers={saveTransfers} /> : null}
 
         <BottomNav active={state.tab} onChange={navigation.changeTab} />
@@ -203,9 +261,10 @@ export function TripApp({ trip }: TripAppProps) {
         <AnimatePresence>{detailActivity ? <ActivityDetail key={detailActivity.id} activity={detailActivity} nearbyPlaces={nearbyPlaces} onBack={navigation.back} /> : null}</AnimatePresence>
         <AnimatePresence>{assignmentPlace ? <AssignmentSheet key={assignmentPlace.id} place={assignmentPlace} days={effectiveTrip.days} assignment={assignment} step={state.assignmentStep} onStepChange={(assignmentStep) => navigation.push((current) => ({ ...current, assignmentStep }))} onAssign={(dayId, section, level) => assignPlace(assignmentPlace.id, dayId, section, level)} onRemove={() => removeAssignment(assignmentPlace.id)} onClose={navigation.back} /> : null}</AnimatePresence>
         <AnimatePresence>{state.placeEditorId ? <PlaceFormSheet key={state.placeEditorId} place={editedPlace} onSave={savePlace} onDelete={editedPlace ? deletePlace : undefined} onClose={navigation.back} /> : null}</AnimatePresence>
-        <AnimatePresence>{detailPlace ? <PlaceDetailSheet key={detailPlace.id} place={detailPlace} onClose={navigation.back} /> : null}</AnimatePresence>
-        <AnimatePresence>{planDay && state.planSheet ? <PlanFormSheet key={`${planDay.id}-${editedPlan?.id ?? "new"}`} day={planDay} days={effectiveTrip.days} places={local.places} plan={editedPlan} view={state.planSheet.view} placementPlaceId={state.planSheet.placeId} onNavigate={(view, placeId) => navigation.push((current) => ({ ...current, planSheet: current.planSheet ? { ...current.planSheet, view, placeId } : null }))} onChoosePlace={chooseSavedForDay} onSave={savePlan} onDelete={editedPlan ? deletePlan : undefined} onClose={navigation.back} /> : null}</AnimatePresence>
-        <AnimatePresence>{openDay && mealActivity ? <MealPickerSheet key={mealActivity.id} day={openDay} meal={mealActivity} places={local.places} selectedPlaceId={mealSelection?.sourcePlaceId} onSelect={chooseRestaurant} onRemove={removeRestaurant} onClose={navigation.back} /> : null}</AnimatePresence>
+        <AnimatePresence>{detailPlace ? <PlaceDetailSheet key={detailPlace.id} place={detailPlace} onClose={navigation.back} onDelete={detailPlace.source === "imported-google" ? () => void deleteImportedPlace(detailPlace) : undefined} deleting={deletingImportedId === detailPlace.importedRecordId} /> : null}</AnimatePresence>
+        <AnimatePresence>{planDay && state.planSheet ? <PlanFormSheet key={`${planDay.id}-${editedPlan?.id ?? "new"}`} day={planDay} days={effectiveTrip.days} places={combinedPlaces} plan={editedPlan} view={state.planSheet.view} placementPlaceId={state.planSheet.placeId} onNavigate={(view, placeId) => navigation.push((current) => ({ ...current, planSheet: current.planSheet ? { ...current.planSheet, view, placeId } : null }))} onChoosePlace={chooseSavedForDay} onSave={savePlan} onDelete={editedPlan ? deletePlan : undefined} onClose={navigation.back} /> : null}</AnimatePresence>
+        <AnimatePresence>{openDay && mealActivity ? <MealPickerSheet key={mealActivity.id} day={openDay} meal={mealActivity} places={combinedPlaces} selectedPlaceId={mealSelection?.sourcePlaceId} onSelect={chooseRestaurant} onRemove={removeRestaurant} onClose={navigation.back} /> : null}</AnimatePresence>
+        <AnimatePresence>{categorySheetOpen ? <ImportCategorySheet key="import-category" onCancel={cancelCategorySelection} /> : null}</AnimatePresence>
 
         <AnimatePresence>{notice ? <motion.aside className="assignment-toast" role="status" initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 8, opacity: 0 }} transition={{ duration: motionDuration.standard, ease: motionEase }}><span>{notice.message}</span>{notice.undo ? <button type="button" onClick={notice.undo}>{es.forms.undo}</button> : null}</motion.aside> : null}</AnimatePresence>
       </AppShell>

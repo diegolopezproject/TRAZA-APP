@@ -129,7 +129,13 @@ export function useAppNavigation() {
     const entry = existing ?? createAppHistoryEntry(navigationFromHash(window.location.hash));
     entryRef.current = entry;
     if (!navigationStateEquals(entry.navigation, stateRef.current)) window.requestAnimationFrame(() => apply(entry.navigation));
-    if (!existing) window.history.replaceState(withHistoryEntry(entry), "", navigationHash(entry.navigation));
+    if (!existing) {
+      window.history.replaceState(
+        withHistoryEntry(entry),
+        "",
+        `${window.location.pathname}${window.location.search}${navigationHash(entry.navigation)}`,
+      );
+    }
 
     const rememberTrigger = (event: PointerEvent) => {
       const target = event.target instanceof Element ? event.target.closest<HTMLElement>("button, a, [tabindex]") : null;

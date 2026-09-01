@@ -1,4 +1,5 @@
 import type { GeoPoint } from "./geometry";
+import type { MapsDestination } from "./models";
 
 export const TRAZA_IMPORT_CATEGORIES = [
   "food-drink",
@@ -45,7 +46,7 @@ export interface ImportedPlaceViewModel {
   name: string;
   area?: string;
   tags: readonly string[];
-  mapsUrl?: string;
+  mapsDestination?: MapsDestination;
 }
 
 /** Provider-neutral scalar candidate produced after an external adapter validates its response. */
@@ -64,4 +65,11 @@ export function importedPlaceViewId(recordId: string): ImportedPlaceViewId {
   }
 
   return `imported:${recordId}`;
+}
+
+export function isTrazaImportCategory(value: unknown): value is TrazaImportCategory {
+  return (
+    typeof value === "string" &&
+    TRAZA_IMPORT_CATEGORIES.includes(value as TrazaImportCategory)
+  );
 }

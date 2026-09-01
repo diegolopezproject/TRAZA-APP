@@ -42,6 +42,7 @@ export interface Activity {
   area?: string;
   venue?: string;
   mapsQuery?: string;
+  mapsDestination?: MapsDestination;
   notes?: string;
   media?: MediaAsset;
   section?: DaySection;
@@ -74,8 +75,15 @@ export interface Place {
   notes?: string;
   media?: MediaAsset;
   mapsQuery?: string;
+  mapsDestination?: MapsDestination;
   userCreated?: boolean;
+  source?: "imported-google";
+  importedRecordId?: string;
 }
+
+export type MapsDestination =
+  | { kind: "query"; value: string }
+  | { kind: "canonical-url"; value: string };
 
 export interface PlaceAssignment {
   placeId: string;

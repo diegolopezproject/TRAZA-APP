@@ -4,6 +4,7 @@ import {
   LOCAL_TRIP_STORAGE_KEY,
   LocalTripRepository,
   duplicateVisibleMediaSources,
+  removeLocalReferences,
 } from "./local-trip-repository";
 import { SeedTripRepository } from "./seed-trip-repository";
 
@@ -68,5 +69,39 @@ describe("LocalTripRepository", () => {
     expect(reloaded.userPlans[0].dayId).toBe("2026-08-12");
     expect(reloaded.placements[0].section).toBe("evening");
     expect(reloaded.transfers[0].transportType).toBe("Tren");
+  });
+
+  it("roundtrips an imported stable assignment without serializing the imported place", async () => {
+    const seed = await new SeedTripRepository().getTrip();
+    const storage = new MemoryStorage();
+    const repository = new LocalTripRepository(seed, storage);
+    const initial = repository.load();
+    const importedId = "imported:018f47f5-4f43-7c8f-8f47-2b9ef863f483";
+    repository.save({
+      ...initial,
+      assignments: [{
+        placeId: importedId,
+        dayId: "2026-08-09",
+        section: "afternoon",
+        level: "nearby-option",
+      }],
+    });
+    const reloaded = new LocalTripRepository(seed, storage).load();
+    expect(reloaded.assignments[0].placeId).toBe(importedId);
+    expect(reloaded.places.some((place) => place.id === importedId)).toBe(false);
+  });
+
+  it("cleans imported assignment and meal references without touching local places", async () => {
+    const seed = await new SeedTripRepository().getTrip();
+    const initial = new LocalTripRepository(seed, new MemoryStorage()).load();
+    const importedId = "imported:018f47f5-4f43-7c8f-8f47-2b9ef863f483";
+    const cleaned = removeLocalReferences({
+      ...initial,
+      assignments: [{ placeId: importedId, dayId: "2026-08-09", section: "anytime", level: "nearby-option" }],
+      mealSelections: [{ mealSlotId: "meal", dayId: "2026-08-09", sourcePlaceId: importedId }],
+    }, importedId);
+    expect(cleaned.assignments).toEqual([]);
+    expect(cleaned.mealSelections).toEqual([]);
+    expect(cleaned.places).toEqual(initial.places);
   });
 });

@@ -108,6 +108,17 @@ export class LocalTripRepository {
   }
 }
 
+export function removeLocalReferences(
+  state: LocalTripState,
+  placeId: string,
+): LocalTripState {
+  return {
+    ...state,
+    assignments: state.assignments.filter((item) => item.placeId !== placeId),
+    mealSelections: state.mealSelections.filter((item) => item.sourcePlaceId !== placeId),
+  };
+}
+
 export function duplicateVisibleMediaSources(places: Place[]): string[] {
   const counts = new Map<string, number>();
   for (const place of places) {

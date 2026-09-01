@@ -5,7 +5,7 @@ import type { CSSProperties, TouchEvent } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import type { Activity, ActivityPlacement, Day, DaySection, Place, PlaceAssignment } from "@/domain/models";
 import { activityTitleEs, coverTitleEs, dayEditorial, es, weekdayEs } from "@/content/es";
-import { dayNumber, formatSpanishDate, mapsUrl } from "@/lib/format";
+import { dayNumber, formatSpanishDate, placeMapsUrl } from "@/lib/format";
 import { ActivityCard } from "./activity-card";
 import { ChevronIcon, CloseIcon, HeartIcon, MapIcon, PlusIcon } from "./icons";
 import { MediaFrame } from "./media-frame";
@@ -176,7 +176,7 @@ export function DayItinerary({ day, dayIndex, onClose, onOpenActivity, assignedI
                   <article className="assigned-place-card" key={place.id}>
                     {place.media ? <MediaFrame media={place.media} sizes="112px" /> : <span className="assigned-place-fallback"><HeartIcon /></span>}
                     <div><small>{es.day.assigned} · {es.forms.sections[assignment.section]}</small><h3>{place.name.replace(" | ", " / ")}</h3><p>{place.area ?? "Londres"} · {es.levels[assignment.level]}</p></div>
-                    <div className="assigned-card-actions">{place.mapsQuery ? <a href={mapsUrl(place.mapsQuery)} target="_blank" rel="noreferrer"><MapIcon /> Mapa</a> : null}<button type="button" onClick={() => onOpenPlace(place.id)}>Detalle</button><button type="button" onClick={() => onEditAssignment(place.id)}>{es.saved.edit}</button></div>
+                    <div className="assigned-card-actions">{placeMapsUrl(place) ? <a href={placeMapsUrl(place)} target="_blank" rel="noreferrer"><MapIcon /> Mapa</a> : null}<button type="button" onClick={() => onOpenPlace(place.id)}>Detalle</button><button type="button" onClick={() => onEditAssignment(place.id)}>{es.saved.edit}</button></div>
                   </article>
                 ))}
               </div>

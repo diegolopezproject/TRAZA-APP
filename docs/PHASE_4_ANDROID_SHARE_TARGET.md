@@ -1,5 +1,19 @@
 # Phase 4 — Android PWA + Web Share Target
 
+## Aceptación física Android
+
+PASS, 1 de septiembre de 2026:
+
+```text
+Días
+→ Google Maps nativo
+→ Compartir
+→ TRAZA instalada
+→ Guardados
+```
+
+La PWA Preview estaba instalada, el usuario dejó TRAZA deliberadamente en Días, Google Maps mostró TRAZA como destino y al seleccionarla la aplicación abrió directamente Guardados. Que no apareciera una fila nueva era el resultado esperado del checkpoint de transporte de Phase 4; la importación real se implementa en Phases 5–6 sin modificar `share_target`.
+
 ## Contrato implementado
 
 - `src/app/manifest.ts` sirve el manifiesto App Router de TRAZA: `start_url` y `scope` `/`, `display: standalone`, fondo paper `#f4f1ea` y tema ink `#161616`.

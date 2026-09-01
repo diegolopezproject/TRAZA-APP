@@ -3,7 +3,7 @@
 import { motion } from "motion/react";
 import type { Activity } from "@/domain/models";
 import { activityTimeLabelEs, activityTitleEs, areaEs, es } from "@/content/es";
-import { mapsUrl } from "@/lib/format";
+import { placeMapsUrl } from "@/lib/format";
 import { ArrowIcon, CheckIcon, ClockIcon, MapIcon, PlusIcon } from "./icons";
 import { MediaFrame } from "./media-frame";
 import { StatusLabel } from "./status-label";
@@ -42,8 +42,8 @@ export function ActivityCard({ activity, onOpen, featured = false, actionLabel }
             </span>
             <span className="round-arrow" aria-hidden="true"><ArrowIcon /></span>
           </button>
-          {activity.mapsQuery ? (
-            <a className="card-map-link" href={mapsUrl(activity.mapsQuery)} target="_blank" rel="noreferrer">
+          {placeMapsUrl(activity) ? (
+            <a className="card-map-link" href={placeMapsUrl(activity)} target="_blank" rel="noreferrer">
               <MapIcon /> {es.activity.maps}
             </a>
           ) : null}
