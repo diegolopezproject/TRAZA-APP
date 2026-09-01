@@ -1,5 +1,16 @@
 # Plan de implementación
 
+## Google Maps → TRAZA — Phase 3C
+
+- [x] Aprobar y registrar el recurso dedicado “Greater London boundary” del London Datastore, publicado por Greater London Authority y mantenido por GLA GIS bajo OGL v2.
+- [x] Auditar el shapefile fuente como una feature Polygon con un anillo cerrado y 10.921 posiciones en OSGB36 / British National Grid (EPSG:27700).
+- [x] Añadir un generador reproducible sin dependencias que transforma a longitud/latitud WGS 84 (EPSG:4326), conserva todos los vértices y valida el perfil exacto de la fuente.
+- [x] Incorporar el asset runtime compacto, versionado y con procedencia verificable, sin incluir el ZIP ni sus sidecars.
+- [x] Cargar y validar el asset de forma fail-closed; mantener la regla pura de país GB/UK + point-in-polygon y exponer el evaluador productivo para inyección.
+- [x] Cubrir puntos fijos interiores y exteriores, país ausente/incorrecto, borde inclusivo, asset ausente o malformado y candidato normalizado sin red.
+
+Decisión de alcance: Phase 3C sólo habilita la decisión determinista de alcance administrativo de Greater London. No conecta el evaluador al orquestador mediante un singleton, no persiste datos, no realiza tráfico Google o Supabase y no crea UI, `/share`, PWA, fotos ni dependencias. La procedencia, transformación aproximada Helmert y su precisión documentada se registran en `docs/GREATER_LONDON_BOUNDARY_SOURCE.md`. La siguiente fase deberá inyectar explícitamente este evaluador en su composition root sin mezclarlo con persistencia o transporte.
+
 ## Google Maps → TRAZA — Phase 3B
 
 - [x] Componer parser, resolución segura, contexto Maps, Text Search/selección, Details, normalización, alcance Londres y clasificación en un único orquestador server-only.
