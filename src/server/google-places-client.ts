@@ -4,18 +4,21 @@ import { isValidGeoPoint, type GeoPoint } from "../domain/geometry";
 import type {
   GoogleAddressComponent,
   GooglePlaceDetails,
+  GooglePlacePhoto,
+  GooglePlacePhotoMedia,
   GoogleTextSearchCandidate,
 } from "./google-places-types";
 
 export const GOOGLE_PLACES_ENDPOINTS = {
   textSearch: "https://places.googleapis.com/v1/places:searchText",
   detailsBase: "https://places.googleapis.com/v1/places",
+  photoMediaBase: "https://places.googleapis.com/v1",
 } as const;
 
 export const GOOGLE_PLACES_FIELD_MASKS = {
   textSearch: "places.id,places.displayName,places.formattedAddress,places.location",
   details:
-    "id,displayName,formattedAddress,addressComponents,location,primaryType,types,googleMapsUri",
+    "id,displayName,formattedAddress,addressComponents,location,primaryType,types,googleMapsUri,photos",
 } as const;
 
 export const GOOGLE_TEXT_SEARCH_LONDON_RESTRICTION = {
@@ -69,7 +72,9 @@ export type GooglePlacesServerEnvironment = Readonly<Record<string, string | und
 
 const DEFAULT_TIMEOUT_MS = 4_000;
 const PLACE_ID = /^[A-Za-z0-9_-]{3,255}$/u;
+const PHOTO_NAME = /^places\/[A-Za-z0-9_-]{3,255}\/photos\/[A-Za-z0-9_-]{3,2048}$/u;
 const GOOGLE_MAPS_URI_HOSTS = new Set(["google.com", "www.google.com", "maps.google.com"]);
+const GOOGLE_PHOTO_URI_HOSTS = new Set(["lh3.googleusercontent.com"]);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -162,6 +167,85 @@ function isSafeGoogleMapsUri(value: string): boolean {
   }
 }
 
+function normalizedGoogleMapsUri(value: unknown): string | null {
+  const candidate = nonEmptyString(value);
+  if (!candidate) return null;
+  const normalized = candidate.startsWith("//") ? `https:${candidate}` : candidate;
+  return isSafeGoogleMapsUri(normalized) ? normalized : null;
+}
+
+function isSafeGooglePhotoUri(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return (
+      url.protocol === "https:" &&
+      !url.username &&
+      !url.password &&
+      !url.port &&
+      GOOGLE_PHOTO_URI_HOSTS.has(url.hostname.toLowerCase())
+    );
+  } catch {
+    return false;
+  }
+}
+
+function normalizedGooglePhotoUri(value: unknown): string | null {
+  const candidate = nonEmptyString(value);
+  if (!candidate) return null;
+  const normalized = candidate.startsWith("//") ? `https:${candidate}` : candidate;
+  return isSafeGooglePhotoUri(normalized) ? normalized : null;
+}
+
+function parsePhotoAuthorAttribution(value: unknown) {
+  if (!isRecord(value)) return null;
+  const displayName = nonEmptyString(value.displayName);
+  const uri = value.uri === undefined ? undefined : normalizedGoogleMapsUri(value.uri);
+  const photoUri = value.photoUri === undefined ? undefined : normalizedGooglePhotoUri(value.photoUri);
+  if (
+    !displayName ||
+    (value.uri !== undefined && !uri) ||
+    (value.photoUri !== undefined && !photoUri)
+  ) return null;
+  return { displayName, ...(uri ? { uri } : {}), ...(photoUri ? { photoUri } : {}) };
+}
+
+function parsePlacePhoto(value: unknown): GooglePlacePhoto | null {
+  if (!isRecord(value)) return null;
+  const name = nonEmptyString(value.name);
+  const googleMapsUri = normalizedGoogleMapsUri(value.googleMapsUri);
+  const authorAttributions = Array.isArray(value.authorAttributions)
+    ? value.authorAttributions.map(parsePhotoAuthorAttribution)
+    : null;
+  if (
+    !name ||
+    !PHOTO_NAME.test(name) ||
+    !Number.isInteger(value.widthPx) ||
+    (value.widthPx as number) <= 0 ||
+    !Number.isInteger(value.heightPx) ||
+    (value.heightPx as number) <= 0 ||
+    !googleMapsUri ||
+    !authorAttributions ||
+    authorAttributions.some((author) => author === null)
+  ) {
+    return null;
+  }
+  return {
+    name,
+    widthPx: value.widthPx as number,
+    heightPx: value.heightPx as number,
+    authorAttributions: authorAttributions as NonNullable<(typeof authorAttributions)[number]>[],
+    googleMapsUri,
+  };
+}
+
+export function parseGooglePlacePhotoMediaResponse(value: unknown): GooglePlacePhotoMedia {
+  const photoUri = isRecord(value) ? normalizedGooglePhotoUri(value.photoUri) : null;
+  if (!photoUri) {
+    throw new GooglePlacesClientError("invalid-response");
+  }
+  return { photoUri };
+}
+
 export function parseGooglePlaceDetailsResponse(value: unknown): GooglePlaceDetails {
   if (!isRecord(value)) {
     throw new GooglePlacesClientError("invalid-response");
@@ -177,6 +261,9 @@ export function parseGooglePlaceDetailsResponse(value: unknown): GooglePlaceDeta
   const addressComponents = Array.isArray(value.addressComponents)
     ? value.addressComponents.map(parseAddressComponent)
     : null;
+  const photos = Array.isArray(value.photos)
+    ? value.photos.map(parsePlacePhoto).filter((photo): photo is GooglePlacePhoto => photo !== null)
+    : [];
 
   if (
     !id ||
@@ -203,6 +290,7 @@ export function parseGooglePlaceDetailsResponse(value: unknown): GooglePlaceDeta
     ...(primaryType ? { primaryType } : {}),
     types,
     googleMapsUri,
+    ...(photos.length ? { photos } : {}),
   };
 }
 
@@ -309,6 +397,27 @@ export class GooglePlacesClient {
       },
     });
     return parseGooglePlaceDetailsResponse(response);
+  }
+
+  async placePhoto(photoName: string): Promise<GooglePlacePhotoMedia> {
+    const normalizedPhotoName = photoName.trim();
+    if (!PHOTO_NAME.test(normalizedPhotoName)) {
+      throw new GooglePlacesClientError("invalid-response");
+    }
+    const query = new URLSearchParams({
+      maxWidthPx: "1200",
+      maxHeightPx: "1200",
+      skipHttpRedirect: "true",
+    });
+    const response = await this.requestJson({
+      url: `${GOOGLE_PLACES_ENDPOINTS.photoMediaBase}/${normalizedPhotoName}/media?${query}`,
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "X-Goog-Api-Key": this.apiKey,
+      },
+    });
+    return parseGooglePlacePhotoMediaResponse(response);
   }
 }
 

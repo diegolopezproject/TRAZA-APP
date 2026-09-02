@@ -5,10 +5,12 @@ import {
   type ImportedPlaceIdentity,
   type ImportedPlaceViewModel,
 } from "@/domain/place-import";
+import { fallbackPlaceMedia } from "@/data/media-catalog";
+import type { MediaAsset } from "@/domain/models";
 import { TRAZA_TRIP_ID } from "@/domain/trip-scope";
 import { normalizeGooglePlaceDetails } from "./google-place-normalizer";
 import { createGooglePlacesClient } from "./google-places-client";
-import type { GooglePlaceDetails } from "./google-places-types";
+import type { GooglePlaceDetails, GooglePlacePhoto } from "./google-places-types";
 import type { ImportedPlaceRepository } from "./imported-place-repository";
 import { createImportedPlaceRepository } from "./supabase";
 
@@ -30,6 +32,7 @@ const FACTUAL_TYPE_LABELS: Readonly<Record<string, string>> = {
 
 export interface ImportedPlaceHydrationClient {
   placeDetails(placeId: string): Promise<GooglePlaceDetails>;
+  placePhoto?(photoName: string): Promise<{ photoUri: string }>;
 }
 
 export interface ImportedPlaceListPort {
@@ -50,7 +53,40 @@ export function degradedImportedPlace(
     category: identity.category,
     name: "Lugar guardado",
     tags: [],
+    media: fallbackPlaceMedia("Lugar guardado"),
   };
+}
+
+async function importedPlaceMedia(
+  name: string,
+  photo: GooglePlacePhoto | undefined,
+  client: ImportedPlaceHydrationClient,
+): Promise<MediaAsset> {
+  if (!photo || !client.placePhoto) return fallbackPlaceMedia(name);
+  try {
+    const { photoUri } = await client.placePhoto(photo.name);
+    return {
+      src: photoUri,
+      alt: `Foto de ${name}`,
+      width: photo.widthPx,
+      height: photo.heightPx,
+      focalPoint: "50% 50%",
+      source: "Google Maps",
+      sourceUrl: photo.googleMapsUri,
+      kind: "photo",
+      classification: "real-photo",
+      googleMapsAttribution: {
+        sourcePhotoUrl: photo.googleMapsUri,
+        authors: photo.authorAttributions.map((author) => ({
+          displayName: author.displayName,
+          ...(author.uri ? { profileUrl: author.uri } : {}),
+          ...(author.photoUri ? { avatarUrl: author.photoUri } : {}),
+        })),
+      },
+    };
+  } catch {
+    return fallbackPlaceMedia(name);
+  }
 }
 
 export async function hydrateImportedPlaceIdentities(
@@ -63,6 +99,11 @@ export async function hydrateImportedPlaceIdentities(
         const details = await client.placeDetails(identity.externalPlaceId);
         if (details.id !== identity.externalPlaceId) return degradedImportedPlace(identity);
         const normalized = normalizeGooglePlaceDetails(details);
+        const media = await importedPlaceMedia(
+          normalized.presentation.displayName,
+          details.photos?.[0],
+          client,
+        );
         return {
           source: "imported-google" as const,
           id: importedPlaceViewId(identity.recordId),
@@ -71,6 +112,7 @@ export async function hydrateImportedPlaceIdentities(
           name: normalized.presentation.displayName,
           area: normalized.presentation.formattedAddress,
           tags: factualTagsForGoogleTypes(normalized.candidate.types),
+          media,
           mapsDestination: {
             kind: "canonical-url" as const,
             value: normalized.presentation.googleMapsUri,

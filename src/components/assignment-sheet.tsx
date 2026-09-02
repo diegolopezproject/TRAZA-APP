@@ -60,7 +60,7 @@ export function AssignmentSheet({ place, days, assignment, onAssign, onRemove, o
           transition={{ duration: reducedMotion ? 0 : .18 }}
         >
           <div className="assignment-place">
-            {place.media ? <MediaFrame media={place.media} sizes="84px" /> : null}
+            {place.media ? <MediaFrame media={place.media} sizes="84px" attributionMode="compact" /> : null}
             <div>
               <strong>{place.name.replace(" | ", " / ")}</strong>
               <span>{step === 1 ? "Estado previsto · Opción cercana" : selectedDay ? `${weekdayEs(selectedDay)} · ${formatSpanishDate(selectedDay.date)}` : es.assignment.description}</span>

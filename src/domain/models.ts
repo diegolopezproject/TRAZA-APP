@@ -10,6 +10,15 @@ export type ActivityStatus =
 
 export type DaySection = "morning" | "afternoon" | "evening" | "anytime";
 
+export interface GoogleMapsPhotoAttribution {
+  sourcePhotoUrl: string;
+  authors: readonly {
+    displayName: string;
+    profileUrl?: string;
+    avatarUrl?: string;
+  }[];
+}
+
 export interface MediaAsset {
   src: string;
   alt: string;
@@ -25,6 +34,7 @@ export interface MediaAsset {
   editorial?: boolean;
   generatedAt?: string;
   sharedFallback?: boolean;
+  googleMapsAttribution?: GoogleMapsPhotoAttribution;
 }
 
 export interface Activity {

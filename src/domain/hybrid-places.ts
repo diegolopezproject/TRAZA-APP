@@ -10,6 +10,7 @@ export function importedViewModelToPlace(place: ImportedPlaceViewModel): Place {
     area: place.area,
     tags: [...place.tags],
     mapsDestination: place.mapsDestination,
+    media: place.media,
     source: place.source,
     importedRecordId: place.recordId,
   };

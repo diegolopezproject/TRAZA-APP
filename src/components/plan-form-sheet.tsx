@@ -90,7 +90,7 @@ export function PlanFormSheet({ day, days, places, plan, onChoosePlace, onSave, 
           {placementPlace ? (
             <div className="placement-step"><p className="mono-label">{placementPlace.name}</p><h3>¿Dónde quieres colocarlo?</h3><p>Elige una capa; podrás reorganizarlo más tarde.</p><div className="placement-options">{placementOptions.map((option) => <button type="button" key={option.value} className={section === option.value ? "is-selected" : ""} onClick={() => setSection(option.value)}><strong>{option.label}</strong><small>{option.copy}</small></button>)}</div></div>
           ) : places.map((place) => (
-            <button type="button" key={place.id} onClick={() => onNavigate("placement", place.id)}>{place.media ? <MediaFrame media={place.media} sizes="64px" /> : <span className="mini-fallback">{place.name.slice(0, 2).toUpperCase()}</span>}<span><strong>{place.name}</strong><small>{place.area ?? "Londres"} · {es.saved.categories[place.category]}</small></span><PlusIcon /></button>
+            <button type="button" key={place.id} onClick={() => onNavigate("placement", place.id)}>{place.media ? <MediaFrame media={place.media} sizes="64px" attributionMode="compact" /> : <span className="mini-fallback">{place.name.slice(0, 2).toUpperCase()}</span>}<span><strong>{place.name}</strong><small>{place.area ?? "Londres"} · {es.saved.categories[place.category]}</small></span><PlusIcon /></button>
           ))}
         </div>
       ) : null}

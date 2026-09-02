@@ -1,5 +1,18 @@
 # Plan de implementación
 
+## Google Maps → TRAZA — Phase 7
+
+- [x] Solicitar `photos` en la hidratación actual de Place Details y validar nombre, dimensiones, `authorAttributions` y `googleMapsUri` sin persistirlos.
+- [x] Obtener una única foto provider-ranked mediante Place Photos (New), `skipHttpRedirect=true`, límite 1200×1200, timeout acotado y transporte inyectable `no-store`.
+- [x] Mantener `GOOGLE_MAPS_PLATFORM_API_KEY` en servidor y entregar al navegador únicamente el `photoUri` efímero validado.
+- [x] Reutilizar `SavedPlaceCard`, `MediaFrame` y detalle; conservar fallback TRAZA ante ausencia, datos malformados, timeout o error de foto.
+- [x] Mostrar `Google Maps` visible solo sobre contenido Google, enlazar la foto individual y mostrar avatar/nombre/perfil del autor cuando estén disponibles; usar marca compacta en miniaturas.
+- [x] Corregir el desplazamiento móvil del `.assignment-toast` existente con insets laterales, centrado por márgenes, ancho de contenido y wrap, sin tocar su Motion, copy ni styling visual.
+- [x] Revalidar offline borrado con ownership, limpieza local, asignación por `imported:{record UUID}` y categoría ambigua.
+- [x] Documentar política, arquitectura y QA en `docs/PHASE_7_PHOTOS_ATTRIBUTION_QA.md`.
+
+Decisión de arquitectura: nombres de recurso, URIs de foto, dimensiones, autores y procedencia viven únicamente en la hidratación server-side y en el modelo de presentación de la respuesta actual. No entran en Supabase, seed, `LocalTripRepository` ni `localStorage`. La identidad durable y el esquema permanecen intactos.
+
 ## Google Maps → TRAZA — Phases 5 + 6
 
 - [x] Registrar la aceptación física de Phase 4 en Android: Días → Google Maps → Compartir → TRAZA → Guardados, PASS.
@@ -18,7 +31,7 @@
 - [x] Convertir Greater London de bloqueo de producto a contexto evaluado: los lugares exteriores continúan a categoría y persistencia, incluidos los pendientes de categoría.
 - [x] Retirar el resultado/toast terminal `outside-scope` del flujo productivo sin eliminar el asset GLA, su evaluador ni sus pruebas históricas.
 - [ ] Configurar los dos secretos de cookies en local/Preview y completar la nueva aceptación física end-to-end desde Android.
-- [ ] Implementar fotos y atribución Google en Phase 7.
+- [x] Implementar fotos y atribución Google en Phase 7.
 
 Decisión de arquitectura: Guardados es híbrido por diseño. `LocalTripRepository` conserva seed/manual, asignaciones y estado de viaje; Supabase conserva solo relaciones importadas. La hidratación Google es transitoria, no entra en `localStorage` ni en `imported_places`. No se modificó el manifiesto, `share_target`, la navegación, la dirección visual, el sistema de toast ni la tarjeta aprobada.
 

@@ -13,6 +13,24 @@ export interface GoogleAddressComponent {
   types: readonly string[];
 }
 
+export interface GooglePhotoAuthorAttribution {
+  displayName: string;
+  uri?: string;
+  photoUri?: string;
+}
+
+export interface GooglePlacePhoto {
+  name: string;
+  widthPx: number;
+  heightPx: number;
+  authorAttributions: readonly GooglePhotoAuthorAttribution[];
+  googleMapsUri: string;
+}
+
+export interface GooglePlacePhotoMedia {
+  photoUri: string;
+}
+
 export interface GooglePlaceDetails {
   id: string;
   displayName: string;
@@ -22,4 +40,5 @@ export interface GooglePlaceDetails {
   primaryType?: string;
   types: readonly string[];
   googleMapsUri: string;
+  photos?: readonly GooglePlacePhoto[];
 }

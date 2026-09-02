@@ -38,7 +38,7 @@ export function MealPickerSheet({ day, meal, places, selectedPlaceId, onSelect, 
     <MobileSheet title={es.forms.chooseRestaurant} kicker={`${meal.title === "Dinner" ? "Cena" : "Comida"} / ${day.date.slice(-2)} AGO`} closeLabel={es.forms.close} onClose={onClose}>
       <div className="picker-heading"><p>{showAll ? `${restaurants.length} lugares para comer y beber` : es.forms.suggested}</p><button type="button" onClick={() => setShowAll((value) => !value)}>{showAll ? es.forms.suggested : es.forms.allRestaurants}</button></div>
       <div className="restaurant-picker-list">
-        {visible.map((place) => <button className={selectedPlaceId === place.id ? "is-selected" : ""} type="button" key={place.id} onClick={() => onSelect(place.id)}>{place.media ? <MediaFrame media={place.media} sizes="76px" /> : <span className="mini-fallback">{place.name.slice(0, 2).toUpperCase()}</span>}<span><strong>{place.name}</strong><small><MapIcon /> {place.area ?? "Londres"}</small><em>{place.tags.slice(0, 2).join(" · ") || "Comer y beber"}</em></span><PlusIcon /></button>)}
+        {visible.map((place) => <button className={selectedPlaceId === place.id ? "is-selected" : ""} type="button" key={place.id} onClick={() => onSelect(place.id)}>{place.media ? <MediaFrame media={place.media} sizes="76px" attributionMode="compact" /> : <span className="mini-fallback">{place.name.slice(0, 2).toUpperCase()}</span>}<span><strong>{place.name}</strong><small><MapIcon /> {place.area ?? "Londres"}</small><em>{place.tags.slice(0, 2).join(" · ") || "Comer y beber"}</em></span><PlusIcon /></button>)}
       </div>
       {selectedPlaceId ? <button className="danger-action" type="button" onClick={onRemove}>{es.day.removeMeal}</button> : null}
     </MobileSheet>

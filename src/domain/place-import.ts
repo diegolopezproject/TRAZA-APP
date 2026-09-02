@@ -1,5 +1,5 @@
 import type { GeoPoint } from "./geometry";
-import type { MapsDestination } from "./models";
+import type { MapsDestination, MediaAsset } from "./models";
 
 export const TRAZA_IMPORT_CATEGORIES = [
   "food-drink",
@@ -47,6 +47,7 @@ export interface ImportedPlaceViewModel {
   area?: string;
   tags: readonly string[];
   mapsDestination?: MapsDestination;
+  media?: MediaAsset;
 }
 
 /** Provider-neutral scalar candidate produced after an external adapter validates its response. */

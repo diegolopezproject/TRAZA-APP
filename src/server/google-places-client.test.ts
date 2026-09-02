@@ -32,6 +32,18 @@ const placeDetails = {
   googleMapsUri: "https://maps.google.com/?cid=123",
 };
 
+const placePhoto = {
+  name: "places/ChIJ_details_1/photos/AUc7tXX_photo_1",
+  widthPx: 1600,
+  heightPx: 1200,
+  authorAttributions: [{
+    displayName: "Google contributor",
+    uri: "//maps.google.com/maps/contrib/123",
+    photoUri: "//lh3.googleusercontent.com/a-/author-avatar",
+  }],
+  googleMapsUri: "https://www.google.com/maps/contrib/123/photo/456",
+};
+
 class FakeGoogleTransport implements GooglePlacesHttpTransport {
   calls: GooglePlacesHttpRequest[] = [];
 
@@ -106,6 +118,82 @@ describe("GooglePlacesClient Place Details", () => {
       },
     });
     expect(transport.calls[0].body).toBeUndefined();
+  });
+
+  it("parses current photo metadata and author attribution without persisting it", async () => {
+    const transport = new FakeGoogleTransport([
+      jsonResponse({ ...placeDetails, photos: [placePhoto] }),
+    ]);
+    const client = new GooglePlacesClient({ apiKey: FAKE_API_KEY, transport });
+
+    await expect(client.placeDetails("ChIJ_details_1")).resolves.toMatchObject({
+      photos: [{
+        name: placePhoto.name,
+        widthPx: 1600,
+        heightPx: 1200,
+        authorAttributions: [{
+          displayName: "Google contributor",
+          uri: "https://maps.google.com/maps/contrib/123",
+          photoUri: "https://lh3.googleusercontent.com/a-/author-avatar",
+        }],
+        googleMapsUri: placePhoto.googleMapsUri,
+      }],
+    });
+  });
+
+  it("ignores malformed optional photo data while preserving valid place details", async () => {
+    const transport = new FakeGoogleTransport([
+      jsonResponse({
+        ...placeDetails,
+        photos: [{ ...placePhoto, authorAttributions: undefined }],
+      }),
+    ]);
+    const client = new GooglePlacesClient({ apiKey: FAKE_API_KEY, transport });
+
+    const parsed = await client.placeDetails("ChIJ_details_1");
+    expect(parsed.displayName).toBe("Tate Modern");
+    expect(parsed.photos).toBeUndefined();
+  });
+});
+
+describe("GooglePlacesClient Place Photos", () => {
+  it("requests a short-lived URI with bounded dimensions and keeps the key in a server header", async () => {
+    const photoUri = "https://lh3.googleusercontent.com/places/photo=w1200-h1200";
+    const transport = new FakeGoogleTransport([jsonResponse({ photoUri })]);
+    const client = new GooglePlacesClient({ apiKey: FAKE_API_KEY, transport });
+
+    await expect(client.placePhoto(placePhoto.name)).resolves.toEqual({ photoUri });
+    const request = transport.calls[0];
+    const url = new URL(request.url);
+    expect(url.origin + url.pathname).toBe(
+      `${GOOGLE_PLACES_ENDPOINTS.photoMediaBase}/${placePhoto.name}/media`,
+    );
+    expect(url.searchParams.get("maxWidthPx")).toBe("1200");
+    expect(url.searchParams.get("maxHeightPx")).toBe("1200");
+    expect(url.searchParams.get("skipHttpRedirect")).toBe("true");
+    expect(request.headers["X-Goog-Api-Key"]).toBe(FAKE_API_KEY);
+    expect(request.url).not.toContain(FAKE_API_KEY);
+    expect(photoUri).not.toContain(FAKE_API_KEY);
+  });
+
+  it("rejects malformed names and non-Google short-lived photo URIs", async () => {
+    const transport = new FakeGoogleTransport([
+      jsonResponse({ photoUri: "https://evil.test/photo" }),
+    ]);
+    const client = new GooglePlacesClient({ apiKey: FAKE_API_KEY, transport });
+    await expect(client.placePhoto("https://evil.test/photo")).rejects.toMatchObject({
+      code: "invalid-response",
+    });
+    await expect(client.placePhoto(placePhoto.name)).rejects.toMatchObject({
+      code: "invalid-response",
+    });
+    const missingUriClient = new GooglePlacesClient({
+      apiKey: FAKE_API_KEY,
+      transport: new FakeGoogleTransport([jsonResponse({})]),
+    });
+    await expect(missingUriClient.placePhoto(placePhoto.name)).rejects.toMatchObject({
+      code: "invalid-response",
+    });
   });
 });
 

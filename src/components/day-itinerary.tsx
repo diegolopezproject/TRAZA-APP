@@ -174,7 +174,7 @@ export function DayItinerary({ day, dayIndex, onClose, onOpenActivity, assignedI
               <div className="assigned-place-list">
                 {assignedItems.map(({ place, assignment }) => (
                   <article className="assigned-place-card" key={place.id}>
-                    {place.media ? <MediaFrame media={place.media} sizes="112px" /> : <span className="assigned-place-fallback"><HeartIcon /></span>}
+                    {place.media ? <MediaFrame media={place.media} sizes="112px" attributionMode="compact" /> : <span className="assigned-place-fallback"><HeartIcon /></span>}
                     <div><small>{es.day.assigned} · {es.forms.sections[assignment.section]}</small><h3>{place.name.replace(" | ", " / ")}</h3><p>{place.area ?? "Londres"} · {es.levels[assignment.level]}</p></div>
                     <div className="assigned-card-actions">{placeMapsUrl(place) ? <a href={placeMapsUrl(place)} target="_blank" rel="noreferrer"><MapIcon /> Mapa</a> : null}<button type="button" onClick={() => onOpenPlace(place.id)}>Detalle</button><button type="button" onClick={() => onEditAssignment(place.id)}>{es.saved.edit}</button></div>
                   </article>

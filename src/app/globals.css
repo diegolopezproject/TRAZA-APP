@@ -483,7 +483,7 @@ button:disabled { opacity: .32; cursor: not-allowed; }
 .assignment-current { display: flex; align-items: center; gap: 4px; font: 650 .625rem/1 var(--sans) !important; }
 .assignment-current svg { width: 14px; }
 .assignment-remove { width: 100%; min-height: 45px; margin-top: 12px; border: 1px solid var(--ink); border-radius: 99px; background: transparent; font-size: .75rem; cursor: pointer; }
-.assignment-toast { position: fixed; z-index: var(--layer-toast); left: max(14px, calc(50% - 180px)); bottom: calc(var(--nav-safe) + 10px); width: min(360px, calc(100vw - 28px)); padding: 13px 16px; border-radius: 16px; background: var(--lime); color: var(--ink); box-shadow: 0 12px 35px rgba(0,0,0,.22); font-size: .8125rem; font-weight: 650; }
+.assignment-toast { position: fixed; z-index: var(--layer-toast); left: 14px; right: 14px; bottom: calc(var(--nav-safe) + 10px); width: fit-content; max-width: min(360px, calc(100vw - 28px)); margin-inline: auto; padding: 13px 16px; border-radius: 16px; background: var(--lime); color: var(--ink); box-shadow: 0 12px 35px rgba(0,0,0,.22); font-size: .8125rem; font-weight: 650; }
 
 @media (min-width: 760px) {
   .journey-view { position: relative; }
@@ -624,6 +624,12 @@ button:disabled { opacity: .32; cursor: not-allowed; }
 .assignment-toast { display: flex; align-items: center; justify-content: space-between; gap: 12px; }.assignment-toast button { min-height: 34px; padding: 0 11px; border: 1px solid var(--ink); border-radius: 99px; background: transparent; font-size: .6875rem; font-weight: 700; }
 .app-shell:has(.assignment-backdrop) .assignment-toast { display: none; }
 .media-frame > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.media-google-attribution { position: absolute; z-index: 2; right: 8px; bottom: 8px; left: 8px; width: fit-content; max-width: calc(100% - 16px); display: flex; flex-wrap: wrap; align-items: center; gap: 3px 7px; padding: 5px 7px; border-radius: 7px; background: rgba(12,12,12,.82); color: #fff; font: normal 400 12px/1.25 var(--sans); letter-spacing: normal; }
+.media-google-attribution a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.media-google-attribution [translate="no"] { white-space: nowrap; }
+.media-google-attribution--compact { right: auto; padding: 3px 5px; }
+.media-google-authors, .media-google-author { min-width: 0; display: inline-flex; align-items: center; gap: 3px; overflow-wrap: anywhere; }
+.media-google-author > img { flex: 0 0 16px; width: 16px; height: 16px; border-radius: 50%; object-fit: cover; }
 
 @media (min-width: 760px) {
   .editor-sheet--wide { max-width: 720px; }
@@ -908,7 +914,7 @@ html, body { background: var(--cloud); }
 .organize-tools .drag-handle { order: -2; }
 .organize-item.is-locked { opacity: .72; }
 .organize-item.is-locked .organize-tools { display: none; }
-.assignment-toast { left: 50%; bottom: calc(var(--nav-safe) + 8px); width: min(420px, calc(100vw - 28px)); transform: translateX(-50%); padding: 12px 14px; border: 1px solid var(--ink); border-radius: var(--radius-control); box-shadow: 0 10px 28px rgba(0,0,0,.22); }
+.assignment-toast { left: 14px; right: 14px; bottom: calc(var(--nav-safe) + 8px); width: fit-content; max-width: min(420px, calc(100vw - 28px)); margin-inline: auto; padding: 12px 14px; border: 1px solid var(--ink); border-radius: var(--radius-control); box-shadow: 0 10px 28px rgba(0,0,0,.22); }
 .app-shell:has(.organize-bar) .assignment-toast { bottom: max(92px, calc(82px + var(--safe-bottom))); }
 
 @media (min-width: 760px) {
@@ -1134,15 +1140,17 @@ input:focus-visible, select:focus-visible, textarea:focus-visible { outline-colo
 .danger-action { min-height: 48px; }
 
 .assignment-toast {
-  left: 50%;
-  right: auto;
+  left: max(14px, var(--safe-left));
+  right: max(14px, var(--safe-right));
   bottom: var(--toast-bottom-with-nav);
-  width: min(420px, calc(100vw - var(--safe-left) - var(--safe-right) - 28px));
-  max-width: calc(100vw - 28px);
+  width: fit-content;
+  max-width: min(420px, calc(100vw - var(--safe-left) - var(--safe-right) - 28px));
+  margin-inline: auto;
   min-height: 48px;
-  transform: translateX(-50%);
+  box-sizing: border-box;
   pointer-events: none;
 }
+.assignment-toast > span { min-width: 0; overflow-wrap: anywhere; }
 .assignment-toast button { min-width: 44px; min-height: 44px; pointer-events: auto; }
 .app-shell:has(.day-open-layer) .assignment-toast, .app-shell:has(.detail-layer) .assignment-toast { bottom: var(--toast-bottom-immersive); }
 .app-shell:has(.organize-bar) .assignment-toast { bottom: calc(var(--safe-bottom) + 94px); }
