@@ -16,14 +16,22 @@ import { ActionGroup, Button, DayHeader, DayHero, SectionHeader } from "@/design
 
 export interface AssignedItem { place: Place; assignment: PlaceAssignment; }
 
-export function groupAssignedItemsBySection(items: AssignedItem[]): Record<DaySection, AssignedItem[]> {
-  const grouped: Record<DaySection, AssignedItem[]> = {
+export type AssignmentPlacementChoice = "morning" | "afternoon" | "evening" | "nearby" | "later";
+
+export function assignmentPlacementChoice(assignment: PlaceAssignment): AssignmentPlacementChoice {
+  if (assignment.section !== "anytime") return assignment.section;
+  return assignment.level === "nearby-option" ? "nearby" : "later";
+}
+
+export function groupAssignedItemsByPlacement(items: AssignedItem[]): Record<AssignmentPlacementChoice, AssignedItem[]> {
+  const grouped: Record<AssignmentPlacementChoice, AssignedItem[]> = {
     morning: [],
     afternoon: [],
     evening: [],
-    anytime: [],
+    nearby: [],
+    later: [],
   };
-  for (const item of items) grouped[item.assignment.section].push(item);
+  for (const item of items) grouped[assignmentPlacementChoice(item.assignment)].push(item);
   return grouped;
 }
 
@@ -91,7 +99,8 @@ export function DayItinerary({ day, dayIndex, onClose, onOpenActivity, assignedI
   ];
   const weekday = weekdayEs(day);
   const editorial = dayEditorial[day.id];
-  const assignedBySection = groupAssignedItemsBySection(assignedItems);
+  const assignedByPlacement = groupAssignedItemsByPlacement(assignedItems);
+  const nearbyAssignedItems = [...assignedByPlacement.nearby, ...assignedByPlacement.later];
 
   function handleTouchStart(event: TouchEvent<HTMLDivElement>) {
     if (event.touches.length === 1 && scrollerRef.current?.scrollTop === 0) pullStart.current = event.touches[0].clientY;
@@ -183,7 +192,7 @@ export function DayItinerary({ day, dayIndex, onClose, onOpenActivity, assignedI
 
           {sections.map((section, sectionIndex) => {
             const activities = (organizing ? draftActivities : day.activities).filter((activity) => sectionFor(activity) === section.id);
-            const sectionAssignedItems = assignedBySection[section.id];
+            const sectionAssignedItems = assignedByPlacement[section.id];
             return (
               <section className="time-section" key={section.id} aria-labelledby={`section-${sectionIndex}`}>
                 <SectionHeader className="section-heading" index={`0${sectionIndex + 1}`} title={section.label} count={es.day.moments(activities.length + sectionAssignedItems.length)} id={`section-${sectionIndex}`} />
@@ -201,10 +210,10 @@ export function DayItinerary({ day, dayIndex, onClose, onOpenActivity, assignedI
             );
           })}
 
-          {assignedBySection.anytime.length ? (
+          {nearbyAssignedItems.length ? (
             <section className="time-section assigned-section" aria-labelledby="assigned-title">
-              <SectionHeader className="section-heading" index="04" title={es.day.nearby} count={es.day.moments(assignedBySection.anytime.length)} id="assigned-title" />
-              <AssignedPlaceList items={assignedBySection.anytime} onEditAssignment={onEditAssignment} onOpenPlace={onOpenPlace} />
+              <SectionHeader className="section-heading" index="04" title={es.day.nearby} count={es.day.moments(nearbyAssignedItems.length)} id="assigned-title" />
+              <AssignedPlaceList items={nearbyAssignedItems} onEditAssignment={onEditAssignment} onOpenPlace={onOpenPlace} />
             </section>
           ) : null}
 

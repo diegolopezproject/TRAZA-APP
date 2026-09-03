@@ -57,7 +57,9 @@ En Android real, Hotel Riu Plaza London Victoria se importó y persistió correc
 
 La asignación local ya conservaba correctamente el ID estable imported:{record UUID}, el día, section: morning y level: intention; LocalTripRepository también mantenía esos campos tras recargar. La pérdida ocurría en DayItinerary: el renderer enviaba todas las asignaciones a la sección final sin consultar PlaceAssignment.section.
 
-El renderer ahora agrupa las tarjetas existentes por el DaySection persistido. morning, afternoon y evening se muestran en su bloque seleccionado; únicamente anytime permanece en Opciones cercanas. La misma regla se aplica a lugares importados y locales, sobrevive al roundtrip y no altera fotos, atribución, toast, Supabase ni el esquema.
+El renderer usa las cinco combinaciones existentes: morning/intention, afternoon/intention, evening/intention, anytime/nearby-option y anytime/intention. Las tres primeras se muestran en su bloque temporal; las dos últimas conservan por separado las semánticas Opciones cercanas y Decidir después, aunque ambas mantienen el destino visual flexible existente. La misma regla se aplica a lugares importados y locales, sobrevive al roundtrip y no altera fotos, atribución, toast, Supabase ni el esquema.
+
+La regresión se verifica sobre el markup compuesto por DayItinerary, no solo sobre el helper de agrupación: una asignación importada afternoon aparece dentro de la sección temporal section-1 y no dentro de assigned-title.
 
 Validación browser local en Chrome headless, viewport 390×844 y copy largo `No hemos podido guardar este sitio. Inténtalo de nuevo.`: bounds 14–376 px, ancho 362 px, centro con delta 0, altura 65 px, texto dentro del contenedor y overflow horizontal de documento 0. Se usó un secreto de instalación ficticio solo en memoria para superar el bootstrap local; no se editó `.env.local` ni se realizaron escrituras remotas.
 
