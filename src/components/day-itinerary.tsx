@@ -14,7 +14,18 @@ import { motionDuration, navigationMotion } from "@/lib/motion";
 import { useBackSwipe } from "@/lib/use-back-swipe";
 import { ActionGroup, Button, DayHeader, DayHero, SectionHeader } from "@/design-system";
 
-interface AssignedItem { place: Place; assignment: PlaceAssignment; }
+export interface AssignedItem { place: Place; assignment: PlaceAssignment; }
+
+export function groupAssignedItemsBySection(items: AssignedItem[]): Record<DaySection, AssignedItem[]> {
+  const grouped: Record<DaySection, AssignedItem[]> = {
+    morning: [],
+    afternoon: [],
+    evening: [],
+    anytime: [],
+  };
+  for (const item of items) grouped[item.assignment.section].push(item);
+  return grouped;
+}
 
 interface DayItineraryProps {
   day: Day;
@@ -47,6 +58,25 @@ function sectionFor(activity: Activity): SectionId {
 
 function activityTitle(activity: Activity): string { return activityTitleEs(activity); }
 
+function AssignedPlaceList({ items, onEditAssignment, onOpenPlace }: {
+  items: AssignedItem[];
+  onEditAssignment: (placeId: string) => void;
+  onOpenPlace: (placeId: string) => void;
+}) {
+  if (!items.length) return null;
+  return (
+    <div className="assigned-place-list">
+      {items.map(({ place, assignment }) => (
+        <article className="assigned-place-card" key={place.id}>
+          {place.media ? <MediaFrame media={place.media} sizes="112px" attributionMode="compact" /> : <span className="assigned-place-fallback"><HeartIcon /></span>}
+          <div><small>{es.day.assigned} · {es.forms.sections[assignment.section]}</small><h3>{place.name.replace(" | ", " / ")}</h3><p>{place.area ?? "Londres"} · {es.levels[assignment.level]}</p></div>
+          <div className="assigned-card-actions">{placeMapsUrl(place) ? <a href={placeMapsUrl(place)} target="_blank" rel="noreferrer"><MapIcon /> Mapa</a> : null}<button type="button" onClick={() => onOpenPlace(place.id)}>Detalle</button><button type="button" onClick={() => onEditAssignment(place.id)}>{es.saved.edit}</button></div>
+        </article>
+      ))}
+    </div>
+  );
+}
+
 export function DayItinerary({ day, dayIndex, onClose, onOpenActivity, assignedItems, onEditAssignment, onOpenPlace, onAddPlan, onEditPlan, onOpenMeal, placements, onSavePlacements, onOrganizeNotice, organizing, onStartOrganizing, onFinishOrganizing }: DayItineraryProps) {
   const reducedMotion = useReducedMotion();
   const backSwipe = useBackSwipe(onClose);
@@ -61,6 +91,7 @@ export function DayItinerary({ day, dayIndex, onClose, onOpenActivity, assignedI
   ];
   const weekday = weekdayEs(day);
   const editorial = dayEditorial[day.id];
+  const assignedBySection = groupAssignedItemsBySection(assignedItems);
 
   function handleTouchStart(event: TouchEvent<HTMLDivElement>) {
     if (event.touches.length === 1 && scrollerRef.current?.scrollTop === 0) pullStart.current = event.touches[0].clientY;
@@ -152,9 +183,10 @@ export function DayItinerary({ day, dayIndex, onClose, onOpenActivity, assignedI
 
           {sections.map((section, sectionIndex) => {
             const activities = (organizing ? draftActivities : day.activities).filter((activity) => sectionFor(activity) === section.id);
+            const sectionAssignedItems = assignedBySection[section.id];
             return (
               <section className="time-section" key={section.id} aria-labelledby={`section-${sectionIndex}`}>
-                <SectionHeader className="section-heading" index={`0${sectionIndex + 1}`} title={section.label} count={es.day.moments(activities.length)} id={`section-${sectionIndex}`} />
+                <SectionHeader className="section-heading" index={`0${sectionIndex + 1}`} title={section.label} count={es.day.moments(activities.length + sectionAssignedItems.length)} id={`section-${sectionIndex}`} />
                 <div className="activity-list">
                   {activities.map((activity, index) => (
                     <motion.div className={`organize-item${isLocked(activity) ? " is-locked" : ""}`} key={activity.id} initial={reducedMotion ? false : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: reducedMotion ? 0 : Math.min(.36, (sectionIndex * 3 + index) * .045) }} draggable={organizing && !isLocked(activity)}>
@@ -164,22 +196,15 @@ export function DayItinerary({ day, dayIndex, onClose, onOpenActivity, assignedI
                     </motion.div>
                   ))}
                 </div>
+                <AssignedPlaceList items={sectionAssignedItems} onEditAssignment={onEditAssignment} onOpenPlace={onOpenPlace} />
               </section>
             );
           })}
 
-          {assignedItems.length ? (
+          {assignedBySection.anytime.length ? (
             <section className="time-section assigned-section" aria-labelledby="assigned-title">
-              <SectionHeader className="section-heading" index="04" title={es.day.nearby} count={es.day.moments(assignedItems.length)} id="assigned-title" />
-              <div className="assigned-place-list">
-                {assignedItems.map(({ place, assignment }) => (
-                  <article className="assigned-place-card" key={place.id}>
-                    {place.media ? <MediaFrame media={place.media} sizes="112px" attributionMode="compact" /> : <span className="assigned-place-fallback"><HeartIcon /></span>}
-                    <div><small>{es.day.assigned} · {es.forms.sections[assignment.section]}</small><h3>{place.name.replace(" | ", " / ")}</h3><p>{place.area ?? "Londres"} · {es.levels[assignment.level]}</p></div>
-                    <div className="assigned-card-actions">{placeMapsUrl(place) ? <a href={placeMapsUrl(place)} target="_blank" rel="noreferrer"><MapIcon /> Mapa</a> : null}<button type="button" onClick={() => onOpenPlace(place.id)}>Detalle</button><button type="button" onClick={() => onEditAssignment(place.id)}>{es.saved.edit}</button></div>
-                  </article>
-                ))}
-              </div>
+              <SectionHeader className="section-heading" index="04" title={es.day.nearby} count={es.day.moments(assignedBySection.anytime.length)} id="assigned-title" />
+              <AssignedPlaceList items={assignedBySection.anytime} onEditAssignment={onEditAssignment} onOpenPlace={onOpenPlace} />
             </section>
           ) : null}
 

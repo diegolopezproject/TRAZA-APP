@@ -7,7 +7,7 @@ import type { ImportedPlaceViewModel } from "@/domain/place-import";
 import { consumeImportResultUrl, IMPORT_RESULT_MESSAGES } from "@/domain/import-result";
 import { mergeHybridPlaces } from "@/domain/hybrid-places";
 import { activityTitleEs, es } from "@/content/es";
-import { createInitialLocalState, LocalTripRepository, removeLocalReferences } from "@/data/local-trip-repository";
+import { createInitialLocalState, LocalTripRepository, removeLocalReferences, replacePlaceAssignment } from "@/data/local-trip-repository";
 import type { LocalTripState } from "@/data/local-trip-repository";
 import { formatSpanishDate } from "@/lib/format";
 import { useAppNavigation } from "@/lib/use-app-navigation";
@@ -145,7 +145,7 @@ export function TripApp({ trip, importedPlaces }: TripAppProps) {
   function assignPlace(placeId: string, dayId: string, section: DaySection, level: ActivityLevel) {
     const place = combinedPlaces.find((item) => item.id === placeId);
     const nextAssignment: PlaceAssignment = { placeId, dayId, section, level };
-    const next = { ...local, assignments: [...local.assignments.filter((item) => item.placeId !== placeId), nextAssignment] };
+    const next = { ...local, assignments: replacePlaceAssignment(local.assignments, nextAssignment) };
     persistWithUndo(next, place ? es.assignment.success(place.name, formatSpanishDate(dayId)) : es.forms.saved);
     navigation.backSteps(state.assignmentStep);
   }
@@ -215,7 +215,7 @@ export function TripApp({ trip, importedPlaces }: TripAppProps) {
     if (!state.planSheet) return;
     const place = combinedPlaces.find((item) => item.id === placeId);
     const nextAssignment: PlaceAssignment = { placeId, dayId: state.planSheet.dayId, section, level: "nearby-option" };
-    persistWithUndo({ ...local, assignments: [...local.assignments.filter((item) => item.placeId !== placeId), nextAssignment] }, place ? es.assignment.success(place.name, formatSpanishDate(state.planSheet.dayId)) : es.forms.saved);
+    persistWithUndo({ ...local, assignments: replacePlaceAssignment(local.assignments, nextAssignment) }, place ? es.assignment.success(place.name, formatSpanishDate(state.planSheet.dayId)) : es.forms.saved);
     navigation.backSteps(state.planSheet.view === "placement" ? 3 : 1);
   }
 

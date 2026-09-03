@@ -119,6 +119,16 @@ export function removeLocalReferences(
   };
 }
 
+export function replacePlaceAssignment(
+  assignments: PlaceAssignment[],
+  nextAssignment: PlaceAssignment,
+): PlaceAssignment[] {
+  return [
+    ...assignments.filter((item) => item.placeId !== nextAssignment.placeId),
+    nextAssignment,
+  ];
+}
+
 export function duplicateVisibleMediaSources(places: Place[]): string[] {
   const counts = new Map<string, number>();
   for (const place of places) {

@@ -10,6 +10,7 @@
 - [x] Corregir el desplazamiento móvil del `.assignment-toast` existente con insets laterales, centrado por márgenes, ancho de contenido y wrap, sin tocar su Motion, copy ni styling visual.
 - [x] Revalidar offline borrado con ownership, limpieza local, asignación por `imported:{record UUID}` y categoría ambigua.
 - [x] Documentar política, arquitectura y QA en `docs/PHASE_7_PHOTOS_ATTRIBUTION_QA.md`.
+- [x] Corregir el QA Android final para que una asignación importada respete `PlaceAssignment.section` en el itinerario y reservar Opciones cercanas para `anytime`.
 
 Decisión de arquitectura: nombres de recurso, URIs de foto, dimensiones, autores y procedencia viven únicamente en la hidratación server-side y en el modelo de presentación de la respuesta actual. No entran en Supabase, seed, `LocalTripRepository` ni `localStorage`. La identidad durable y el esquema permanecen intactos.
 

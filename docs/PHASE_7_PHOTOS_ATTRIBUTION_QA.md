@@ -51,6 +51,14 @@ Cobertura offline focal:
 - roundtrip de asignación por ID `imported:{record UUID}` sin serializar el lugar importado;
 - finalización de las cuatro categorías mediante ticket existente.
 
+## QA real — colocación en el itinerario
+
+En Android real, Hotel Riu Plaza London Victoria se importó y persistió correctamente, pero después de Guardados → Añadir a un día → viernes 7 → Mañana aparecía bajo Opciones cercanas.
+
+La asignación local ya conservaba correctamente el ID estable imported:{record UUID}, el día, section: morning y level: intention; LocalTripRepository también mantenía esos campos tras recargar. La pérdida ocurría en DayItinerary: el renderer enviaba todas las asignaciones a la sección final sin consultar PlaceAssignment.section.
+
+El renderer ahora agrupa las tarjetas existentes por el DaySection persistido. morning, afternoon y evening se muestran en su bloque seleccionado; únicamente anytime permanece en Opciones cercanas. La misma regla se aplica a lugares importados y locales, sobrevive al roundtrip y no altera fotos, atribución, toast, Supabase ni el esquema.
+
 Validación browser local en Chrome headless, viewport 390×844 y copy largo `No hemos podido guardar este sitio. Inténtalo de nuevo.`: bounds 14–376 px, ancho 362 px, centro con delta 0, altura 65 px, texto dentro del contenedor y overflow horizontal de documento 0. Se usó un secreto de instalación ficticio solo en memoria para superar el bootstrap local; no se editó `.env.local` ni se realizaron escrituras remotas.
 
 No se limpió Supabase ni seed. No se ejecutó una escritura de validación real adicional porque el pipeline de importación ya está aceptado físicamente y la suite normal debe permanecer offline; la comprobación final del contenido en dispositivo queda asociada al Preview generado por este push.

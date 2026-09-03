@@ -5,6 +5,7 @@ import {
   LocalTripRepository,
   duplicateVisibleMediaSources,
   removeLocalReferences,
+  replacePlaceAssignment,
 } from "./local-trip-repository";
 import { SeedTripRepository } from "./seed-trip-repository";
 
@@ -82,13 +83,36 @@ describe("LocalTripRepository", () => {
       assignments: [{
         placeId: importedId,
         dayId: "2026-08-09",
-        section: "afternoon",
-        level: "nearby-option",
+        section: "morning",
+        level: "intention",
       }],
     });
     const reloaded = new LocalTripRepository(seed, storage).load();
-    expect(reloaded.assignments[0].placeId).toBe(importedId);
+    expect(reloaded.assignments[0]).toEqual({
+      placeId: importedId,
+      dayId: "2026-08-09",
+      section: "morning",
+      level: "intention",
+    });
     expect(reloaded.places.some((place) => place.id === importedId)).toBe(false);
+  });
+
+  it("reassigns an imported stable ID without leaving its previous placement", () => {
+    const importedId = "imported:018f47f5-4f43-7c8f-8f47-2b9ef863f483";
+    const reassigned = replacePlaceAssignment([
+      { placeId: importedId, dayId: "2026-08-07", section: "morning", level: "intention" },
+      { placeId: "local-place", dayId: "2026-08-08", section: "anytime", level: "nearby-option" },
+    ], {
+      placeId: importedId,
+      dayId: "2026-08-10",
+      section: "evening",
+      level: "intention",
+    });
+
+    expect(reassigned).toEqual([
+      { placeId: "local-place", dayId: "2026-08-08", section: "anytime", level: "nearby-option" },
+      { placeId: importedId, dayId: "2026-08-10", section: "evening", level: "intention" },
+    ]);
   });
 
   it("cleans imported assignment and meal references without touching local places", async () => {
