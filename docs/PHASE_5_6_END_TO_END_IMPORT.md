@@ -47,8 +47,8 @@ Validación real controlada, 1 de septiembre de 2026:
 - la fila dedicada se eliminó en `finally`;
 - no se imprimieron secretos ni valores de entorno.
 
-El short link físico que motivó el fallback es `https://maps.app.goo.gl/Ux3ZEovmVFPLA1Ja7?g_st=ac`, pero el payload exacto de `title`/`text` entregado por Android no quedó capturado. No se inventó: la regresión usa contexto realista controlado y la confirmación final queda para el dispositivo físico sobre el nuevo Preview. No se ejecutó una fixture exterior o ambigua real; esos caminos se validan offline con fronteras inyectadas. El ciclo HTTP local completo requiere añadir `TRAZA_INSTALLATION_COOKIE_SECRET` y `TRAZA_IMPORT_TICKET_SECRET` al entorno. La configuración de Preview se comprueba después del push.
+El short link físico que motivó el fallback es `https://maps.app.goo.gl/Ux3ZEovmVFPLA1Ja7?g_st=ac`, pero el payload exacto de `title`/`text` entregado por Android no quedó capturado. No se inventó: la regresión usa contexto realista controlado. No se ejecutó una fixture exterior o ambigua real; esos caminos se validan offline con fronteras inyectadas. La aceptación física final sobre el Preview validó importación, persistencia tras recarga, duplicado y borrado contra Supabase. Los secretos de instalación/ticket y la configuración de Preview se verificaron por disponibilidad, sin registrar valores.
 
-## Limitaciones y Phase 7
+## Limitaciones finales
 
-La identidad es de instalación, no una cuenta recuperable; borrar cookies pierde acceso a relaciones previas. No hay sincronización entre dispositivos. Las fotos Google siguen totalmente fuera de alcance: los importados usan el fallback actual. Phase 7 debe implementar obtención transitoria de fotos, proxy server-side y atribución conforme a política, sin guardar resource names ni desplegar a producción sin autorización.
+La identidad es de instalación, no una cuenta recuperable; borrar cookies pierde acceso a relaciones previas. No hay sincronización entre dispositivos. Phase 7 completó después la foto Google transitoria, la atribución y el fallback sin añadir columnas ni datos Google durables. La deduplicación entre fuentes seed/manual e importadas continúa fuera de alcance. No se desplegó a producción.

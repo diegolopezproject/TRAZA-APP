@@ -1,291 +1,210 @@
-# Plan de implementación
+# Google Maps → TRAZA — Final Implementation Plan
 
-## Google Maps → TRAZA — Phase 7
+This document answers **“In what order was the final specification built and validated?”** The [SDD](./SDD_GOOGLE_MAPS_IMPORT.md) defines what must be true; this plan records the executable sequence that actually happened. Older TRAZA product iterations remain in their dedicated `ITERATION_*` documents and are not duplicated here.
 
-- [x] Solicitar `photos` en la hidratación actual de Place Details y validar nombre, dimensiones, `authorAttributions` y `googleMapsUri` sin persistirlos.
-- [x] Obtener una única foto provider-ranked mediante Place Photos (New), `skipHttpRedirect=true`, límite 1200×1200, timeout acotado y transporte inyectable `no-store`.
-- [x] Mantener `GOOGLE_MAPS_PLATFORM_API_KEY` en servidor y entregar al navegador únicamente el `photoUri` efímero validado.
-- [x] Reutilizar `SavedPlaceCard`, `MediaFrame` y detalle; conservar fallback TRAZA ante ausencia, datos malformados, timeout o error de foto.
-- [x] Mostrar `Google Maps` visible solo sobre contenido Google, enlazar la foto individual y mostrar avatar/nombre/perfil del autor cuando estén disponibles; usar marca compacta en miniaturas.
-- [x] Corregir el desplazamiento móvil del `.assignment-toast` existente con insets laterales, centrado por márgenes, ancho de contenido y wrap, sin tocar su Motion, copy ni styling visual.
-- [x] Revalidar offline borrado con ownership, limpieza local, asignación por `imported:{record UUID}` y categoría ambigua.
-- [x] Documentar política, arquitectura y QA en `docs/PHASE_7_PHOTOS_ATTRIBUTION_QA.md`.
-- [x] Corregir el QA Android final con un mapa explícito de las cinco combinaciones `PlaceAssignment.section + level`, integrarlas en el itinerario y probar la composición real de `DayItinerary`.
+Baseline: `7266d2fa38297a2296f1bbbf3ac43b262d016055`
 
-Decisión de arquitectura: nombres de recurso, URIs de foto, dimensiones, autores y procedencia viven únicamente en la hidratación server-side y en el modelo de presentación de la respuesta actual. No entran en Supabase, seed, `LocalTripRepository` ni `localStorage`. La identidad durable y el esquema permanecen intactos.
+Final validated implementation: `08a45eeabb854bed0b2f50f59b3514ca366de8fb`
 
-## Google Maps → TRAZA — Phases 5 + 6
+Branch: `feat/google-maps-traza-import`
 
-- [x] Registrar la aceptación física de Phase 4 en Android: Días → Google Maps → Compartir → TRAZA → Guardados, PASS.
-- [x] Crear una identidad de instalación UUID firmada en `__Host-traza-installation`, con bootstrap normal y fallo seguro si `/share` no recibe la cookie existente.
-- [x] Conectar `POST /share` al parser, resolver, Places API (New), normalización, Greater London, categoría y `ImportedPlaceRepository`.
-- [x] Persistir únicamente identidad Google y estado TRAZA, delegando duplicados a la restricción PostgreSQL `23505`.
-- [x] Añadir ticket ambiguo firmado, ligado a instalación/viaje y con diez minutos de validez; finalizar desde una sheet basada en `MobileSheet`.
-- [x] Consumir resultados cerrados una sola vez y mostrarlos con el toast `.assignment-toast` existente, sin nuevas variantes visuales.
-- [x] Cargar e hidratar relaciones importadas server-side, degradar fallos por elemento y mezclarlas después de los 28 lugares locales mediante `SavedPlaceCard`.
-- [x] Conservar asignación local con `imported:{record UUID}` y borrar la relación remota con scope de record/instalación/viaje más su limpieza local.
-- [x] Mantener enlaces manuales por query y aceptar URI canónica Google validada únicamente para importados.
-- [x] Cubrir identidad, tickets, share, resultados, hidratación, UI reutilizada, finalización, borrado y roundtrip local con una suite ordinaria offline.
-- [x] Validar de forma real y controlada una fixture londinense: insert, duplicado, hidratación y cleanup de la fila dedicada.
-- [x] Añadir fallback textual únicamente para short links Maps ya validados que fallen por disponibilidad; conservar redirects rechazados y fuentes no soportadas como terminales.
-- [x] Mantener Text Search y la selección determinista como autoridad de identidad también en el fallback, sin persistir ni reflejar `title`/`text`.
-- [x] Convertir Greater London de bloqueo de producto a contexto evaluado: los lugares exteriores continúan a categoría y persistencia, incluidos los pendientes de categoría.
-- [x] Retirar el resultado/toast terminal `outside-scope` del flujo productivo sin eliminar el asset GLA, su evaluador ni sus pruebas históricas.
-- [ ] Configurar los dos secretos de cookies en local/Preview y completar la nueva aceptación física end-to-end desde Android.
-- [x] Implementar fotos y atribución Google en Phase 7.
+## Phase 0 — Technical discovery / feasibility
 
-Decisión de arquitectura: Guardados es híbrido por diseño. `LocalTripRepository` conserva seed/manual, asignaciones y estado de viaje; Supabase conserva solo relaciones importadas. La hidratación Google es transitoria, no entra en `localStorage` ni en `imported_places`. No se modificó el manifiesto, `share_target`, la navegación, la dirección visual, el sistema de toast ni la tarjeta aprobada.
+**Purpose.** Decide whether Google Maps personal saved lists could be synchronized and establish a safe assessment-sized alternative.
 
-Decisión posterior a validación física: algunos `maps.app.goo.gl` válidos abren en Android pero devuelven 404 sin `Location` desde Vercel. Solo después de validar la fuente Maps, los fallos tipados de disponibilidad pueden usar `title`/`text` saneados como contexto de Text Search; un redirect inseguro nunca habilita fallback. La misma validación mostró que una excursión legítima puede quedar fuera del límite administrativo GLA, por lo que `outside` deja de bloquear el guardado. `invalid-or-unknown` continúa fallando de forma segura.
+**Why this phase existed.** The original request assumed direct saved-list sync. Repository discovery also showed a local-only trip model, no PWA/share target, no Supabase connection and an existing Guardados visual system that should not be replaced.
 
-## Google Maps → TRAZA — Phase 4
+**What changed.** Direct consumer saved-list sync was rejected because no reasonable supported API/event contract was identified. The product direction became Google Maps → Android Share → TRAZA → Places API. Hybrid persistence, server-only Google/Supabase boundaries and installation identity were specified before implementation.
 
-- [x] Publicar el manifiesto App Router de TRAZA con identidad instalable, colores de producto, iconos PNG 192/512 y variante maskable derivadas del asset de marca existente.
-- [x] Registrar `/share` como Web Share Target `POST multipart/form-data` para `title`, `text` y `url`, sin archivos.
-- [x] Implementar el Route Handler de transporte con límite total de 16 KiB, allow-list de campos, rechazo de `File`, parser único de Phase 3A y redirects 303 cerrados a Guardados.
-- [x] Añadir y registrar un service worker mínimo de instalación/activación, sin fetch handler, cachés ni interceptación offline.
-- [x] Cubrir manifiesto, assets, registro y los casos válidos/inválidos del POST con pruebas offline sin Google, Places ni Supabase.
-- [x] Cerrar lint, typecheck, tests, build y validación estática local de Phase 4.
-- [x] Crear el checkpoint Git de Phase 4 sin incluir `.env.local` ni `exports/`.
+**Main files / areas.** `docs/SDD_GOOGLE_MAPS_IMPORT.md`, `src/app/page.tsx`, `src/components/trip-app.tsx`, `src/data/local-trip-repository.ts`, Google Maps Platform documentation.
 
-Decisión histórica del checkpoint: Phase 4 demostró únicamente instalación/transporte Android PWA. La aceptación física posterior confirmó PASS en Días → Google Maps → Compartir → TRAZA → Guardados. Phases 5–6 sustituyen ahora el resultado temporal `shareTarget` por el pipeline, identidad, persistencia y estados finales documentados arriba, sin cambiar el contrato del manifiesto.
+**Validation gate.** Feasibility and security review; preserve Journey/Días, Guardados, Viaje, local state and existing design patterns; no Production deployment.
 
-## Google Maps → TRAZA — Phase 3D
+**Result.** A reviewable SDD and phased architecture replaced the unsupported initial hypothesis.
 
-- [x] Añadir una composition root server-only que conecta las fronteras productivas existentes y mantiene transportes, cliente Places y evaluación de Londres inyectables.
-- [x] Resolver de forma controlada los tres enlaces Android reales mediante la allow-list existente, sin scraping ni interpretación de payloads opacos.
-- [x] Validar con Places API (New) identidad, Details, normalización, Greater London y categoría hasta el contrato pre-persistencia.
-- [x] Registrar evidencia segura: A y B terminan `ready-to-save`; C termina `identity-ambiguous` antes de Details al no existir identidad única demostrable.
-- [x] Mantener el harness real fuera de la suite ordinaria y eliminarlo después de la ejecución.
-- [x] Cerrar lint, typecheck, tests, build, revisión de secretos y checkpoint Git de Phase 3D.
+**Relevant commit.** Initial SDD entered with `82ec8790c94e0499d60a714c1c55798d08f95425`; pre-feature baseline `7266d2fa38297a2296f1bbbf3ac43b262d016055`.
 
-Decisión de alcance: Phase 3D prueba el proveedor real sólo hasta pre-persistencia. No invoca `ImportedPlaceRepository`, no escribe en Supabase y no añade UI, `localStorage`, `/share`, PWA o fotos. La evidencia sanitizada y la incidencia de restricción IP resuelta están en `docs/PHASE_3D_REAL_GOOGLE_VALIDATION.md`.
+## Phase 1 — Domain foundation
 
-## Google Maps → TRAZA — Phase 3C
+**Purpose.** Create provider-independent contracts before network, database or UI work.
 
-- [x] Aprobar y registrar el recurso dedicado “Greater London boundary” del London Datastore, publicado por Greater London Authority y mantenido por GLA GIS bajo OGL v2.
-- [x] Auditar el shapefile fuente como una feature Polygon con un anillo cerrado y 10.921 posiciones en OSGB36 / British National Grid (EPSG:27700).
-- [x] Añadir un generador reproducible sin dependencias que transforma a longitud/latitud WGS 84 (EPSG:4326), conserva todos los vértices y valida el perfil exacto de la fuente.
-- [x] Incorporar el asset runtime compacto, versionado y con procedencia verificable, sin incluir el ZIP ni sus sidecars.
-- [x] Cargar y validar el asset de forma fail-closed; mantener la regla pura de país GB/UK + point-in-polygon y exponer el evaluador productivo para inyección.
-- [x] Cubrir puntos fijos interiores y exteriores, país ausente/incorrecto, borde inclusivo, asset ausente o malformado y candidato normalizado sin red.
+**Why this phase existed.** Identity, category and geography decisions needed deterministic tests independent of Google and Supabase.
 
-Decisión de alcance: Phase 3C sólo habilita la decisión determinista de alcance administrativo de Greater London. No conecta el evaluador al orquestador mediante un singleton, no persiste datos, no realiza tráfico Google o Supabase y no crea UI, `/share`, PWA, fotos ni dependencias. La procedencia, transformación aproximada Helmert y su precisión documentada se registran en `docs/GREATER_LONDON_BOUNDARY_SOURCE.md`. La siguiente fase deberá inyectar explícitamente este evaluador en su composition root sin mezclarlo con persistencia o transporte.
+**What changed.** Added imported-place identity/view contracts, four import categories, result/failure types, stable `imported:{record UUID}` presentation IDs, explicit Google-type mapping, factual tags, geometry primitives and the initial London scope contract.
 
-## Google Maps → TRAZA — Phase 3B
+**Main files / areas.** `src/domain/place-import.ts`, `place-category.ts`, `geometry.ts`, `london-scope.ts` and their tests.
 
-- [x] Componer parser, resolución segura, contexto Maps, Text Search/selección, Details, normalización, alcance Londres y clasificación en un único orquestador server-only.
-- [x] Definir un resultado pre-persistencia que separa identidad/categoría durable preparada de metadatos Google transitorios y nunca inventa `recordId`.
-- [x] Inyectar transporte de redirects, cliente Places y evaluador de Londres; mantener normalizador y clasificador como fronteras puras sustituibles en tests.
-- [x] Mapear fallos de share, resolución, Places, normalización e identidad al modelo provider-independent sin exponer payloads o detalles internos.
-- [x] Cubrir los caminos Text Search y Place ID directo, alcance, categoría ambigua, fallos terminales e idempotencia con 12 tests integrados sin red ni persistencia.
+**Validation gate.** Pure domain tests pass with no browser, network, provider credentials or persistence.
 
-Decisión de alcance: Phase 3B termina en `ready-to-save`, `needs-category`, `outside-scope` o `failed`. No importa ni invoca el repositorio de Phase 2, no usa Supabase y no crea PWA, `/share`, UI, fotos ni tráfico real de Google. El evaluador de Londres es obligatorio como dependencia; la regla productiva de Phase 1 continúa fallando de forma segura mientras falte el asset autoritativo.
+**Result.** Stable domain seams supported later adapters without embedding provider payloads in UI state.
 
-## Google Maps → TRAZA — Phase 3A
+**Relevant commit.** `82ec8790c94e0499d60a714c1c55798d08f95425`.
 
-- [x] Preservar los contratos provider-independent de Phase 1 y la frontera de persistencia de Phase 2.
-- [x] Extraer un único enlace Maps desde `url`, `text` o `title` con límites del SDD y allow-list exacta compartida.
-- [x] Resolver únicamente short links aprobados mediante transporte inyectado, redirects manuales, tres saltos y presupuestos 2 s / 5 s.
-- [x] Derivar Place ID solo desde `api=1&query_place_id=` documentado; usar contexto de Text Search para rutas/nombres/coordenadas reconocibles.
-- [x] Implementar Text Search y Place Details de Places API (New) con máscaras mínimas, validación runtime, timeout y clave server-only.
-- [x] Seleccionar candidatos de forma determinista y mantener ambiguos los empates materiales.
-- [x] Normalizar Place Details al `NormalizedPlaceCandidate` de Phase 1 sin persistencia ni acceso a Supabase.
-- [x] Cubrir parser, SSRF, redirects, contexto, Places mockeado, selección y normalización con tests sin red.
-- [x] Phase 3B: componer estas fronteras en un servicio de orquestación y mapear fallos internos sin crear todavía PWA, `/share` ni UI.
+## Phase 2 — Supabase persistence boundary
 
-Decisión de alcance: Phase 3A no contiene un `importGoogleMapsPlace()` monolítico. Parser, autoridad/resolución URL, contexto Maps, HTTP Places, selección y normalización permanecen independientes. Los tres enlaces Android reales son fixtures de parser y no se resuelven. La mitigación DNS se apoya en hosts exactos de Google; DNS rebinding no se considera resuelto por validación textual y no se añade infraestructura de red en esta fase.
+**Purpose.** Persist the minimum imported relationship through a server-only repository.
 
-## Iteración 12 — consistencia de ritmo y sistema cromático de día
+**Why this phase existed.** Canonical duplicate and ownership behavior needed database enforcement without migrating TRAZA's local trip state.
 
-### Device fit y safe areas
+**What changed.** Added `public.imported_places`, unique identity `(installation, trip, provider, Place ID)`, RLS with no browser policies, least required server-role grants, list/insert/delete repository methods and strict runtime mapping.
 
-- [x] Derivar cabeceras, navegación y reservas inferiores de `env(safe-area-inset-*)` mediante tokens compartidos.
-- [x] Colocar metadata de DayCover y la fila completa de DayDetail después del safe area superior.
-- [x] Priorizar el titular de DayDetail y desplazar el motivo al plano inferior/derecho sin excepciones por día.
-- [x] Reutilizar el skyline canónico del Día 07 en Cover y Detail con crop distinto.
-- [x] Centrar icono y label de los tres estados activos de BottomNavigation con una columna flex compartida.
-- [x] Validar 360×800, 390×844, 393×852, 412×915 y 430×932 en Chromium/WebKit con simulación QA 47/34.
-- [x] Generar las doce capturas iPhone 17 y la lámina de aprobación desde UI real.
+**Main files / areas.** `supabase/migrations/20260831175852_create_imported_places.sql`, `src/server/imported-place-repository.ts`, `supabase-config.ts`, `supabase.ts`, [Phase 2 evidence](./GOOGLE_MAPS_IMPORT_PHASE_2_VALIDATION.md).
 
-- [x] Separar el límite de ilustración y la metadata mediante una reserva compartida de 20 px, independiente de la geometría SVG.
-- [x] Mantener crops y asimetrías por capítulo, recortando únicamente el desborde que invadiría la zona funcional.
-- [x] Formalizar `dayBase` y `daySurface` para 06–13 con una derivación Base→Texto común.
-- [x] Aplicar `daySurface` e Ink al hero compartido de los ocho DayDetail, conservando el itinerario warm neutral y el radio inferior.
-- [x] Comprobar automáticamente contraste de título, ruta, descripción, fecha, posición e iconos.
-- [x] Generar `iteration-12-day-system.png` y `iteration-12-daycover-rhythm.png`.
-- [x] Validar 64 pares cover/detail en Chromium y WebKit sobre cuatro viewports móviles sin overflow ni excepciones por día.
+**Validation gate.** Migration/repository tests plus isolated Supabase review: schema contains no Google display/photo data; ownership isolation, uniqueness, insert/list/delete and grants/RLS pass.
 
-Decisión de sistema: cada superficie de detalle se obtiene con la misma relación cromática, 42% `dayBase` + 58% Texto. Todos los heroes permiten Ink con contraste mínimo superior a 6.6:1. El ritmo funcional queda fijado por layout en 20 px ilustración→metadata, 20 px metadata→CTA, 8 px CTA→progreso y al menos 12 px progreso→navbar.
+**Result.** A minimal server-only durable boundary, independent of Google ingestion and browser state.
 
-## Iteración 12 — Mobile Experience Polish
+**Relevant commit.** `cb9f09eb0f78fb146b780e9af8b3ca25cb0b784f`.
 
-- [x] Extender el color Base de cada DayCover a todo el viewport, también detrás de la navegación flotante.
-- [x] Mantener la navbar fija fuera del transform del deck y reservar CTA/progreso desde altura de navegación, gap y `safe-area` compartidos.
-- [x] Afinar axis lock, seguimiento directo, cancelación, snap de un solo día y resistencia acotada en los extremos.
-- [x] Convertir el progreso 06–13 en feedback continuo durante el drag sin añadir otro indicador.
-- [x] Unificar CTA y gesto vertical sobre la misma apertura; presentar DayDetail desde abajo conservando DayCover debajo.
-- [x] Conservar Día 07 al volver mediante Android/Browser Back, swipe-edge y botón de cierre.
-- [x] Eliminar escalas tipográficas por longitud y usar una única jerarquía DayCoverTitle / FunctionalMeta / CTA.
-- [x] Validar Chromium y WebKit en 360×800, 390×844, 412×915 y 430×932, con los ocho crops a 390×844.
-- [x] Completar quality gate final con lint, tipos, 44 tests, token gate, build, Storybook y navegación histórica.
-- [ ] Crear commit, push y Vercel Preview; no desplegar a producción.
+## Phase 3A — Secure Google Maps resolution boundary
 
-Decisión de interacción: `DayDeck` sigue montando únicamente anterior / actual / siguiente y nunca avanza más de un día. La navegación Días / Guardados / Viaje permanece fija e independiente; su reserva inferior es el único origen geométrico para CTA y progreso. El detalle entra como una capa desde abajo sin sustituir previamente la portada, y todas sus salidas convergen en la misma operación de historial.
+**Purpose.** Parse Maps shares and talk to mocked Places API without weakening the server boundary.
 
-## Iteración 12 — DayCover Full Bleed aprobada
+**Why this phase existed.** Shared text and redirect locations are untrusted, and Text Search can return plausible but incorrect candidates.
 
-- [x] Aprobar en Open Design la dirección B — Full Bleed, su respuesta móvil y el sistema cromático 06–13.
-- [x] Limitar la implementación a `DayCover`, sin modificar Guardados, Viaje ni navegación.
-- [x] Sustituir frame y fecha gigante por fondo continuo, cabecera funcional, titular editorial, ilustración integrada y CTA Lime.
-- [x] Aplicar los roles Base / Texto / Apoyo / Ink a las ocho portadas; reservar Electric Lime para interacción y posición activa.
-- [x] Validar lint, tipos, tests, build y Preview local en Chromium/WebKit para 360×800, 390×844, 412×915 y 430×932.
-- [ ] Esperar aprobación de Preview antes de cualquier despliegue a producción.
+**What changed.** Added bounded share parsing, exact host/path allow-lists, manual redirect resolution with three-hop and time budgets, documented Place-ID parsing, Text Search/Details client, deterministic candidate selection and normalization.
 
-Decisión de alcance: la variante Full Bleed sustituye únicamente la presentación cerrada de las DayCover. El día abierto conserva su composición y paleta previas. La ilustración refinada del Día 07 se activa solo en portada; los demás motivos mantienen su semántica existente dentro de la nueva lógica cromática de colección.
+**Main files / areas.** `src/server/google-maps-share-parser.ts`, `google-maps-url.ts`, `google-maps-url-resolver.ts`, `google-maps-place-resolution.ts`, `google-places-client.ts`, candidate selection/normalizer, [Phase 3A evidence](./PHASE_3A_GOOGLE_MAPS_READINESS.md).
 
-## Iteración 11 — auditoría visual y aplicación mobile-first
+**Validation gate.** Offline parser, SSRF, redirect, provider-contract, candidate ambiguity and normalization tests; no real network, persistence or UI.
 
-- [x] Auditar producción y Storybook en Chromium/WebKit para 360×800, 390×844, 412×915 y 430×932.
-- [x] Documentar hallazgos, prioridades y propuesta DayCover A/B sin alterar navegación, datos ni CRUD.
-- [x] Validar y aprobar DayCover A con Open Design como dirección de implementación.
-- [x] Aplicar correcciones seguras: tipo funcional, apertura táctil, iconos, crop de Hard Rock y stories móviles reales.
-- [x] Implementar la retícula editorial estable de DayCover A en los ocho días.
-- [x] Simplificar ActivityCard conservando anchor / intention / nearby-option.
-- [x] Refinar SavedPlaceCard, TripSectionCard y FlightTicketCard sin cambiar comportamiento.
-- [x] Migrar estilos visibles heredados a tokens DS mediante cambios acotados.
-- [x] Actualizar documentación de ilustraciones, decisiones y evidencia before/after.
-- [x] Ejecutar lint, typecheck, tests, token gate, build y matriz visual móvil antes de cualquier despliegue.
+**Result.** Secure independent boundaries ready for composition.
 
-Decisión móvil: 390×844 es la referencia de composición; 360×800 y 430×932 son límites obligatorios. Todos los controles interactivos mantienen al menos 44 px y la navegación Días / Guardados / Viaje no cambia.
+**Relevant commit.** `b66038dfc2c582b0c45e1273d5fa23ca21769ac6`.
 
-## Iteración 09 — Navigation & Motion Polish
+## Phase 3B — Import orchestration
 
-- [x] Proteger `744c16d`, crear `iteration-09-navigation-motion-polish` y capturar baseline Chromium/WebKit.
-- [x] Localizar en `0cf6abb` la navegación histórica Ink + pill Lime y auditar la causa del flash.
-- [x] Recuperar la intención histórica dentro de `BottomNavigation` de Design System 1.1.
-- [x] Eliminar brightness/opacity del deck sin cambiar portadas ni contenido.
-- [x] Coordinar History API, X, Back, fallback, scroll y foco con una sola API.
-- [x] Añadir swipe-back lateral únicamente a pantallas secundarias.
-- [x] Cerrar Storybook, tests, matriz móvil, capturas y vídeo after.
-- [ ] Publicar Vercel Preview y esperar aprobación antes de producción.
+**Purpose.** Compose share → Maps → Google → normalized candidate into one pre-persistence result.
 
-## Iteración 08 — recuperación móvil y carácter visual
+**Why this phase existed.** Route/UI code needed one provider-neutral outcome rather than knowledge of each network step.
 
-- [x] Proteger baseline, crear rama y auditar producción en Chromium/WebKit y cinco viewports.
-- [x] Sustituir el carrusel libre por `DayDeck` controlado con axis lock y máximo ±1.
-- [x] Recuperar navbar Ink y una reserva inferior única.
-- [x] Madurar DayCover 2.0 con pilotos expresivos 6, 7 y 10.
-- [x] Simplificar día abierto, headers internos y copy redundante.
-- [x] Reconstruir SavedPlaceCard y flight tickets desde Patterns.
-- [x] Añadir historias atmosférica/flat, vertical stack y contenido largo real.
-- [ ] Cerrar gates y Vercel Preview sin tocar producción; vídeo y matriz ya validados.
+**What changed.** Added a server-only orchestrator with injectable redirects, Places client and London evaluator; mapped failures; separated durable prepared identity from transient Google presentation data; returned ready, category-needed or failed outcomes.
 
-## Iteración 06 — base móvil y capítulos ilustrados
+**Main files / areas.** `src/server/google-maps-import-orchestrator.ts` and integration tests.
 
-- [x] Proteger el baseline, ejecutar el quality gate inicial y crear `iteration-06-mobile-foundation`.
-- [x] Centralizar safe areas, viewport dinámico, reserva de navegación, sheets y feedback.
-- [x] Convertir asignación de Guardados en un sheet secuencial de dos pasos.
-- [x] Consolidar formularios móviles con header/footer sticky y compatibilidad con teclado.
-- [x] Crear un sistema SVG común para las ocho portadas sin fotografía principal.
-- [x] Restaurar desde Git la fotografía editorial anterior de Sky Garden.
-- [x] Validar WebKit y Chromium en la matriz móvil y guardar evidencias before/after.
+**Validation gate.** Mocked end-to-end orchestration covers direct Place ID, Text Search, ambiguity, geography, classification, provider errors and repeatability without network/Supabase.
 
-## Iteración 05 — sistema de producto unificado
+**Result.** A composition boundary prepared imports without creating rows or UI state.
 
-- [x] Proteger `fc2a772`, crear `iteration-05-unified-product-system` y capturar baseline.
-- [x] Cerrar investigación práctica, principios y auditoría antes de modificar UI.
-- [x] Unificar shell, navegación Ink, header opcional, safe areas, sheets y feedback.
-- [x] Centralizar spacing, radios, superficies, botones, media provenance y motion.
-- [x] Reimplementar pilotos: portada 7, Guardados y Viaje.
-- [x] Aplicar plantilla editorial a portadas 7, 8 y 10 sin códigos decorativos.
-- [x] Auditar 28 Guardados y sustituir siete por fotografía real licenciada.
-- [x] Diferenciar de forma visible generated editorial y graphic fallback.
-- [x] Cerrar matriz final de navegador, capturas after y láminas before/after.
-- [ ] Reintentar los tres assets Commons limitados por HTTP 429 o solicitar imagen al usuario.
+**Relevant commit.** `e118660979705f60f196a9f461cacd944e92c02e`.
 
-## Iteración 04 — TRAZA: viaje por capas
+## Phase 3C — Authoritative Greater London dataset
 
-El alcance, referencias y decisiones completas están documentados en `ITERATION_04_PLAN.md`, `REFERENCE_AUDIT.md` y `PATTERN_DECISIONS.md`.
+**Purpose.** Replace placeholder geography with a reproducible authoritative boundary.
 
-- [x] Proteger el baseline de Iteración 03 con Git y commit reproducible.
-- [x] Reemplazar L/26/coordenadas por marca TRAZA, header global, favicon y app icon.
-- [x] Documentar componentes, tipografía y superficies; glass limitado a la capa funcional.
-- [x] Completar media y Maps para los 28 lugares con auditoría trazable.
-- [x] Añadir paso Guardados → ¿Dónde quieres colocarlo? y persistencia v4.
-- [x] Implementar Organizar con borrador, cancelar/guardar, locks y controles accesibles.
-- [x] Mantener Días / Guardados / Viaje, CRUD local-first y reduced motion.
-- [ ] Capturar la matriz visual final de Iteración 04 y cerrar QA de navegador.
+**Why this phase existed.** The original spec treated Greater London as a hard scope rule and required deterministic evidence rather than a rough bounding box.
 
-## Iteración 02 — sistema y legibilidad
+**What changed.** Added the GLA source record, OSGB36 → WGS84 build script, versioned full polygon, strict loader and inside/outside/edge/failure tests.
 
-- [x] Auditar producto, código y capturas en 390×844, 430×932, 768×1024 y 1440×900.
-- [x] Centralizar contenido español, fechas y etiquetas semánticas.
-- [x] Añadir tokens tipográficos y capas/zona segura de portada.
-- [x] Reconstruir el escenario responsive del carrusel y añadir teclado.
-- [x] Añadir `MediaAsset` y medios locales reconocibles para Sky Garden y Guardados.
-- [x] Reordenar navegación inferior y áreas scrollables para que no tapen acciones.
-- [x] Implementar asignación local Guardado → Día y reflejarla como opción cercana.
-- [x] Afinar motion y microinteracciones con reduced motion.
-- [x] Actualizar documentación de datos, visual e interacciones.
-- [x] Validar los cuatro viewports, consola, accesibilidad, lint, tipos, tests y build.
+**Main files / areas.** `scripts/build-greater-london-boundary.mjs`, `src/data/greater-london-boundary.json`, `src/domain/london-scope.ts`, [boundary provenance](./GREATER_LONDON_BOUNDARY_SOURCE.md).
 
-### Resultado de validación
+**Validation gate.** Source/hash/license, transformation example, polygon invariants and known points verified offline.
 
-- 390×844, 430×932, 768×1024 y 1440×900 sin overflow de documento.
-- Portada activa centrada, titular dentro de card y navegación sin solapamiento.
-- Flechas de teclado cambian de día en los cuatro viewports.
-- Consola limpia, reduced motion operativo y posición de itinerario preservada.
-- Asignación, movimiento visual y retirada Guardado → Día cubiertos por reducer y navegador.
-- Capturas finales e informes en `screenshots/` y `screenshots/audit-iteration-02/`.
+**Result.** Authoritative context exists. **Evolved final decision:** later physical/product evidence showed day trips must be allowed, so `outside` no longer blocks persistence; invalid/unknown geography still fails. The dataset was retained rather than retconned away.
 
-### Decisiones conservadas
+**Relevant commit.** `505197b22367f2a226b372e08323881e8cd83f6f`; product-rule evolution in `fc965f7236030b6c04c20be5d702fc3b8b7bd8c0`.
 
-- Electric London sigue siendo la dirección aprobada.
-- El cambio entre portadas continúa sobre scroll horizontal nativo con snap.
-- Abrir/cerrar el día mantiene el gesto deliberado y su alternativa visible.
-- Supabase continúa fuera de alcance; la persistencia pasa al repositorio local versionado de Iteración 03.
+## Phase 3D — Real Google provider validation
 
-### Nota de dependencias
+**Purpose.** Exercise the real provider boundary before connecting persistence/UI.
 
-La auditoría de npm continúa señalando avisos transitivos en `postcss` y `sharp` dentro de Next. El `fix --force` sugerido degrada Next de forma incompatible, por lo que no se aplica automáticamente.
+**Why this phase existed.** Mocked contracts could not prove real short-link redirects, API access, response shapes or ambiguity behavior.
 
-## Iteración 03 — utilidad local-first
+**What changed.** Added the production composition root and ran a temporary sanitized harness against three real Maps fixtures. Two resolved/classified; Hamleys stopped as identity-ambiguous. An initial IP restriction failure was fixed in external credential configuration, not code.
 
-El alcance, riesgos y orden completo están documentados en `ITERATION_03_PLAN.md`.
+**Main files / areas.** `src/server/google-maps-import-service.ts`, [real Google evidence](./PHASE_3D_REAL_GOOGLE_VALIDATION.md).
 
-- [x] Corregir horarios, estados, meals y narrativa de los ocho días.
-- [x] Derivar índices, copies, final de capítulo y anchors desde datos reales.
-- [x] Crear ocho themes y motivos semánticos sin el asset genérico anterior.
-- [x] Implementar apertura espacial con handle accesible y reduced motion.
-- [x] Renderizar 28 Guardados y medios/fallbacks diferenciados.
-- [x] Añadir CRUD de lugares y repositorio local versionado con migración/reset.
-- [x] Persistir asignaciones, comidas, planes personalizados y traslados.
-- [x] Añadir restaurante por meal slot, Añadir plan, mover, eliminar y deshacer.
-- [x] Añadir Traslados editables y resumen desplegable de 12 anchors reales.
-- [x] Documentar medios, transición y sistema de motion.
-- [x] Validar flujo móvil y los cuatro viewports sin Supabase.
-# Iteración 07 — TRAZA Design System 1.0
+**Validation gate.** Only approved hosts contacted; no secret output, Supabase call, persistence, PWA or UI; ordinary gates pass after removing the harness.
 
-- [x] Proteger Iteración 06, capturar baseline y crear `iteration-07-design-system-foundation`.
-- [x] Crear tokens semánticos con salidas CSS, Tailwind y TypeScript.
-- [x] Configurar Storybook 10 con Next/Vite, viewports, themes y preferencias.
-- [x] Construir Core, Patterns y frontera Core/Expression.
-- [x] Implementar DayCover 2.0, Lab, overlays y tests de bounds.
-- [x] Migrar pilotos visibles de Días, Guardados y Viaje.
-- [x] Añadir gate de tokens y documentación operativa/Figma.
-- [x] Cerrar matriz WebKit/Chromium, capturas y commit final.
-## Microiteración — approval gate CTA + swipe de DayCover 07
+**Result.** Real Places behavior matched the secured pre-persistence pipeline, including honest ambiguity.
 
-- [x] Mantener CTA ancho y swipe-up como accesos equivalentes sin modificar navegación ni transición.
-- [x] Reutilizar `ChevronIcon` del sistema local de TRAZA como chevron ascendente y centrar el grupo label + icono.
-- [x] Consolidar CTA, progreso activo y BottomNavigation activa sobre `--ds-color-action-accent` (`#d5f43b`).
-- [x] Prototipar un único hint vertical de 8 px / 420 ms con el easing estándar y exclusión para Reduced Motion.
-- [x] Aprobar visualmente DayCover 07 y extender la misma regla CTA, sin variantes, a los días 06–13.
-- [x] Regenerar y revisar las ocho capturas finales y la contact sheet específica sin UI de desarrollo.
+**Relevant commit.** `69c6a2aa12e0f96e992ef8577a3efdd8de6543cd`.
 
-## Microiteración — compactación y safe zone del motif en DayDetail
+## Phase 4 — PWA / Android Web Share Target
 
-- [x] Sustituir la reserva vertical fija del hero por una composición en flujo basada en copy, pausa, motif y padding compartido.
-- [x] Aplicar una safe zone común al motif y mostrar la composición completa en el uso compacto de DayDetail.
-- [x] Auditar DayDetail 06–13 en la matriz móvil y actualizar únicamente la captura final afectada.
+**Purpose.** Make TRAZA installable and reachable from native Google Maps Share.
+
+**Why this phase existed.** Provider/domain work had no Android entry point, and emulator/browser checks cannot prove share-sheet registration.
+
+**What changed.** Added manifest identity/icons, `POST /share` multipart contract, bounded/closed transport, minimal no-fetch service worker and registration.
+
+**Main files / areas.** `src/app/manifest.ts`, `src/app/share/route.ts`, `src/components/service-worker-registration.tsx`, `public/sw.js`, icons, [Phase 4 evidence](./PHASE_4_ANDROID_SHARE_TARGET.md).
+
+**Validation gate.** Manifest/route tests, build asset checks, then physical Android install and Días → Google Maps → Share → TRAZA → Guardados.
+
+**Result.** Native Android Share Target PASS; this checkpoint intentionally opened Guardados without yet persisting a place.
+
+**Relevant commit.** `a1978c295d1d073da79b5cc59063999a38c3d240`.
+
+## Phases 5 + 6 — End-to-end import
+
+**Purpose.** Connect Android Share to persistence and the existing product lifecycle.
+
+**Why this phase existed.** The prior phases were isolated proof points; the assessment required save, duplicate, ambiguity, hydration, delete and add-to-day behavior.
+
+**What changed.** Added signed installation cookie/bootstrap, ten-minute signed category ticket, real `/share` orchestration/persistence, same-origin finalize/delete routes, server hydration, hybrid merge, degraded cards, stable imported IDs, one-shot result toasts, category sheet and local cleanup/assignment integration.
+
+**Main files / areas.** `src/app/share/route.ts`, `api/installation`, `api/imported-places`, `src/server/installation-identity.ts`, `import-ticket.ts`, `finalize-import.ts`, `imported-place-hydration.ts`, `src/domain/hybrid-places.ts`, `TripApp`, [Phases 5–6 evidence](./PHASE_5_6_END_TO_END_IMPORT.md).
+
+**Validation gate.** Offline route/security/lifecycle tests plus controlled real insert → duplicate → list/hydrate → delete in Supabase; physical import/reload/delete acceptance.
+
+**Result.** End-to-end import worked while Supabase stored only relationship data and day placement stayed local.
+
+**Relevant commit.** `48b824c49503f886ba7bb07e109958d1575d8d63`.
+
+## Robustness pass
+
+**Purpose.** Make real `maps.app.goo.gl` shares resilient without broadening trust.
+
+**Why this phase existed.** Android opened a valid short link that Vercel returned as 404 without `Location`; the original server-resolution assumption was false. The same real use showed that a legitimate trip can include outside-London day trips.
+
+**What changed.** Added sanitized title/text fallback only for typed availability failures after source validation; unsafe redirects remain terminal. Removed outside-London rejection/result while retaining geography evaluation and tests.
+
+**Main files / areas.** parser, URL resolver, place resolution, import orchestrator/service, finalize/persistence and result contracts; Phases 5–6 evidence.
+
+**Validation gate.** Regression tests prove safe fallback, rejection boundary and outside continuation; real Android/Preview flow rechecked.
+
+**Result.** Real shares no longer depend on every token resolving server-to-server, and day trips are a final product rule.
+
+**Relevant commit.** `fc965f7236030b6c04c20be5d702fc3b8b7bd8c0`.
+
+## Phase 7 — Google photos, attribution and final UI polish
+
+**Purpose.** Complete transient Google presentation and finish import-specific polish inside existing components.
+
+**Why this phase existed.** Imported places needed current imagery with compliant attribution and failure isolation; the existing mobile toast also exposed a centering defect under Motion transforms.
+
+**What changed.** Added photo parsing/media requests with `no-store`, ephemeral validated URI, Google Maps/source/author attribution, fallback isolation and mobile toast geometry correction. No schema or durable photo data was added.
+
+**Main files / areas.** `src/server/google-places-client.ts`, `imported-place-hydration.ts`, `src/components/media-frame.tsx`, `src/app/globals.css`, [Phase 7 evidence](./PHASE_7_PHOTOS_ATTRIBUTION_QA.md).
+
+**Validation gate.** Provider parsing/media/fallback/attribution tests, mobile bounds check, full repository gates and physical photo/attribution acceptance.
+
+**Result.** Google media is transient and attributed; photo failure never fails import; existing TRAZA cards/toast remain the UI.
+
+**Relevant commit.** `f5a44e6541d20dc0fd3e139aa71ab84ca7311f56`.
+
+## Final QA / regression
+
+**Purpose.** Convert physical Android evidence into a regression at the actual composition boundary.
+
+**Why this phase existed.** Selecting Mediodía/tarde produced correct persisted `section`/`level`, and all tests were green, yet the real Android itinerary rendered the place under Opciones cercanas. Tests had proved storage/helper behavior, not `DayItinerary` composition.
+
+**What changed.** First preserved assignment placement through local state, then explicitly mapped the five combinations: morning/intention, afternoon/intention, evening/intention, anytime/nearby-option and anytime/intention. Added server-rendered component assertions that check the chosen section's markup.
+
+**Main files / areas.** `src/components/day-itinerary.tsx`, `day-itinerary-assignment.test.ts`, `src/components/trip-app.tsx`, `src/data/local-trip-repository.ts`, Phase 7/final QA evidence.
+
+**Validation gate.** 346/346 tests, lint, typecheck and build PASS; physical Android day placement and reload PASS.
+
+**Result.** The renderer now respects the selected temporal block. This is the clearest example of why green tests do not replace supervised real-device acceptance.
+
+**Relevant commits.** `ee11c3b2a2ca4b600bb3bbed18f10833abc96c3a`, then final composition fix `08a45eeabb854bed0b2f50f59b3514ca366de8fb`.
+
+## Final evidence gate
+
+- Final implementation: `08a45eeabb854bed0b2f50f59b3514ca366de8fb`.
+- Automated: 346/346 tests, lint, typecheck and build PASS.
+- External: real Google API validation; isolated Supabase schema/ownership/duplicate checks.
+- Physical: Android Share Target, real import, reload, duplicate, delete, five-intention day placement, photos and attribution PASS.
+- Deployment: feature-branch Vercel Preview validated; no Production deployment and no merge to `main`.
+- Assessment navigation starts at [ASSESSMENT_WALKTHROUGH.md](./ASSESSMENT_WALKTHROUGH.md).

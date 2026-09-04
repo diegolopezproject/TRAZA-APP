@@ -39,7 +39,7 @@ Esta fase no resuelve short links, no invoca el orquestador de importación, Goo
 
 La validación local no demuestra el registro del share target por Android. Ese gate solo pasa instalando por HTTPS el build exacto de Phase 4 en el dispositivo físico.
 
-## Aceptación Android pendiente
+## Procedimiento de reproducción de la aceptación Android
 
 1. Servir por HTTPS un build revisado que contenga el commit de Phase 4; `localhost` solo sirve como diagnóstico de desarrollo.
 2. Desinstalar cualquier TRAZA PWA/WebAPK o acceso directo anterior para evitar que Android conserve un manifiesto/share target obsoleto.
@@ -49,4 +49,4 @@ La validación local no demuestra el registro del share target por Android. Ese 
 6. Confirmar que **TRAZA** aparece como destino del panel de compartir y seleccionarlo.
 7. Confirmar que TRAZA abre Guardados (`#saved`) con el resultado cerrado `shareTarget=accepted`; en Phase 4 no aparecerá un lugar nuevo ni se ejecutará una importación.
 
-Registrar versión de Android/Chrome, URL HTTPS, commit probado y evidencia visual. Si TRAZA no aparece, reinstalar tras verificar que el manifiesto servido contiene el contrato; no debilitar cookies ni añadir un share target GET como workaround.
+Este procedimiento produjo el PASS físico registrado al inicio del documento. Al repetirlo, registrar versión de Android/Chrome, URL HTTPS, commit probado y evidencia visual. Si TRAZA no aparece, reinstalar tras verificar que el manifiesto servido contiene el contrato; no debilitar cookies ni añadir un share target GET como workaround.

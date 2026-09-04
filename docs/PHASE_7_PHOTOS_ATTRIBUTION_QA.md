@@ -1,6 +1,6 @@
 # Phase 7 — Google Photos, atribución y QA final de importación
 
-Fecha de revisión: 3 de septiembre de 2026.
+Fecha de revisión final: 4 de septiembre de 2026.
 
 ## Fuentes oficiales actuales
 
@@ -53,20 +53,22 @@ Cobertura offline focal:
 
 ## QA real — colocación en el itinerario
 
-En Android real, Hotel Riu Plaza London Victoria se importó y persistió correctamente, pero después de Guardados → Añadir a un día → viernes 7 → Mañana aparecía bajo Opciones cercanas.
+En Android real, Hotel Riu Plaza London Victoria se importó y persistió correctamente, pero después de Guardados → Añadir a un día una selección temporal aparecía bajo Opciones cercanas. La evidencia final reprodujo la clase de fallo con Mediodía / tarde.
 
 La asignación local ya conservaba correctamente el ID estable imported:{record UUID}, el día, section: morning y level: intention; LocalTripRepository también mantenía esos campos tras recargar. La pérdida ocurría en DayItinerary: el renderer enviaba todas las asignaciones a la sección final sin consultar PlaceAssignment.section.
 
 El renderer usa las cinco combinaciones existentes: morning/intention, afternoon/intention, evening/intention, anytime/nearby-option y anytime/intention. Las tres primeras se muestran en su bloque temporal; las dos últimas conservan por separado las semánticas Opciones cercanas y Decidir después, aunque ambas mantienen el destino visual flexible existente. La misma regla se aplica a lugares importados y locales, sobrevive al roundtrip y no altera fotos, atribución, toast, Supabase ni el esquema.
 
-La regresión se verifica sobre el markup compuesto por DayItinerary, no solo sobre el helper de agrupación: una asignación importada afternoon aparece dentro de la sección temporal section-1 y no dentro de assigned-title.
+La regresión se verifica sobre el markup compuesto por DayItinerary, no solo sobre el helper de agrupación: una asignación importada `afternoon` aparece dentro de la sección temporal `section-1` y no dentro de `assigned-title`.
 
 Validación browser local en Chrome headless, viewport 390×844 y copy largo `No hemos podido guardar este sitio. Inténtalo de nuevo.`: bounds 14–376 px, ancho 362 px, centro con delta 0, altura 65 px, texto dentro del contenedor y overflow horizontal de documento 0. Se usó un secreto de instalación ficticio solo en memoria para superar el bootstrap local; no se editó `.env.local` ni se realizaron escrituras remotas.
 
-No se limpió Supabase ni seed. No se ejecutó una escritura de validación real adicional porque el pipeline de importación ya está aceptado físicamente y la suite normal debe permanecer offline; la comprobación final del contenido en dispositivo queda asociada al Preview generado por este push.
+No se limpió Supabase ni seed durante el ajuste del renderer. La aceptación final del Preview verificó físicamente la colocación, recarga, foto y atribuciones después de los commits de corrección; la suite ordinaria continuó offline.
 
-## Pendiente conocido
+## Cierre y consideraciones conocidas
 
-- Confirmar en el Preview resultante que las variables server-side requeridas están configuradas, sin mostrar valores.
-- Repetir una comprobación visual física en Android del toast largo y de una foto con autor antes de la demo final.
+- Preview confirmó la disponibilidad de las variables server-side requeridas sin mostrar valores.
+- Android físico confirmó foto Google, marca `Google Maps`, autor cuando estaba disponible y colocación correcta en el itinerario.
+- El toast largo se validó por bounds/overflow en navegador móvil; la evidencia pública no registra valores privados ni contenido de entorno.
 - La deduplicación entre fuentes seed/manual y Google continúa fuera de Phase 7.
+- No hubo cambio de esquema, merge a `main` ni despliegue de Producción.
