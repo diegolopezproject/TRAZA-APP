@@ -9,6 +9,7 @@ describe("import result adapter", () => {
   it.each([
     ["saved", "Lugar guardado"],
     ["duplicate", "Ya tienes guardado este sitio"],
+    ["rate-limited", "Has alcanzado el límite de importaciones de hoy. Inténtalo mañana."],
     ["failed", "No hemos podido guardar este sitio. Inténtalo de nuevo."],
   ] as const)("owns the exact %s toast copy in the UI boundary", (result, message) => {
     expect(IMPORT_RESULT_MESSAGES[result]).toBe(message);

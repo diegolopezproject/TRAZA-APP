@@ -23,12 +23,12 @@ export interface FinalizeRouteDependencies {
     installationId: string;
     ticket: ImportTicketPayload;
     category: TrazaImportCategory;
-  }): Promise<Exclude<ImportResultCode, "needs-category">>;
+  }): Promise<Exclude<ImportResultCode, "needs-category" | "rate-limited">>;
 }
 
 function redirectResult(
   request: Request,
-  result: Exclude<ImportResultCode, "needs-category">,
+  result: Exclude<ImportResultCode, "needs-category" | "rate-limited">,
 ): Response {
   const destination = new URL("/", request.url);
   destination.searchParams.set("importResult", result);

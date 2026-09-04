@@ -9,7 +9,7 @@ import type {
 } from "./imported-place-repository";
 
 export type PersistedPreparedImportResult =
-  | { kind: Exclude<ImportResultCode, "needs-category"> }
+  | { kind: Exclude<ImportResultCode, "needs-category" | "rate-limited"> }
   | { kind: "needs-category"; externalPlaceId: string };
 
 export interface ImportedPlaceInsertPort {

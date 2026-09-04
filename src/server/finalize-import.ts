@@ -29,7 +29,7 @@ export async function finalizePendingImport(
     category: TrazaImportCategory;
   },
   dependencies: FinalizeImportDependencies,
-): Promise<Exclude<ImportResultCode, "needs-category">> {
+): Promise<Exclude<ImportResultCode, "needs-category" | "rate-limited">> {
   try {
     const details = await dependencies.placeDetails(input.ticket.externalPlaceId);
     if (details.id !== input.ticket.externalPlaceId) return "failed";

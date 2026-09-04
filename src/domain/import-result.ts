@@ -2,6 +2,7 @@ export const IMPORT_RESULT_CODES = [
   "saved",
   "duplicate",
   "needs-category",
+  "rate-limited",
   "failed",
 ] as const;
 
@@ -12,6 +13,7 @@ export const IMPORT_RESULT_MESSAGES: Readonly<
 > = {
   saved: "Lugar guardado",
   duplicate: "Ya tienes guardado este sitio",
+  "rate-limited": "Has alcanzado el límite de importaciones de hoy. Inténtalo mañana.",
   failed: "No hemos podido guardar este sitio. Inténtalo de nuevo.",
 };
 

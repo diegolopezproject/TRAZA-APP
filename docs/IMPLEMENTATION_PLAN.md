@@ -200,6 +200,16 @@ Branch: `feat/google-maps-traza-import`
 
 **Relevant commits.** `ee11c3b2a2ca4b600bb3bbed18f10833abc96c3a`, then final composition fix `08a45eeabb854bed0b2f50f59b3514ca366de8fb`.
 
+## Post-assessment Preview cost-safety guard
+
+**Purpose.** Bound Google Places cost while the TRAZA Preview is shared with a small external tester group.
+
+**Scope.** This is a tester/demo safeguard, not a production-scale quota or abuse-prevention system. A server-only Supabase RPC atomically consumes one installation bucket (10 attempts per UTC day) and one global bucket (50 attempts per UTC day) before the accepted share reaches Google Places. Deletion does not change usage; duplicate and failed provider-bound attempts remain consumed.
+
+**Main files / areas.** `src/app/share/route.ts`, `src/server/google-import-attempt-limit.ts`, `supabase/migrations/20260904181336_cap_google_import_attempts.sql`, and the existing closed import-result/toast adapter.
+
+**Validation gate.** Focused limit, failure, rollover and concurrency tests; migration permissions/atomicity contract; ordinary repository gates and the public-repository secrets/security review.
+
 ## Final evidence gate
 
 - Final implementation: `08a45eeabb854bed0b2f50f59b3514ca366de8fb`.

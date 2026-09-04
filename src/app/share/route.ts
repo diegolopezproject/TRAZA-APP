@@ -7,8 +7,12 @@ import type {
   PreparedPlaceImportOutcome,
 } from "@/server/google-maps-import-orchestrator";
 import {
+  parseGoogleMapsSharePayload,
   type GoogleMapsSharePayload,
 } from "@/server/google-maps-share-parser";
+import type {
+  GoogleImportAttemptConsumer,
+} from "@/server/google-import-attempt-limit";
 import {
   clearImportTicketCookieHeader,
   createImportTicket,
@@ -18,6 +22,7 @@ import {
   readInstallationIdFromRequest,
 } from "@/server/installation-identity";
 import {
+  createGoogleImportAttemptLimiter,
   createImportedPlaceRepository,
 } from "@/server/supabase";
 import {
@@ -31,6 +36,7 @@ const SHARE_FIELDS = new Set<keyof GoogleMapsSharePayload>(["title", "text", "ur
 
 export interface ShareRouteDependencies {
   installationId(request: Request): string | null;
+  consumeAttempt: GoogleImportAttemptConsumer["consume"];
   prepare(payload: GoogleMapsSharePayload): Promise<PreparedPlaceImportOutcome>;
   repository(): ImportedPlaceInsertPort;
   issueTicket(input: { installationId: string; externalPlaceId: string }): string;
@@ -146,6 +152,17 @@ export function createShareRouteHandler(dependencies: ShareRouteDependencies) {
       const payload = formData ? extractSharePayload(formData) : null;
       if (!payload) return redirectToSaved(request, "failed");
 
+      const parsed = parseGoogleMapsSharePayload(payload);
+      if (parsed.kind !== "failed") {
+        const attempt = await dependencies.consumeAttempt(installationId);
+        if (attempt.kind !== "allowed") {
+          return redirectToSaved(
+            request,
+            attempt.kind === "exhausted" ? "rate-limited" : "failed",
+          );
+        }
+      }
+
       const prepared = await dependencies.prepare(payload);
       const result = await persistPreparedPlaceImport(prepared, {
         installationId,
@@ -167,9 +184,14 @@ export function createShareRouteHandler(dependencies: ShareRouteDependencies) {
 }
 
 let importService: GoogleMapsImportService | null = null;
+let attemptLimiter: GoogleImportAttemptConsumer | null = null;
 
 export const POST = createShareRouteHandler({
   installationId: (request) => readInstallationIdFromRequest(request),
+  consumeAttempt(installationId) {
+    attemptLimiter ??= createGoogleImportAttemptLimiter();
+    return attemptLimiter.consume(installationId);
+  },
   prepare(payload) {
     importService ??= createGoogleMapsImportService();
     return importService.prepare({ sharePayload: payload });

@@ -17,6 +17,9 @@ function multipart(entries: ReadonlyArray<readonly [string, string | Blob]>): Re
 }
 
 function harness(prepared: PreparedPlaceImportOutcome) {
+  const consumeAttempt = vi.fn<ShareRouteDependencies["consumeAttempt"]>(
+    async () => ({ kind: "allowed" }),
+  );
   const prepare = vi.fn(async () => prepared);
   const insert = vi.fn<ImportedPlaceInsertPort["insert"]>(async () => ({
     kind: "saved" as const,
@@ -31,11 +34,19 @@ function harness(prepared: PreparedPlaceImportOutcome) {
   const issueTicket = vi.fn(() => "signed-ticket");
   const dependencies: ShareRouteDependencies = {
     installationId: () => installationId,
+    consumeAttempt,
     prepare,
     repository: () => ({ insert }),
     issueTicket,
   };
-  return { handler: createShareRouteHandler(dependencies), dependencies, prepare, insert, issueTicket };
+  return {
+    handler: createShareRouteHandler(dependencies),
+    dependencies,
+    consumeAttempt,
+    prepare,
+    insert,
+    issueTicket,
+  };
 }
 
 function ready(): PreparedPlaceImportOutcome {
@@ -81,6 +92,10 @@ describe("POST /share end-to-end adapter", () => {
       "duplicate",
     );
     expect(test.insert).toHaveBeenCalledTimes(1);
+    expect(test.consumeAttempt).toHaveBeenCalledOnce();
+    expect(test.consumeAttempt.mock.invocationCallOrder[0]).toBeLessThan(
+      test.prepare.mock.invocationCallOrder[0],
+    );
   });
 
   it.each([
@@ -91,6 +106,35 @@ describe("POST /share end-to-end adapter", () => {
       await test.handler(multipart([["url", "https://maps.app.goo.gl/EJoMkxSzVytZT5gB9"]])),
       result,
     );
+    expect(test.insert).not.toHaveBeenCalled();
+    expect(test.consumeAttempt).toHaveBeenCalledOnce();
+  });
+
+  it("blocks an exhausted attempt before Google preparation or persistence", async () => {
+    const test = harness(ready());
+    test.consumeAttempt.mockResolvedValueOnce({ kind: "exhausted" });
+
+    await expectResult(
+      await test.handler(multipart([["url", "https://maps.app.goo.gl/EJoMkxSzVytZT5gB9"]])),
+      "rate-limited",
+    );
+
+    expect(test.consumeAttempt).toHaveBeenCalledWith(installationId);
+    expect(test.prepare).not.toHaveBeenCalled();
+    expect(test.insert).not.toHaveBeenCalled();
+    expect(test.issueTicket).not.toHaveBeenCalled();
+  });
+
+  it("fails closed before Google when quota consumption cannot be verified", async () => {
+    const test = harness(ready());
+    test.consumeAttempt.mockResolvedValueOnce({ kind: "failed" });
+
+    await expectResult(
+      await test.handler(multipart([["url", "https://maps.app.goo.gl/EJoMkxSzVytZT5gB9"]])),
+      "failed",
+    );
+
+    expect(test.prepare).not.toHaveBeenCalled();
     expect(test.insert).not.toHaveBeenCalled();
   });
 
@@ -124,6 +168,7 @@ describe("POST /share end-to-end adapter", () => {
     expect(response.headers.get("location")).toContain("/api/installation/bootstrap?");
     expect(test.prepare).not.toHaveBeenCalled();
     expect(test.insert).not.toHaveBeenCalled();
+    expect(test.consumeAttempt).not.toHaveBeenCalled();
   });
 
   it.each([
@@ -144,5 +189,6 @@ describe("POST /share end-to-end adapter", () => {
     await expectResult(response, "failed");
     expect(response.headers.get("location")).not.toContain("private");
     expect(test.prepare).not.toHaveBeenCalled();
+    expect(test.consumeAttempt).not.toHaveBeenCalled();
   });
 });

@@ -6,6 +6,10 @@ import {
   ImportedPlaceRepository,
 } from "./imported-place-repository";
 import {
+  createSupabaseGoogleImportAttemptDataSource,
+  GoogleImportAttemptLimiter,
+} from "./google-import-attempt-limit";
+import {
   readSupabaseServerConfig,
   type SupabaseServerEnvironment,
 } from "./supabase-config";
@@ -30,4 +34,13 @@ export function createImportedPlaceRepository(
 ): ImportedPlaceRepository {
   const client = createSupabaseServerClient(environment);
   return new ImportedPlaceRepository(createSupabaseImportedPlaceDataSource(client));
+}
+
+export function createGoogleImportAttemptLimiter(
+  environment: SupabaseServerEnvironment = process.env,
+): GoogleImportAttemptLimiter {
+  const client = createSupabaseServerClient(environment);
+  return new GoogleImportAttemptLimiter(
+    createSupabaseGoogleImportAttemptDataSource(client),
+  );
 }
